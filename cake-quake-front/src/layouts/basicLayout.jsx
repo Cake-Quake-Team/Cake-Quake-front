@@ -1,15 +1,16 @@
+// layouts/BasicLayout.jsx
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import { Outlet } from "react-router";
 
 function BasicLayout() {
     return (
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col"> {/* <-- 이 구조가 Tailwind 적용을 전제로 함 */}
             <Header />
             <main className="flex-grow">
                 <Outlet />
             </main>
-            <Footer />
+            <Footer /> {/* <-- 여기에 푸터가 위치 */}
         </div>
     );
 }

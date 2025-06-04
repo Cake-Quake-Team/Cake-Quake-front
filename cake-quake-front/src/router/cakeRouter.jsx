@@ -10,7 +10,7 @@ const Loading = <div>Cake Loading...</div>;
 
 export default function cakeRouter() {
     return {
-        path: "cake",
+        path: "/cake",
         element: <Suspense fallback={Loading}><CakeIndex /></Suspense>,
         children: [
             {
