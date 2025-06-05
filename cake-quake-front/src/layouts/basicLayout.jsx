@@ -1,12 +1,13 @@
 // layouts/BasicLayout.jsx
-import Header from "../components/common/Header";
+
 import Footer from "../components/common/Footer";
 import { Outlet } from "react-router";
+import BuyerHeader from "../components/common/buyerHeader.jsx";
 
 function BasicLayout() {
     return (
         <div className="min-h-screen flex flex-col"> {/* <-- 이 구조가 Tailwind 적용을 전제로 함 */}
-            <Header />
+            <BuyerHeader />
             <main className="flex-grow">
                 <Outlet />
             </main>
