@@ -3,13 +3,9 @@ import BasicLayout from "../layouts/BasicLayout";
 import MainPage from "../pages/mainPage";
 import {createBrowserRouter} from "react-router";
 import {lazy, Suspense} from "react";
-import cakeRouter from "./cakeRouter.jsx"; // mainPage.jsx의 export default MainPage; 에 대응
-
-const CakeList = lazy(() => import("../pages/cake/listPage"));
-const CakeRead = lazy(() => import("../pages/cake/readPage"));
-const CakeAdd = lazy(() => import("../pages/cake/addPage"));
-const CakeModify = lazy(() => import("../pages/cake/modifyPage"));
-const CakeIndex = lazy(() => import("../pages/cake/indexPage"));
+import cakeRouter from "./cakeRouter.jsx";
+import sellerRouter from "./sellerRouter.jsx";
+import adminRouter from "./adminRouter.jsx";
 
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
@@ -25,7 +21,10 @@ const mainRouter = createBrowserRouter([
                 element: <Suspense fallback={Loading}><MainPage /></Suspense>
             },
 
-            cakeRouter()
+            cakeRouter(),
+            sellerRouter(),
+            adminRouter()
+
 
 
         ]

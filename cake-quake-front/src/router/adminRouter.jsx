@@ -1,17 +1,20 @@
 import AdminLayout from "../layouts/adminLayout.jsx";
 import Shops from "../pages/admin/shops.jsx";
 import Reviews from "../pages/admin/reviews.jsx";
+import mainRouter from "./mainRouter.jsx";
 
-const adminRoutes  = [
-    {
+const adminRouter  = ()=> {
+    return {
         path: "/admin",
-        element: <AdminLayout />,
+        element: <AdminLayout/>,
         children: [
-            { path: "shops", element: <Shops /> },      // /admin/shops
-            { path: "reviews", element: <Reviews /> },  // /admin/reviews
+            {path: "shops", element: <Shops/>},      // /admin/shops
+            {path: "reviews", element: <Reviews/>},  // /admin/reviews
 
         ]
-    }
-];
 
-export default adminRoutes ;
+    }
+}
+
+
+export default adminRouter ;
