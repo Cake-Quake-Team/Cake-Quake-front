@@ -7,19 +7,19 @@ const ShopCard = ({ shop }) => {
     // 별을 렌더링하는 함수
     const renderStars = (rating) => {
         const fullStars = Math.floor(rating); // 정수 부분 (꽉 찬 별)
-        const halfStar = rating % 1 !== 0; // 소수점이 있으면 반 별
+        const halfStar = rating % 1 !== 0 && rating %1>=0.5; // 소수점이 있으면 반 별
         const emptyStars = 5 - Math.ceil(rating); // 빈 별 (총 5개에서 채워진 별 뺀 나머지)
 
         let stars = [];
 
         // 꽉 찬 별 추가
         for (let i = 0; i < fullStars; i++) {
-            stars.push(<span key={`full-${i}`}>⭐</span>); // 꽉 찬 별 이모지
+            stars.push(<span key={`full-${i}`} style={{ color: 'gold' }}>★</span>); // 꽉 찬 별 이모지
         }
 
         // 반 별 추가 (소수점이 있는 경우)
         if (halfStar) {
-            stars.push(<span key="half">⭐️</span>); // 반 별 또는 다른 이모지 사용 가능
+            stars.push(<span key="half" style={{ color: 'gold' }}>★</span>); // 반 별 또는 다른 이모지 사용 가능
         }
 
         // 빈 별 추가

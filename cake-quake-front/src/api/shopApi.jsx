@@ -4,9 +4,9 @@ export const API_SERVER_HOST = "http://localhost:8080";
 const prefix = `${ API_SERVER_HOST }/api`;
 
 // 가게 목록 가져오기
-export const getShopListInfinity = async ({ page = 1, keyword = "", size = 8 }) => {
+export const getShopListInfinity = async ({ page = 1, keyword = "", size = 8 ,filter = "", sort = "shopId"}) => {
     const response = await axios.get(`${prefix}/shops`, {
-        params: { page, size, keyword },
+        params: { page, size, keyword,status:filter,sort },
     })
     return response.data;
 }
