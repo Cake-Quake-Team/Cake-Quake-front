@@ -1,7 +1,8 @@
 import axios from "axios";
-import {getCookie, setCookie} from "~/util/cookieUtil";
+import {getCookie, setCookie} from "./cookieUtil";
 
 const jwtAxios = axios.create()
+const baseUrl = import.meta.env.VITE_API_BASE_URL
 
 //요청 보내기 전에 추가 작업
 const beforeReq = (config) => {
@@ -26,17 +27,19 @@ const beforeRes = async (res) => {
     return res
 }
 
-// 응답 실패 시 추가 작업업
+// 응답 실패 시 추가 작업
 const responseFail = async (err) => {
     console.log("---------응답 실패 오류---------")
     console.log(err)
 
     // 401 unauthorized
     if (err.response?.status === 401) {
-        const msg = getErrorMsg(err)
+        // const msg = getErrorMsg(err)
+        const errorCode = err.response.data?.code
 
         // refresh 이용해서 다시 한 번 시도
-        if (msg === "Expired token") {
+        // if (msg === "Expired token") {
+        if (errorCode === 804) {
             console.log("---------만료된 토큰을 새로 고침---------")
 
             try {
@@ -45,6 +48,7 @@ const responseFail = async (err) => {
                 return newResponse
             } catch (refreshError) {
                 console.log("Token refresh failed", refreshError)
+                // window.location.href = "/auth/signin"
             }
         } // end if
     } // end if
@@ -54,6 +58,7 @@ const responseFail = async (err) => {
 
 // 토큰 갱신 함수
 async function refreshTokens(originalConfig) {
+    console.log("---토큰 재발급 요청 시작")
 
     const accessToken = getCookie("access_token")
     const refreshToken = getCookie("refresh_token")
@@ -67,16 +72,18 @@ async function refreshTokens(originalConfig) {
 
     // 토큰 갱신 요청
     const res = await axios.post(
-        "http://localhost:8080/api/v1/member/refresh",
+        `${baseUrl}/auth/refresh`,
         { refreshToken },
         header
     )
 
-    const newAccessToken = res.data[0]
-    const newRefreshToken = res.data[1]
+    const newAccessToken = res.data.accessToken;
+    const newRefreshToken = res.data.refreshToken;
 
     setCookie("access_token", newAccessToken, 1)
     setCookie("refresh_token", newRefreshToken, 7)
+
+    console.log("토큰 재발급 성공")
 
     // 원래 요청의 Authorization 헤더를 새로운 토큰으로 수정
     if (originalConfig) {

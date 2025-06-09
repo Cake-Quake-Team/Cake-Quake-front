@@ -7,7 +7,7 @@ export const setCookie = (name, value, days) => {
     const expires = new Date()
     expires.setUTCDate(expires.getUTCDate() + days ) //보관기한
 
-    // 경로설정정. 앱 전체에서 사용
+    // 경로설정. 앱 전체에서 사용
     return cookies.set(name, value, {path: '/', expires: expires})
  
 }

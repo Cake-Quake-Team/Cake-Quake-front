@@ -1,30 +1,34 @@
 import { useState } from "react";
 import { getToken } from "../../api/memberApi";
 import kakaoIcon from "../../assets/kakao-loginicon.png";
+import { setCookie } from "../../utils/cookieUtil";
+import { Link, useNavigate } from "react-router";
 
 
 const SigninComponent = () => {
-    const [userid, setUserId] = useState("");
-    const [password, setPassword] = useState("");
+    const [userId, setUserId] = useState("")
+    const [password, setPassword] = useState("")
+    const [errorMessage, setErrorMessage] = useState('')
 
-    const handleSubmit = (e) => {
+    const navigate = useNavigate()
+
+    const handleSubmit = async(e) => {
         e.preventDefault()
-        // 여기에 로그인 로직 추가
-        console.log("ID:", userid, "PW:", password)
+        setErrorMessage('') // 이전 에러 초기화
 
         try{
             // accessToken, refreshToken을 쿠키에 저장
-            getToken(userid, password).then((res) => {
-                const accessToken = res[0]
-                const refreshToken = res[1]
+            const {accessToken, refreshToken} = await getToken(userId, password)
     
                 setCookie('access_token', accessToken, 1)
                 setCookie('refresh_token', refreshToken, 7)
-            })
 
-            // 로그인 성공 후 페이지 이동 등 처리
+            // 로그인 성공 후 메인 페이지로 이동
             console.log("로그인 성공")
+            navigate('/')
         } catch (err) {
+            const msg = err?.response?.data?.message || '로그인 중 오류가 발생했습니다.'
+            setErrorMessage(msg)
             console.error("로그인 실패", err)
         }
     };
@@ -35,11 +39,11 @@ const SigninComponent = () => {
                 <h2 className="text-2xl font-bold mb-6 text-center">Please sign in</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label htmlFor="userid" className="block text-sm font-medium text-gray-700"></label>
+                        <label htmlFor="userId" className="block text-sm font-medium text-gray-700"></label>
                         <input
-                            id="userid"
+                            id="userId"
                             type="text"
-                            value={userid}
+                            value={userId}
                             onChange={(e) => setUserId(e.target.value)}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="아이디 입력"
@@ -58,18 +62,22 @@ const SigninComponent = () => {
                             required
                         />
                     </div>
-                    <div className="flex items-center">
+                    {/* <div className="flex items-center">
                         <input type="checkbox" id="remember" className="mr-2" />
                         <label htmlFor="remember" className="text-sm text-gray-600">
                             자동 로그인
                         </label>
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full bg-teal-400 text-white py-2 rounded-lg hover:bg-teal-500 transition"
-                    >
+                    </div> */}
+                    {errorMessage && (
+                        <div style={{ color: 'red', marginTop: '8px' }}>{errorMessage}</div>
+                    )}
+                    <button type="submit"
+                            className="w-full bg-teal-400 text-white py-2 rounded-lg hover:bg-teal-500 transition font-bold">
                         로그인
                     </button>
+                    <Link to="/auth/signup" className="w-full block text-center bg-rose-50 text-gray-700 py-2 rounded-lg hover:bg-rose-200 transition font-bold">
+                        처음 방문하셨나요? 회원 가입(Sign up)
+                    </Link>
 
                     <div className="mt-6 text-center text-sm text-gray-500">
                         Login with OAuth 2.0
