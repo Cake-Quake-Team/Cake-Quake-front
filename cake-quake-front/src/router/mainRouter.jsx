@@ -6,8 +6,10 @@ import {lazy, Suspense} from "react";
 import cakeRouter from "./cakeRouter.jsx";
 import sellerRouter from "./sellerRouter.jsx";
 import adminRouter from "./adminRouter.jsx";
+import buyerRouter from "./reviewRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
+
 
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
@@ -26,9 +28,9 @@ const mainRouter = createBrowserRouter([
             cakeRouter(),
             sellerRouter(),
             adminRouter(),
+            buyerRouter()
             authRouter(),
             memberRouter(),
-
 
 
         ]
