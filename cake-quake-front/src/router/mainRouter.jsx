@@ -9,6 +9,7 @@ import adminRouter from "./adminRouter.jsx";
 import buyerRouter from "./reviewRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
+import shopRouter from "./shopRouter.jsx";
 
 
 
@@ -31,6 +32,7 @@ const mainRouter = createBrowserRouter([
             buyerRouter()
             authRouter(),
             memberRouter(),
+            shopRouter()
 
 
         ]
