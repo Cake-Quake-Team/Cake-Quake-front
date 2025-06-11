@@ -1,4 +1,7 @@
-import {Star} from "lucide-react";
+import React from 'react';
+import { MapPin, Clock, Phone, Star, Heart, Share2 ,ArrowLeft} from 'lucide-react';
+import {Navigate, useNavigate} from "react-router";
+
 
 //평점 별 채우기
 const renderStars=(rating)=> {
@@ -22,8 +25,20 @@ const renderStars=(rating)=> {
 
 const ShopDetailSection=({shop})=>{
     const numericRating =parseFloat(shop.rating);
+    const navigate =useNavigate();
     return(
-        <div className="text-center mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+
+        <div className="relative text-center mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+            {/* 목록으로 돌아가기 */}
+            <div className="absolute top-4 left-4">
+                <span
+                    onClick={() => navigate('/shop')}
+                    className="flex items-center text-gray-500 hover:text-blue-600 cursor-pointer text-sm transition-colors"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    목록으로 돌아가기
+                </span>
+            </div>
             {/* 프로필 이미지 (원형) */}
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden mx-auto mb-5 border-4 border-blue-200 shadow-xl">
                 <img
@@ -65,6 +80,7 @@ const ShopDetailSection=({shop})=>{
                     <Share2 className="mr-2 w-6 h-6" /> 공유하기
                 </button>
             </div>
+
             {/*추가 URL 정보*/}
             {(shop.websiteUrl || shop.instagramUrl) && (
                 <div className="mt-4 text-sm text-gray-600">
@@ -82,8 +98,10 @@ const ShopDetailSection=({shop})=>{
                             </a>
                         </p>
                     )}
+
                 </div>
             )}
+
         </div>
     );
 };
