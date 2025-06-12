@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import ShopFilterBar from "../../components/shop/shopFilterBar.jsx";
-import ShopList from "../../components/shop/shopList.jsx";
+import ShopFilterBar from "../../components/shop/list/shopFilterBar.jsx";
+import ShopList from "../../components/shop/list/shopList.jsx";
 import {getShopListInfinity} from "../../api/shopApi.jsx";
 
 const MainPage = () => {
