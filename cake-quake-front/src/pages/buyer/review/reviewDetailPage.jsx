@@ -38,16 +38,17 @@ export default function ReviewDetailPage() {
     return (
         <div className="max-w-2xl mx-auto p-6">
             {/* 페이지 제목 */}
-            <h1 className="text-3xl font-bold text-center mb-6 relative inline-block">
+            {/* 제목 */}
+            <h2 className="text-xl font-bold text-center relative mb-6">
                 리뷰 상세
-                <span className="absolute left-0 bottom-0 w-full h-1 bg-green-400"></span>
-            </h1>
+                <span  className="absolute bottom-0 left-1/2 w-[100px] h-0.5 bg-black -translate-x-1/2"></span>
+            </h2>
 
             {/* 상세 컴포넌트 */}
             <ReviewDetail
                 review={review}
                 onBack={() => nav(-1)}  // 뒤로가기
-                onDelete={handleDelete()}
+                onDelete={handleDelete}
                 onEdit={() => nav(`/buyer/reviews/${reviewId}/edit`)}
             />
         </div>

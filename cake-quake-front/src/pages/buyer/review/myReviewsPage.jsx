@@ -8,7 +8,7 @@ export default function MyReviewsPage() {
     const [page,setPage] =useState(1);
     const [loading, setLoading] = useState(false);
     const [hasNext,setHasNext] = useState(true);
-    const nav = useNavigate()();
+    const nav = useNavigate();
 
     // useEffect(() => {
     //     setLoading(true);
@@ -50,17 +50,21 @@ export default function MyReviewsPage() {
 
     //수정 버튼 클릭 시 상세 페이지로 이동
     const handleEdit = reviewId => {
-        nav(`/buyer/reviews/${reviewId}`);
+        nav(`/buyer/reviews/${reviewId}/edit`);
     };
+
+     const handleDetail = reviewId => {
+            nav(`/buyer/reviews/${reviewId}`);
+         };
 
 
     return (
         <div className="max-w-3xl mx-auto p-6">
-            {/* 페이지 제목 */}
-            <h1 className="text-3xl font-bold text-center mb-6 relative inline-block">
+            {/* 제목 */}
+            <h2 className="text-xl font-bold text-center relative mb-6">
                 나의 리뷰
-                <span className="absolute left-0 bottom-0 w-full h-1 bg-green-400"></span>
-            </h1>
+                <span  className="absolute bottom-0 left-1/2 w-[100px] h-0.5 bg-black -translate-x-1/2"></span>
+            </h2>
 
             {/* 리뷰 리스트 컴포넌트 */}
             <ReviewList
@@ -69,6 +73,7 @@ export default function MyReviewsPage() {
                 hasNext={hasNext}
                 onLoadMore={handleLoadMore}
                 onEdit={handleEdit}
+                onDetail={handleDetail}
             />
         </div>
     );

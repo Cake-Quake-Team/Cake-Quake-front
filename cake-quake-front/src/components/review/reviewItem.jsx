@@ -1,12 +1,12 @@
 import React from 'react';
 
-export default function ReviewItem({ review, onEdit }) {
+export default function ReviewItem({ review, onEdit,onDetail }) {
     return (
         <div className="flex items-start bg-white border rounded-lg shadow-sm p-4">
             {/* 썸네일 */}
             <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-md border">
                 {review.reviewPictureUrl
-                    ? <img src={review.reviewPictureUrl} alt="" className="object-cover w-full h-full"/>
+                    ? <img src={`http://localhost${review.reviewPictureUrl}`} alt="" className="object-cover w-full h-full"/>
                     : <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">No Image</div>
                 }
             </div>
@@ -33,6 +33,13 @@ export default function ReviewItem({ review, onEdit }) {
                         ))}
                     </div>
                     {/* 수정 버튼 */}
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={() => onDetail(review.reviewId)}
+                            className="px-3 py-1 border rounded text-sm hover:bg-gray-50"
+                        >
+                            상세보기
+                        </button>
                     <button
                         onClick={() => onEdit(review.reviewId)}
                         className="text-sm px-3 py-1 border rounded hover:bg-gray-100"
@@ -42,5 +49,8 @@ export default function ReviewItem({ review, onEdit }) {
                 </div>
             </div>
         </div>
+
+        </div>
     );
+
 }

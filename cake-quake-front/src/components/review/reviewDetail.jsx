@@ -1,31 +1,29 @@
 import React from 'react';
 
-export default function ReviewDetail({ review,onEdit,onDelete, onBack }) {
+export default function ReviewDetail({ review, onEdit, onDelete, onBack }) {
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-            {/* 1. 리뷰 이미지: 있는 경우에만 표시 */}
+            {/* 1. 원본 이미지 */}
             {review.reviewPictureUrl && (
                 <img
-                    src={review.reviewPictureUrl}
+                    src={`http://localhost${review.reviewPictureUrl}`}
                     alt={`리뷰 이미지 ${review.reviewId}`}
-                    className="w-full h-64 object-cover rounded mb-6"
+                    className="w-full h-auto object-contain rounded mb-6"
+                    loading="lazy"
                 />
             )}
 
-            {/* 2. 리뷰 제목(대표 내용): 본문 앞부분 또는 요약 */}
-            <h2 className="text-2xl font-semibold mb-4">
-                {review.content}
-            </h2>
 
-            {/* 3. 별점 표시: 5개의 스타 아이콘 중 rating 개수만큼 채움 */}
+            {/* 3. 별점 */}
             <div className="flex items-center text-yellow-500 mb-4">
-                {Array.from({ length: 5 }, (_, i) => (
+                {Array.from({length: 5}, (_, i) => (
                     <svg
                         key={i}
                         viewBox="0 0 20 20"
                         className={`w-5 h-5 fill-current ${i < review.rating ? '' : 'text-gray-300'}`}
                     >
-                        <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.954L10 0l2.951 5.956 6.561.954-4.756 4.635 1.122 6.545z" />
+                        <path
+                            d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.954L10 0l2.951 5.956 6.561.954-4.756 4.635 1.122 6.545z"/>
                     </svg>
                 ))}
             </div>
@@ -35,9 +33,9 @@ export default function ReviewDetail({ review,onEdit,onDelete, onBack }) {
                 {review.content}
             </p>
 
-            {/* 5. 작성일 표시 */}
+            {/* 5. 작성일 */}
             <div className="text-xs text-gray-500 mb-6">
-                작성일: {new Date(review.createdAt).toLocaleString()}
+                작성일: {new Date(review.regDate).toLocaleString()}
             </div>
 
             {/* 버튼 그룹 */}
