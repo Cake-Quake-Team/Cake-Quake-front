@@ -40,3 +40,13 @@
 .read-the-docs {
   color: #888;
 }
+
+/* 스크롤바 숨기기 공통 스타일 */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
