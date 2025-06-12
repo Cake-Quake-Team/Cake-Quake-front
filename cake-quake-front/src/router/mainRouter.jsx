@@ -29,7 +29,7 @@ const mainRouter = createBrowserRouter([
             cakeRouter(),
             sellerRouter(),
             adminRouter(),
-            buyerRouter()
+            buyerRouter(),
             authRouter(),
             memberRouter(),
             shopRouter()
