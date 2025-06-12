@@ -9,19 +9,12 @@ import CakeListSection from "../../components/shop/read/CakeListSection.jsx";
 const ShopDetailPage = () => {
     const { cid} = useParams();
     const [shopDetail, setShopDetail] = useState(null);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         const loadShopDetail = async () => {
             setShopDetail(null); // 새로운 shopId로 로딩 시 기존 데이터 초기화 (선택 사항)
-            setError(null);
-            try {
-                const data = await getShopDetail(cid);
-                setShopDetail(data);
-            } catch (err) {
-                setError("매장 상세 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.");
-                console.error("Error fetching shop detail:", err);
-            }
+            const data = await getShopDetail(cid);
+            setShopDetail(data);
         };
 
         if (cid) { // shopId가 유효할 때만 데이터 로드
@@ -30,17 +23,6 @@ const ShopDetailPage = () => {
     }, [cid]); // shopId가 변경될 때마다 useEffect 재실행
 
 
-    if (error) {
-        return (
-            <main className="flex-grow max-w-3xl w-full mx-auto px-4 py-8 md:px-0">
-                <div className="text-center p-8 bg-red-100 text-red-700 rounded-lg shadow-md">
-                    <p className="text-xl font-semibold mb-4">오류 발생</p>
-                    <p>{error}</p>
-                    <p className="text-sm mt-4">잠시 후 다시 시도하거나, 다른 매장을 검색해보세요.</p>
-                </div>
-            </main>
-        );
-    }
 
     if (!shopDetail) {
         return (
