@@ -10,6 +10,7 @@ import buyerRouter from "./reviewRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
+import reviewRouter from "./reviewRouter.jsx";
 
 
 
@@ -29,7 +30,7 @@ const mainRouter = createBrowserRouter([
             cakeRouter(),
             sellerRouter(),
             adminRouter(),
-            buyerRouter(),
+            reviewRouter(),
             authRouter(),
             memberRouter(),
             shopRouter()
