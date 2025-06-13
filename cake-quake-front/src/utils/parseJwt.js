@@ -10,7 +10,7 @@ export const parseJwt = (token) => {
         .map(c => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
         .join('')
     );
-    return JSON.parse(jsonPayload); // { sub, exp, role, ... }
+    return JSON.parse(jsonPayload); // { userId, uname, role }
   } catch (e) {
     console.error('Invalid JWT token', e);
     return null;
