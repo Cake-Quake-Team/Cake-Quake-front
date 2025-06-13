@@ -1,9 +1,9 @@
 import { Link } from "react-router";
-import cakeImage from "../../assets/signup_lettering_cake.jpg";
+import cakeImage from "../../../assets/signup_lettering_cake.jpg";
 
 const SignupComponent = () => {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-white px-4">
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl flex flex-col items-center">
                 <div className="flex flex-col md:flex-row items-center w-full mb-6">
                     {/* 이미지 */}
@@ -26,13 +26,13 @@ const SignupComponent = () => {
                 {/* 버튼 영역 */}
                 <div className="w-full flex flex-col md:flex-row gap-4">
                     <Link
-                        to="/auth/buyer/signup"
+                        to="/auth/signup/buyer"
                         className="w-full text-center bg-rose-50 text-gray-700 py-2 rounded-lg hover:bg-rose-200 transition font-bold"
                     >
                         일반 회원 가입
                     </Link>
                     <Link
-                        to="/auth/seller/signup"
+                        to="/auth/signup/seller-step1"
                         className="w-full text-center bg-rose-50 text-gray-700 py-2 rounded-lg hover:bg-rose-200 transition font-bold"
                     >
                         판매자 회원 가입

@@ -1,21 +1,16 @@
-import { Link } from "react-router";
-import {useState} from "react";
+import { Link, useNavigate } from "react-router";
 import {Search, ShoppingCart} from "lucide-react";
+import { useAuth } from "../../store/AuthContext";
 
 function BuyerHeader() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const {user, signOut} = useAuth()
+    const navigate = useNavigate()
 
-    // 로그인 처리 함수
-    const handleLogin = () => {
-        console.log("로그인 시도....");
-        setIsLoggedIn(true);
-    };
-
-    // 로그아웃 처리 함수
-    const handleLogout = () => {
-        console.log("로그아웃 시도");
-        setIsLoggedIn(false);
-    };
+    // 로그아웃
+    const handleSignOut = async () => {
+        await signOut() // 쿠키 제거
+        navigate('/auth/signin')
+    }
 
     return (
         <header className="w-full border-b shadow-sm bg-white">
@@ -29,24 +24,32 @@ function BuyerHeader() {
                 <div className="flex items-center space-x-4">
                     <Search className="w-5 h-5 cursor-pointer" />
                     <ShoppingCart className="w-5 h-5 cursor-pointer" />
-                    {isLoggedIn ? (
-                        <button
-                            onClick={handleLogout}
-                            className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
-                        >
-                            로그아웃
-                        </button>
+                    {user ? (
+                        <>
+                            <span className="text-sm font-semibold text-gray-700">
+                                {user.uname}님
+                            </span>
+                            <button
+                                onClick={handleSignOut}
+                                className="w-[90px] text-sm bg-blue-100 hover:bg-blue-300 font-bold py-2 px-3 rounded-lg text-center"
+                            >
+                                로그아웃
+                            </button>
+                        </>
                     ) : (
                         <>
-                            <button
-                                onClick={handleLogin}
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                            <Link
+                                to="/auth/signin"
+                                className="w-[90px] text-sm text-center bg-teal-400 text-white px-3 py-2 rounded-lg hover:bg-teal-500 transition font-bold"
                             >
                                 로그인
-                            </button>
-                            <button className="text-sm border px-3 py-1 rounded-md hover:bg-gray-100">
-                                회원가입
-                            </button>
+                            </Link>
+                            <Link
+                                to="/auth/signup"
+                                className="w-[90px] text-sm text-center bg-rose-50 text-gray-700 px-3 py-2 rounded-lg hover:bg-rose-200 transition font-bold"
+                            >
+                                회원 가입
+                            </Link>
                         </>
                     )}
                 </div>
