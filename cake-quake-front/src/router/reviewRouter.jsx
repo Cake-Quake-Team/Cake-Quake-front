@@ -5,11 +5,19 @@ const MyReviewsPage     = lazy(() => import("../pages/buyer/review/myReviewsPage
 const ReviewCreatePage = lazy(()=>import("../pages/buyer/review/reviewCreatePage.jsx"));
 const ReviewDetailPage = lazy(()=>import("../pages/buyer/review/reviewDetailPage.jsx"));
 const ReviewEditPage = lazy(()=> import("../pages/buyer/review/reviewEditPage.jsx"));
+
+const SellerReviewPage = lazy(()=>import("../pages/shop/review/sellerReviewPage.jsx"));
+const SellerReviewDetailPage = lazy(()=>import("../pages/shop/review/sellerReviewDetailPage.jsx"))
+
 const Loading = <div>Loading...</div>
 
 const ReviewRouter = () =>({
-    path: "buyer",
+    path: "",
     children: [
+        //buyer 페이지
+        {
+            path: "buyer",
+            children:[
         //내 리뷰 리스트
         {
             index: false,
@@ -47,16 +55,32 @@ const ReviewRouter = () =>({
                     <ReviewEditPage/>
                 </Suspense>
             )
+        }]
         },
 
-        //잘못된 /buyer경로 다이렉트
+        //seller페이지
         {
-            path:'',
-            element: <Navigate to="reviews" replace/>
+            path:'seller',
+            children: [
+                    {
+                    index:false,
+                    path: "shops/:shopId/reviews",
+                    element:(
+                        <Suspense fallback={Loading}>
+                            <SellerReviewPage/>
+                        </Suspense>
+                    )
+                },
+                {
+                    path: "shops/:shopId/reviews/:reviewId",
+                    element:(
+                        <Suspense fallback={Loading}>
+                            <SellerReviewDetailPage/>
+                        </Suspense>
+                    )
+                }
+            ]
         }
-
-
-
         ]
 });
 export default ReviewRouter;

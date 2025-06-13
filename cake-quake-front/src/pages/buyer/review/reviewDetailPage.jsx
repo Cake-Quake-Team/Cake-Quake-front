@@ -1,56 +1,42 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from "react-router";
-import {deleteMyReview, getMyReviewDetail} from "../../../api/reviewApi.jsx";
-import ReviewDetail from "../../../components/review/reviewDetail.jsx";
+// src/pages/buyer/review/ReviewDetailPage.jsx
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router';
+import ReviewDetail from '../../../components/review/reviewDetail.jsx';
+import { getMyReviewDetail, deleteMyReview } from '../../../api/reviewApi.jsx';
 
 export default function ReviewDetailPage() {
-    const {reviewId} = useParams();
-    const [review, setReview] = useState(null);
+    const { reviewId } = useParams();
     const nav = useNavigate();
+    const [review, setReview] = useState(null);
 
-    useEffect(()=>{
-        async function fetchDetail() {
+    useEffect(() => {
+        (async () => {
             try {
                 const data = await getMyReviewDetail(reviewId);
                 setReview(data);
-            } catch (e) {
-                console.error('리뷰 상세 로드 실패', e);
+            } catch {
+                alert('리뷰를 불러올 수 없습니다.');
+                nav('/buyer/reviews');
             }
-        }
-        fetchDetail();
-    },[reviewId]);
+        })();
+    }, [reviewId, nav]);
 
-
-    const handleDelete = async() => {
-        if (!window.confirm('정말 이 리뷰를 삭제하시겠습니까?')) return;
-        try {
-            await deleteMyReview(reviewId);
-            alert('리뷰가 삭제 되었습니다');
-            nav('/buyer/reviews');
-        } catch (e) {
-            console.error('리뷰 삭제 실패', e);
-            alert('삭제에 실패했습니다.')
-        }
+    const handleDelete = async () => {
+        if (!window.confirm('정말 삭제하시겠습니까?')) return;
+        await deleteMyReview(reviewId);
+        alert('삭제되었습니다.');
+        nav('/buyer/reviews');
     };
 
-    if(!review) return <div>로딩 중...</div>;
+    if (!review) return <div className="text-center py-20">로딩 중…</div>;
 
     return (
-        <div className="max-w-2xl mx-auto p-6">
-            {/* 페이지 제목 */}
-            {/* 제목 */}
-            <h2 className="text-xl font-bold text-center relative mb-6">
-                리뷰 상세
-                <span  className="absolute bottom-0 left-1/2 w-[100px] h-0.5 bg-black -translate-x-1/2"></span>
-            </h2>
-
-            {/* 상세 컴포넌트 */}
-            <ReviewDetail
-                review={review}
-                onBack={() => nav(-1)}  // 뒤로가기
-                onDelete={handleDelete}
-                onEdit={() => nav(`/buyer/reviews/${reviewId}/edit`)}
-            />
-        </div>
+        <ReviewDetail
+            review={review}
+            onEdit={() => nav(`/buyer/reviews/${reviewId}/edit`)}
+            onDelete={handleDelete}
+            onBack={() => nav(-1)}
+            // 구매자는 답글 수정 권한이 없으므로 onReplyEdit는 넘기지 않음
+        />
     );
 }

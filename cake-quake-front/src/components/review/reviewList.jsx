@@ -1,7 +1,13 @@
 import React, {useCallback, useRef} from 'react';
 import ReviewItem from "./reviewItem.jsx";
 
-export default function ReviewList({reviews = [],loading,hasNext,onLoadMore, onEdit,onDetail}) {
+export default function ReviewList({
+                                       reviews = [],
+                                       loading,hasNext,onLoadMore,
+                                       onEdit,
+                                       onDetail,
+                                   showEdit=true,
+                                   showReply= false}) {
     //IntersectionObserver 인스턴스를 저장할 ref
     const observer = useRef();
 
@@ -42,6 +48,8 @@ export default function ReviewList({reviews = [],loading,hasNext,onLoadMore, onE
                         <ReviewItem review={r}
                                     onEdit={onEdit}
                                     onDetail={onDetail}
+                                    showEdit={showEdit}
+                                    showReply={showReply}
                         />
                     </li>
                 );

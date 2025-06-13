@@ -1,6 +1,36 @@
-import React from 'react';
+// src/components/review/reviewDetail.jsx
+import React, {useState} from 'react';
 
-export default function ReviewDetail({ review, onEdit, onDelete, onBack }) {
+export default function ReviewDetail({
+                                         review,
+                                         onEdit,         // 리뷰 자체 수정
+                                         onDelete,       // 리뷰 삭제
+                                         onBack,         // 뒤로가기
+                                         onReplyEdit,     // 답글 수정 (판매자 전용)
+                                        showEdit = true // 수정 버튼 여부
+
+                                     }) {
+    // 답글 수정 모드 상태
+    const [isEditingReply, setIsEditingReply] = useState(false);
+    const [editedReply, setEditedReply] = useState(review.reply || '');
+
+
+    const startEditReply = () => {
+        setEditedReply(review.reply || '');
+        setIsEditingReply(true);
+    };
+    const cancelEditReply = () => {
+        setIsEditingReply(false);
+        setEditedReply(review.reply || '');
+    };
+    const saveReply = () => {
+        onReplyEdit(review.reviewId, editedReply);
+        setIsEditingReply(false);
+    };
+
+
+
+
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
             {/* 1. 원본 이미지 */}
@@ -13,44 +43,44 @@ export default function ReviewDetail({ review, onEdit, onDelete, onBack }) {
                 />
             )}
 
-
-            {/* 3. 별점 */}
+            {/* 2. 별점 */}
             <div className="flex items-center text-yellow-500 mb-4">
-                {Array.from({length: 5}, (_, i) => (
+                {Array.from({ length: 5 }, (_, i) => (
                     <svg
                         key={i}
                         viewBox="0 0 20 20"
                         className={`w-5 h-5 fill-current ${i < review.rating ? '' : 'text-gray-300'}`}
                     >
-                        <path
-                            d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.954L10 0l2.951 5.956 6.561.954-4.756 4.635 1.122 6.545z"/>
+                        <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.954L10 0l2.951 5.956 6.561.954-4.756 4.635 1.122 6.545z" />
                     </svg>
                 ))}
             </div>
 
-            {/* 4. 상세 내용 */}
+            {/* 3. 상세 내용 */}
             <p className="text-gray-700 mb-6">
                 {review.content}
             </p>
 
-            {/* 5. 작성일 */}
+            {/* 4. 작성일 */}
             <div className="text-xs text-gray-500 mb-6">
                 작성일: {new Date(review.regDate).toLocaleString()}
             </div>
 
-            {/* 버튼 그룹 */}
-            <div className="flex space-x-4">
-                <button
-                    onClick={onEdit}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
-                    수정하기
-                </button>
+            {/* 5. 버튼 그룹 (리뷰 수정/삭제/뒤로가기) */}
+            <div className="flex space-x-4 mb-6">
+                {showEdit && (
+                    <button
+                        onClick={onEdit}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        수정하기
+                    </button>
+                )}
                 <button
                     onClick={onDelete}
                     className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                    삭제하기
+                    {showEdit ? '삭제하기' : '삭제 요청'}
                 </button>
                 <button
                     onClick={onBack}
@@ -59,6 +89,49 @@ export default function ReviewDetail({ review, onEdit, onDelete, onBack }) {
                     뒤로가기
                 </button>
             </div>
+            {/* 6. 답글 섹션 */}
+            <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500 space-y-4">
+                <h4 className="font-semibold">답글</h4>
+                {/* 수정 모드 */}
+                {isEditingReply ? (
+                    <div className="space-y-2">
+            <textarea
+                value={editedReply}
+                onChange={e => setEditedReply(e.target.value)}
+                rows={3}
+                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+            />
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={saveReply}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                                disabled={!editedReply.trim()}
+                            >
+                                저장
+                            </button>
+                            <button
+                                onClick={cancelEditReply}
+                                className="px-4 py-2 border bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+                            >
+                                취소
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex justify-between items-start">
+                        <p className="text-gray-700 flex-1">{review.reply}</p>
+                        {onReplyEdit && (
+                            <button
+                                onClick={startEditReply}
+                                className="text-sm text-blue-600 hover:underline ml-4"
+                            >
+                                답글 수정하기
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+
         </div>
     );
 }

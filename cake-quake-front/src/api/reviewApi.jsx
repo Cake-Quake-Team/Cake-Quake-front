@@ -48,3 +48,48 @@ export const getShopReviews = async (shopId, {page =1, size =10, sort = 'regDate
     });
     return res.data
 }
+
+export const getShopReviewDetail = async (shopId, reviewId) => {
+    const res = await jwtAxios.get(`${prefix}/shops/${shopId}/reviews/${reviewId}`);
+    return res.data;
+}
+
+export const replyToShopReview = async (shopId, reviewId, {reply})=>{
+    await jwtAxios.post(`${prefix}/shops/${shopId}/reviews/${reviewId}/reply`, {reply});
+    return true;
+}
+
+export const requestDeleteShopReview = async (shopId, reviewId,reason)=>{
+    await jwtAxios.post(
+        `${prefix}/shops/${shopId}/reviews/${reviewId}/delete`,
+        null,
+    {params:{reason}}
+    );
+    return true
+}
+
+
+// //---------------------관리자--------------------------------
+// // 삭제 요청 목록 조회
+// export const getDeletionRequests = async ({ page = 1, size = 10 }) => {
+//     const res = await jwtAxios.get(`${prefix}/admin/review-deletion-request`, {
+//         params: { page, size },
+//     });
+//     return res.data;
+// };
+//
+// // 요청 승인(리뷰 실제 삭제)
+// export const approveDeletionRequest = async (requestId) => {
+//     await jwtAxios.patch(
+//         `${prefix}/admin/review-deletion-request/${requestId}/approve`
+//     );
+//     return true;
+// };
+//
+// // 요청 거절(삭제 요청 취소)
+// export const rejectDeletionRequest = async (requestId) => {
+//     await jwtAxios.patch(
+//         `${prefix}/admin/review-deletion-request/${requestId}/reject`
+//     );
+//     return true;
+// };
