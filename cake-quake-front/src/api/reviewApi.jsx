@@ -1,5 +1,6 @@
 
 import jwtAxios from "../utils/jwtUtil.js";
+import axios from "axios";
 
 
 export const API_SERVER_HOST = "http://localhost:8080";
@@ -75,21 +76,34 @@ export const requestDeleteShopReview = async (shopId, reviewId,reason)=>{
 //     const res = await jwtAxios.get(`${prefix}/admin/review-deletion-request`, {
 //         params: { page, size },
 //     });
+//     console.log("res.data=" , res.data);
 //     return res.data;
 // };
-//
-// // 요청 승인(리뷰 실제 삭제)
-// export const approveDeletionRequest = async (requestId) => {
-//     await jwtAxios.patch(
-//         `${prefix}/admin/review-deletion-request/${requestId}/approve`
-//     );
-//     return true;
-// };
-//
-// // 요청 거절(삭제 요청 취소)
-// export const rejectDeletionRequest = async (requestId) => {
-//     await jwtAxios.patch(
-//         `${prefix}/admin/review-deletion-request/${requestId}/reject`
-//     );
-//     return true;
-// };
+
+export const getDeletionRequests = async ({ page = 1, size = 10 }) => {
+    // jwtAxios가 자동으로 JWT 토큰을 헤더에 붙이고,
+    // 인터셉터가 response.data를 리턴하므로 res 자체가 payload입니다.
+    const payload = await jwtAxios.get(
+        `${prefix}/admin/review-deletion-request`,
+        { params: { page, size } }
+    );
+    console.log('getDeletionRequests payload →', payload);
+    return payload;  // { content: [...], hasNext: boolean, totalCount: number }
+};
+
+
+// 요청 승인(리뷰 실제 삭제)
+export const approveDeletionRequest = async (requestId) => {
+    await jwtAxios.patch(
+        `${prefix}/admin/review-deletion-request/${requestId}/approve`
+    );
+    return true;
+};
+
+// 요청 거절(삭제 요청 취소)
+export const rejectDeletionRequest = async (requestId) => {
+    await jwtAxios.patch(
+        `${prefix}/admin/review-deletion-request/${requestId}/reject`
+    );
+    return true;
+};
