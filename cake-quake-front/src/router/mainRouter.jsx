@@ -11,6 +11,7 @@ import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
 import reviewRouter from "./reviewRouter.jsx";
+import pointRouter from "./paymentRouter.jsx";
 
 
 
@@ -33,7 +34,8 @@ const mainRouter = createBrowserRouter([
             reviewRouter(),
             authRouter(),
             memberRouter(),
-            shopRouter()
+            shopRouter(),
+            pointRouter()
 
 
         ]
