@@ -1,10 +1,13 @@
-
+import { useEffect } from "react";
 import SignupComponent from "../../../components/member/auth/signupComponent";
 
 
 const SignupPage = () => {
 
-    
+    // 스크롤 제일 위로 이동
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
 
     return (
         <div className="p-4">
