@@ -15,6 +15,7 @@ import paymentRouter from "./paymentRouter.jsx";
 
 
 
+
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 
 // createBrowserRouter에 전달할 라우트 객체 배열을 정의합니다.
@@ -35,7 +36,9 @@ const mainRouter = createBrowserRouter([
             authRouter(),
             memberRouter(),
             shopRouter(),
-            paymentRouter()
+            paymentRouter(),
+            pointRouter()
+
 
 
         ]
