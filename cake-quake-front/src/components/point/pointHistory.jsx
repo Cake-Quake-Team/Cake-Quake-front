@@ -9,13 +9,14 @@ import React from "react";
  * - onLoadMore: () => void
  */
 export default function HistoryList({
-                                        items   = [],
+                                        items = [],
                                         hasNext = false,
                                         onLoadMore,
                                     }) {
     if (!items.length) {
         return <p className="text-center py-4 text-gray-500">내역이 없습니다.</p>;
     }
+
     return (
         <div className="bg-white rounded-lg shadow overflow-hidden">
             <table className="w-full text-left">
@@ -28,23 +29,26 @@ export default function HistoryList({
                 </tr>
                 </thead>
                 <tbody>
-                {items.map(item => (
-                    <tr key={item.pointHistoryId} className="border-t">
-                        <td className="p-2">
-                            {new Date(item.regDate).toLocaleDateString("ko-KR")}
-                        </td>
-                        <td className="p-2">{item.description}</td>
-                        <td
-                            className={`p-2 ${
-                                item.amount > 0 ? "text-green-600" : "text-red-600"
-                            }`}
-                        >
-                            {item.amount > 0 ? "+" : ""}
-                            {item.amount}P
-                        </td>
-                        <td className="p-2">{item.balanceAmount}P</td>
-                    </tr>
-                ))}
+                {items.map((item) => {
+                    const isEarn = item.changeType === "EARN";
+                    return (
+                        <tr key={item.pointHistoryId} className="border-t">
+                            <td className="p-2">
+                                {new Date(item.regDate).toLocaleDateString("ko-KR")}
+                            </td>
+                            <td className="p-2">{item.description}</td>
+                            <td
+                                className={`p-2 ${
+                                    isEarn ? "text-green-600" : "text-red-600"
+                                }`}
+                            >
+                                {isEarn ? "+" : "-"}
+                                {item.amount}P
+                            </td>
+                            <td className="p-2">{item.balanceAmount}P</td>
+                        </tr>
+                    );
+                })}
                 </tbody>
             </table>
             {hasNext && (
