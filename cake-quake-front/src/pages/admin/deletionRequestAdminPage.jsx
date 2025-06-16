@@ -28,20 +28,16 @@ export default function DeletionRequestAdminPage() {
         setLoading(true);
         getDeletionRequests({ page, size: 20 })
             .then(payload => {
-                console.log('▶ getDeletionRequests payload 전체:', payload);
-
-                const body = payload.data !== undefined
-                    ? payload.data
-                    : payload;
-                console.log('▶ getDeletionRequests body:', body);
-
+                const body = payload.data ?? payload;
                 const content = Array.isArray(body.content) ? body.content : [];
-                console.log('▶ content 배열:', content);
+                const next = Boolean(body.hasNext);
 
-                const next = typeof body.hasNext === 'boolean' ? body.hasNext : false;
-                console.log('▶ hasNext:', next);
-
-                setRequests(prev => [...prev, ...content]);
+                       setRequests(prev => [...prev, ...content]);
+                       setRequests(prev =>
+                            page === 1
+                              ? content        // 1페이지면 새로 교체
+                                  : [...prev, ...content]  // 2이상 페이징이면 이어붙이기
+                              );
                 setHasMore(next);
             })
             .catch(err => {
@@ -88,31 +84,32 @@ export default function DeletionRequestAdminPage() {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-bold mb-4">관리자: 리뷰 삭제 요청</h1>
+            <h1 className="text-2xl font-bold mb-4"> 리뷰 삭제 요청</h1>
             <ul className="space-y-4">
                 {requests.map((r, idx) => (
                     <li
-                        key={r.id}
+                        key={r.requestId}
                         ref={idx === requests.length - 1 ? lastRef : null}
                         className="border rounded p-4 flex justify-between items-start"
                     >
                         <div>
-                            <p><strong>요청 ID:</strong> {r.id}</p>
-                            <p><strong>리뷰 ID:</strong> {r.reviewId}</p>
-                            <p className="mt-1"><strong>사유:</strong> {r.requestReason}</p>
+                            {/*<p><strong>요청 ID:</strong> {r.requestId}</p>*/}
+                            {/*<p><strong>리뷰 ID:</strong> {r.reviewId}</p>*/}
+                            <p><strong>리뷰 내용: </strong> {r.reviewContent}</p>
+                            <p className="mt-1"><strong>사유:</strong> {r.reason}</p>
                             <p className="mt-1 text-sm text-gray-500">
-                                요청일: {new Date(r.requestDate).toLocaleString()}
+                                요청일: {new Date(r.regDate).toLocaleString()}
                             </p>
                         </div>
                         <div className="space-y-2">
                             <button
-                                onClick={() => handleApprove(r.id)}
+                                onClick={() => handleApprove(r.requestId)}
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
                                 승인
                             </button>
                             <button
-                                onClick={() => handleReject(r.id)}
+                                onClick={() => handleReject(r.requestId)}
                                 className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50"
                             >
                                 거절
