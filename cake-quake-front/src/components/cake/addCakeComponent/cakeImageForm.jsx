@@ -6,13 +6,9 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnail
 
     const handleChange = (e) => {
         onImageChange(e);
-        // input 초기화
-        if (inputRef.current) {
-            inputRef.current.value = null;
-        }
+        if (inputRef.current) inputRef.current.value = null;
     };
 
-    // 이미지 변경될 때마다 오른쪽으로 자동 스크롤
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
@@ -20,40 +16,44 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnail
     }, [images]);
 
     return (
-        <div className="bg-white p-6 rounded-xl shadow mb-6">
-            <h2 className="text-xl font-semibold mb-4">이미지 업로드</h2>
+        <div className="bg-white mt-6 rounded-xl">
+            <h2 className="font-medium mb-4">이미지 업로드</h2>
 
             <div
                 ref={scrollRef}
                 className="flex gap-5 overflow-x-auto max-w-full scrollbar-hide"
-                style={{ height: '120px', overflowY: 'hidden' }}
+                style={{ height: "120px", overflowY: "hidden" }}
             >
-                {images.map((img, index) => (
-                    <div key={index} className="relative w-30 h-30 flex-shrink-0">
-                        <img
-                            src={URL.createObjectURL(img.file)}
-                            alt={`미리보기 ${index + 1}`}
-                            className={`w-full h-24 object-cover rounded-lg border-2 ${img.isThumbnail ? "border-blue-500" : "border-transparent"}`}
-                        />
-                        <div className="text-center mt-1">
-                            <input
-                                type="radio"
-                                name="thumbnail"
-                                checked={img.isThumbnail}
-                                onChange={() => onThumbnailSelect(index)}
+                {images.map((img, index) => {
+                    const src = img.file ? URL.createObjectURL(img.file) : img.src;
+                    return (
+                        <div key={index} className="relative w-30 h-30 flex-shrink-0">
+                            <img
+                                src={src}
+                                alt={`미리보기 ${index + 1}`}
+                                className={`w-full h-24 object-cover rounded-lg border-2 ${
+                                    img.isThumbnail ? "border-blue-500" : "border-transparent"
+                                }`}
                             />
+                            <div className="text-center mt-1">
+                                <input
+                                    type="radio"
+                                    name="thumbnail"
+                                    checked={img.isThumbnail}
+                                    onChange={() => onThumbnailSelect(index)}
+                                />
+                            </div>
+                            <button
+                                onClick={() => onImageRemove(index)}
+                                className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-opacity-80"
+                                title="삭제"
+                            >
+                                ×
+                            </button>
                         </div>
-                        <button
-                            onClick={() => onImageRemove(index)}
-                            className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-opacity-80"
-                            title="삭제"
-                        >
-                            ×
-                        </button>
-                    </div>
-                ))}
+                    );
+                })}
 
-                {/* 업로드 버튼 */}
                 <div className="flex-shrink-0">
                     <input
                         type="file"
