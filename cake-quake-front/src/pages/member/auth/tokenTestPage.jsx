@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react"
-import { testAdminOnly, testSellerOnly, testToken } from "../../api/memberApi"
+import { testToken } from "../../../api/memberApi"
 
 const TokenTestPage = () => {
     const [message, setMessage] = useState("")
 
     useEffect(() => {
-        testToken() // api 서버 호출_쿠키에 저장한 토큰 이용
-            .then((data) => {
-                setMessage(data.message)
-            })
-            .catch((err) => {
-                setMessage(err.message)
-            })
-    }, [])
+    const fetchData = async () => {
+      try {
+        const res = await testToken() // Axios 요청
+        console.log(res.data)
+        setMessage(res.data.message)
+      } catch (err) {
+        console.error(err)
+        setMessage(err.response?.data?.message || "에러가 발생했습니다.")
+      }
+    }
+
+    fetchData()
+  }, [])
+
 
     // useEffect(() => {
     //     testSellerOnly() // api 서버 호출_판매자만 접근 가능한지 확인

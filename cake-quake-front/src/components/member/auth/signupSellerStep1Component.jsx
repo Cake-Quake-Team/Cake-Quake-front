@@ -1,7 +1,8 @@
+import LoadingSpinner from "../../common/loadingSpinner";
 
-
-const SellerSignupStep1Component = ({
+const SignupSellerStep1Component = ({
     form,
+    isLoading,
     errorMessage,
     handleChange,
     handlePhoneNumberChange,
@@ -10,20 +11,17 @@ const SellerSignupStep1Component = ({
     handleSubmit,
     openVerifyModal,
     isVerified,
-    isBusinessVerified
+    isBusinessVerified,
+    inputRefs
 }) => {
 
-    const { userId, password, verifyPassword, uname, phoneNumber, publicInfo, businessNumber, bossName, openingDate, shopName, businessCertificate } = form;
+    const { userId, password, verifyPassword, uname, phoneNumber, publicInfo, businessNumber, bossName, openingDate, shopName } = form
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md mt-5">
                 <h2 className="text-2xl font-bold mb-6 text-center">판매자 회원가입</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
-
-                    {errorMessage && (
-                        <div className="text-red-500 text-sm text-center">{errorMessage}</div>
-                    )}
 
                     <input
                         type="text"
@@ -34,6 +32,7 @@ const SellerSignupStep1Component = ({
                         placeholder="아이디"
                         required
                         className="w-full px-4 py-2 border rounded-lg"
+                        ref={inputRefs.userId}
                     />
                     <input
                         type="password"
@@ -44,6 +43,7 @@ const SellerSignupStep1Component = ({
                         placeholder="비밀번호"
                         required
                         className="w-full px-4 py-2 border rounded-lg"
+                        ref={inputRefs.password}
                     />
 
                     <input
@@ -69,6 +69,7 @@ const SellerSignupStep1Component = ({
                         onChange={handleChange}
                         required
                         className="w-full px-4 py-2 border rounded-lg"
+                        ref={inputRefs.uname}
                     />
                     <input
                         type="text"
@@ -81,6 +82,7 @@ const SellerSignupStep1Component = ({
                         maxLength={13} // 010-1234-5678까지 최대 13자
                         inputMode="numeric" // 모바일 숫자 키패드 유도
                         className="w-full px-4 py-2 border rounded-lg"
+                        ref={inputRefs.phoneNumber}
                     />
                     {/* 휴대전화 인증 버튼 */}
                     <button
@@ -103,8 +105,9 @@ const SellerSignupStep1Component = ({
                         value={shopName}
                         onChange={handleChange}
                         placeholder="상호명"
-                        className="w-full px-4 py-2 border rounded-lg"
                         required
+                        className="w-full px-4 py-2 border rounded-lg"
+                        ref={inputRefs.shopName}
                     />
 
                     <hr />
@@ -121,6 +124,7 @@ const SellerSignupStep1Component = ({
                             onChange={handleChange}
                             placeholder="사업자등록번호"
                             className="w-full p-2 border rounded-lg"
+                            ref={inputRefs.businessNumber}
                         />
                         <input
                             type="text"
@@ -140,6 +144,7 @@ const SellerSignupStep1Component = ({
                             onChange={handleChange}
                             placeholder="개업일자 (YYYYMMDD)"
                             className="w-full p-2 border rounded-lg"
+                            ref={inputRefs.isBusinessVerified}
                         />
 
                         <button
@@ -157,14 +162,15 @@ const SellerSignupStep1Component = ({
                     </div>
 
                     <div>
-                        <label className="block mb-1 font-medium">사업자 등록증 첨부</label>
+                        <label htmlFor="businessCertificate" className="block mb-1 font-medium">사업자 등록증 첨부</label>
                         <input
+                            type="file"
                             id="businessCertificate"
                             name="businessCertificate"
-                            type="file"
                             accept="image/*"
                             onChange={handleBusinessFileChange}
                             className="w-full p-2 border rounded"
+                            ref={inputRefs.businessCertificate}
                         />
                     </div>
 
@@ -176,16 +182,25 @@ const SellerSignupStep1Component = ({
                             checked={publicInfo}
                             onChange={handleChange}
                             className="mr-2"
+                            ref={inputRefs.publicInfo}
                         />
                         <label htmlFor="publicInfo" className="text-sm text-gray-700">[필수] 개인정보 수집 밎 이용 동의</label>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full px-4 py-2 bg-violet-400 text-white font-bold rounded hover:bg-violet-600"
-                    >
-                        다음 단계로
-                    </button>
+                    {errorMessage && (
+                        <div className="text-red-500 text-sm text-center">{errorMessage}</div>
+                    )}
+
+                    {isLoading ? (
+                        <LoadingSpinner />
+                    ) : (
+                        <button
+                            type="submit"
+                            className="w-full px-4 py-2 bg-violet-400 text-white font-bold rounded hover:bg-violet-600"
+                        >
+                            다음 단계로
+                        </button>
+                    )}
                 </form>
             </div>
         </div>
@@ -194,4 +209,4 @@ const SellerSignupStep1Component = ({
     )
 }
 
-export default SellerSignupStep1Component;
+export default SignupSellerStep1Component;

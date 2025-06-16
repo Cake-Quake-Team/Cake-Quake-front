@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import SignupSellersStep2Page from "../pages/member/auth/signupSellerStep2Page";
 
 const SigninPage = lazy(() => import("../pages/member/auth/signinPage"))
 const SignupPage = lazy(() => import("../pages/member/auth/signupPage"))
@@ -26,6 +27,10 @@ const authRouter = () => {
             {
                 path: "signup/seller-step1",
                 element: <Suspense fallback={Loading}><SignupSellersStep1Page /></Suspense>
+            },
+            {
+                path: "signup/seller-step2",
+                element: <Suspense fallback={Loading}><SignupSellersStep2Page /></Suspense>
             },
         ]
     };

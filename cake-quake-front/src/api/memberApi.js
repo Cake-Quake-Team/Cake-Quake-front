@@ -6,6 +6,7 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL
 const endpoints = {
     signupBuyers: 'auth/signup/buyers',
     signupSellerStep1: 'auth/signup/sellers/step1',
+    signupSellerStep2: 'auth/signup/sellers/step2',
     signin: 'auth/signin',
     signout: 'auth/signout',
     otpSend: 'auth/otp/send',
@@ -33,11 +34,26 @@ export const singup = async(signupData) => {
     }
 }
 
-// 회원가입(판매자)
+// 회원가입(판매자-1단계)
 export const postSellerSignupStep1 = async (formData) => {
 
     try {
         const res = await axios.post(`${baseUrl}/${endpoints.signupSellerStep1}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+        console.log(res.data)
+        return res.data
+
+    } catch (error) {
+        throw error
+    }
+}
+
+// 회원가입(판매자-2단계)
+export const postSellerSignupStep2 = async (formData) => {
+
+    try {
+        const res = await axios.post(`${baseUrl}/${endpoints.signupSellerStep2}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
         console.log(res.data)

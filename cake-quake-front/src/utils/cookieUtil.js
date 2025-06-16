@@ -9,6 +9,9 @@ export const setCookie = (name, value, days) => {
 
     // 경로설정. 앱 전체에서 사용
     return cookies.set(name, value, {path: '/', expires: expires})
+
+    // https용
+    // return cookies.set(name, value, {path: '/', expires: expires, secure: true, sameSite: 'none'})
  
 }
  

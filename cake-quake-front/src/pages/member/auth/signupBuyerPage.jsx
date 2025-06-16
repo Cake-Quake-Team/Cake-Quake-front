@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ResultModal from "../../../components/common/resultModal";
 import { singup } from "../../../api/memberApi";
@@ -7,6 +7,13 @@ import { createBuyerSignupDTO } from "../../../dto/memberdto/signup.dto";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
 
 const SignupBuyerPage = () => {
+
+    // 스크롤 제일 위로 이동
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const [form, setForm] = useState({
         userId: "",
@@ -100,6 +107,7 @@ const SignupBuyerPage = () => {
         }
 
         try {
+            setIsLoading(true)
             const signupData = createBuyerSignupDTO(form); // form → DTO 변환
             console.log(signupData)
 
@@ -112,6 +120,8 @@ const SignupBuyerPage = () => {
             const msg = err?.response?.data?.message || "회원가입 중 오류가 발생했습니다."
             setErrorMessage(msg)
             console.error("회원 가입 실패", err)
+        } finally{
+            setIsLoading(false) // 성공/실패 관계없이 로딩 종료
         }
     }
 
@@ -124,11 +134,13 @@ const SignupBuyerPage = () => {
         <div className="p-4">
             <SignupBuyerComponent
                 form={form}
+                isLoading={isLoading}
                 errorMessage={errorMessage}
                 handleChange={handleChange}
                 handlePhoneNumberChange={handlePhoneNumberChange}
                 handleSubmit={handleSubmit}
                 openVerifyModal={openVerifyModal}
+                isVerified={isVerified}
             />
             {isVerifyModalOpen  && (
                 <VerifyModal

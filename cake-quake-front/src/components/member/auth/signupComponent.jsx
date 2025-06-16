@@ -4,7 +4,7 @@ import cakeImage from "../../../assets/signup_lettering_cake.jpg";
 const SignupComponent = () => {
     return (
         <div className="min-h-screen flex items-center justify-center bg-white px-4">
-            <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-2xl flex flex-col items-center">
+            <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-2xl flex flex-col items-center">
                 <div className="flex flex-col md:flex-row items-center w-full mb-6">
                     {/* 이미지 */}
                     <img

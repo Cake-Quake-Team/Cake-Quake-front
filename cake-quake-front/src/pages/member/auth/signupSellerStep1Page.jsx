@@ -1,16 +1,21 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { sellerSignupStep1DTO } from "../../../dto/memberdto/signup.dto";
-import SellerSignupStep1Component from "../../../components/member/auth/SignupSellerStep1Component";
 import ResultModal from "../../../components/common/resultModal";
 import { verifyBusiness } from "../../../api/memberApi";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
 import { postSellerSignupStep1 } from "../../../api/memberApi";
+import SellerSignupStep1Component from "../../../components/member/auth/signupSellerStep1Component";
 
 
 const SignupSellersStep1Page = () => {
 
+    // 스크롤 제일 위로 이동
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     const navigate = useNavigate()
+    const [isLoading, setIsLoading] = useState(false)
 
     const [form, setForm] = useState({
         userId: "",
@@ -27,7 +32,18 @@ const SignupSellersStep1Page = () => {
         businessCertificate: "",
     })
 
-    const [file, setFile] = useState(null)
+    const inputRefs = {
+        userId: useRef(null),
+        uname: useRef(null),
+        password: useRef(null),
+        phoneNumber: useRef(null),
+        businessNumber: useRef(null),
+        shopName: useRef(null),
+        isBusinessVerified: useRef(null),
+        publicInfo: useRef(null),
+        businessCertificate: useRef(null),
+    }
+
     const [showModal, setShowModal] = useState(false)
     const [modalMsg, setModalMsg] = useState("")
     const [errorMessage, setErrorMessage] = useState("")
@@ -47,7 +63,7 @@ const SignupSellersStep1Page = () => {
         }))
     }
 
-    // 전화번호에 - 하이픈 자동 추가
+    // 전화번호 입력 받을 때 '-' 하이픈 자동 추가
     const handlePhoneNumberChange = (e) => {
         // 숫자만 추출
         const rawValue = e.target.value.replace(/\D/g, "")
@@ -77,15 +93,44 @@ const SignupSellersStep1Page = () => {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=-])[A-Za-z\d!@#$%^&*()_+=-]{8,20}$/
         const phoneRegex = /^\d{3}-\d{3,4}-\d{4}$/
         
-        if (!userIdRegex.test(userId)) return "아이디는 영문 또는 숫자 4~20자여야 합니다."
-        if (!unameRegex.test(uname)) return "이름은 한글 또는 영어 포함 1~19자여야 합니다."
-        if (!passwordRegex.test(password)) return "비밀번호는 문자, 숫자, 특수문자 포함 8~20자여야 합니다."
+        if (!userIdRegex.test(userId)) {
+            inputRefs.userId.current?.focus()
+            return "아이디는 영문 또는 숫자 4~20자여야 합니다."
+        }
+        if (!unameRegex.test(uname)) {
+            inputRefs.uname.current?.focus()
+            return "이름은 한글 또는 영어 포함 1~19자여야 합니다."
+        } 
+        if (!passwordRegex.test(password)) {
+            inputRefs.password.current?.focus()
+            return "비밀번호는 문자, 숫자, 특수문자 포함 8~20자여야 합니다."
+        } 
         if (password !== verifyPassword) return "비밀번호가 일치하지 않습니다."
-        if (!phoneRegex.test(phoneNumber)) return "전화번호는 010-1234-5678 형식이어야 합니다."
+        if (!phoneRegex.test(phoneNumber)) {
+            inputRefs.phoneNumber.current?.focus()
+            return "전화번호는 010-XXXX-XXXX 형식이어야 합니다."
+        } 
         if (!publicInfo) return "개인정보 수집 및 이용에 동의해야 합니다."
-        if (!isVerified) return "휴대폰 인증을 완료해주세요."
-        if (!shopName || shopName.length > 50) return "상호명은 1~50자 사이여야 합니다."
-        if (!businessCertificate) return "사업자 등록증 파일을 첨부해주세요."
+        if (!isVerified) {
+            inputRefs.phoneNumber.current?.focus()
+            return "휴대폰 인증을 완료해주세요."
+        }
+        if (!shopName || shopName.length > 50) {
+            inputRefs.shopName.current?.focus()
+            return "상호명은 1~50자 사이여야 합니다."
+        }
+        if (!isBusinessVerified) {
+            inputRefs.isBusinessVerified.current?.focus()
+            return "사업자 등록 조회가 필요합니다."
+        }
+        if (!businessCertificate) {
+            inputRefs.businessCertificate.current?.focus()
+            return "사업자 등록증 파일을 첨부해주세요."
+        }
+        if (!publicInfo) {
+            inputRefs.publicInfo.current?.focus()
+            return "개인정보 수집 및 이용에 동의해야 합니다."
+        }
 
         return null
     }
@@ -123,18 +168,29 @@ const SignupSellersStep1Page = () => {
         }
 
         try {
+            setIsLoading(true)
             const res = await verifyBusiness(businessData)
             console.log("businessData: ", businessData)
 
-            // 성공 응답 처리
-            setModalMsg(res.message)
-            setModalType("businessCheck")
-            setShowModal(true)
-            setIsBusinessVerified(true)
+            if (res.success) {
+                // 진위여부 확인 성공
+                setModalMsg(res.message || "사업자 등록 정보가 확인되었습니다.")
+                setModalType("businessCheck")
+                setShowModal(true)
+                setIsBusinessVerified(true)
+            } else {
+                // 확인 실패: 사용자에게 안내
+                setModalMsg("확인 실패: 사업자 등록 정보를 다시 확인해 주세요.")
+                setModalType("businessCheckFailed")
+                setShowModal(true)
+                setIsBusinessVerified(false) // 이전 상태를 초기화
+            }
         } catch (error) {
             const msg = error?.response?.data?.message || "사업자 진위여부 확인 중 오류가 발생했습니다."
             setErrorMessage(msg)
             console.error("사업자 진위여부 확인 실패", error)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -176,11 +232,16 @@ const SignupSellersStep1Page = () => {
         }
 
         try {
-
-            console.log("formData: ", formData)
+            setIsLoading(true)
+            // console.log("FormData 내부 확인:")
+            // formData.forEach((value, key) => {
+            //     console.log(`${key}:`, value)
+            // })
             const res = await postSellerSignupStep1(formData)
 
-            // 회원가입 성공 시 모달 표시
+            sessionStorage.setItem("tempSellerId", res.data) // 서버 응답에서 받은 tempSellerId 세션 스토리지에 저장.
+
+            // 회원가입 1단계 성공 시 모달 표시
             setModalMsg(res.message)
             setModalType("signupSuccess")
             setShowModal(true)
@@ -188,6 +249,8 @@ const SignupSellersStep1Page = () => {
             const msg = err?.response?.data?.message || "회원가입 중 오류가 발생했습니다."
             setErrorMessage(msg)
             console.error("회원 가입 실패", err)
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -195,9 +258,11 @@ const SignupSellersStep1Page = () => {
         setShowModal(false)
 
         if (modalType === "signupSuccess") {
-            navigate("/auth/signin")
+            navigate("/auth/signup/seller-step2")
+        } else if (modalType === "businessCheckFailed") {
+            // 실패 시 포커스를 사업자 번호 입력으로 이동하게
+            inputRefs.businessNumber.current?.focus()
         }
-
         // businessCheck일 경우에는 페이지 이동 없음
         setModalType(null); // 상태 초기화
     }
@@ -206,6 +271,7 @@ const SignupSellersStep1Page = () => {
         <div>
             <SellerSignupStep1Component
                 form={form}
+                isLoading={isLoading}
                 errorMessage={errorMessage}
                 handleChange={handleChange}
                 handlePhoneNumberChange={handlePhoneNumberChange}
@@ -215,6 +281,7 @@ const SignupSellersStep1Page = () => {
                 openVerifyModal={openVerifyModal}
                 isVerified={isVerified}
                 isBusinessVerified={isBusinessVerified}
+                inputRefs={inputRefs}
             />
             {isVerifyModalOpen  && (
                 <VerifyModal

@@ -1,16 +1,24 @@
+import { useEffect } from "react";
+import LoadingSpinner from "../../common/loadingSpinner";
 
 
 const SignupBuyerComponent = ({
     form,
+    isLoading,
     errorMessage,
     handleChange,
     handlePhoneNumberChange,
     handleSubmit,
-    openVerifyModal
+    openVerifyModal,
+    isVerified
 }) => {
 
     const { userId, password, verifyPassword, uname, phoneNumber, publicInfo, alarm } = form;
     
+    // 스크롤 제일 위로 이동
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">
@@ -76,10 +84,16 @@ const SignupBuyerComponent = ({
                     <button
                         type="button"
                         onClick={openVerifyModal}
-                        className="w-full bg-blue-100 text-gray-700 py-2 rounded-lg hover:bg-blue-200 font-bold"
+                        disabled={isVerified} // 인증 완료 시 버튼 비활성화
+                        className={`w-full py-2 rounded-lg font-bold ${
+                            isVerified
+                            ? "bg-gray-300 text-gray-500 cursor-not-allowed"  // 비활성 상태 디자인
+                            : "bg-blue-100 text-gray-700 hover:bg-blue-200"
+                        }`}
                     >
-                        전화번호 인증
+                        {isVerified ? "전화번호 인증 완료" : "전화번호 인증"}
                     </button>
+
                     <div className="flex items-center">
                         <input
                             type="checkbox"
@@ -105,12 +119,16 @@ const SignupBuyerComponent = ({
 
                     {errorMessage && <div className="text-red-500 text-sm">{errorMessage}</div>}
 
-                    <button
-                        type="submit"
-                        className="w-full bg-rose-100 text-gray-700 py-2 rounded-lg hover:bg-rose-200 font-bold"
-                    >
-                        회원가입
-                    </button>
+                    {isLoading ? (
+                        <LoadingSpinner />
+                    ) : (
+                        <button
+                            type="submit"
+                            className="w-full bg-rose-100 text-gray-700 py-2 rounded-lg hover:bg-rose-200 font-bold"
+                        >
+                            회원가입
+                        </button>
+                    )}
                 </form>
             </div>
         </div>

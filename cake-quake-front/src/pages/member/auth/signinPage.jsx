@@ -7,6 +7,12 @@ import { useAuth } from "../../../store/AuthContext";
 import { parseJwt } from "../../../utils/parseJwt";
 
 const SigninPage = () => {
+
+    // 스크롤 제일 위로 이동
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [])
+
     const [userId, setUserId] = useState("")
     const [password, setPassword] = useState("")
     const [errorMessage, setErrorMessage] = useState('')
