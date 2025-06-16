@@ -1,40 +1,18 @@
-import { useState } from "react";
-import { getToken } from "../../api/memberApi";
-import kakaoIcon from "../../assets/kakao-loginicon.png";
-import { setCookie } from "../../utils/cookieUtil";
-import { Link, useNavigate } from "react-router";
+import kakaoIcon from "../../../assets/kakao-loginicon.png";
+import { Link } from "react-router";
 
 
-const SigninComponent = () => {
-    const [userId, setUserId] = useState("")
-    const [password, setPassword] = useState("")
-    const [errorMessage, setErrorMessage] = useState('')
-
-    const navigate = useNavigate()
-
-    const handleSubmit = async(e) => {
-        e.preventDefault()
-        setErrorMessage('') // 이전 에러 초기화
-
-        try{
-            // accessToken, refreshToken을 쿠키에 저장
-            const {accessToken, refreshToken} = await getToken(userId, password)
-    
-                setCookie('access_token', accessToken, 1)
-                setCookie('refresh_token', refreshToken, 7)
-
-            // 로그인 성공 후 메인 페이지로 이동
-            console.log("로그인 성공")
-            navigate('/')
-        } catch (err) {
-            const msg = err?.response?.data?.message || '로그인 중 오류가 발생했습니다.'
-            setErrorMessage(msg)
-            console.error("로그인 실패", err)
-        }
-    };
+const SigninComponent = ({
+  userId,
+  password,
+  errorMessage,
+  onUserIdChange,
+  onPasswordChange,
+  handleSubmit,
+}) => {
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-white">
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-center">Please sign in</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -44,7 +22,7 @@ const SigninComponent = () => {
                             id="userId"
                             type="text"
                             value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
+                            onChange={onUserIdChange}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="아이디 입력"
                             required
@@ -56,7 +34,7 @@ const SigninComponent = () => {
                             id="password"
                             type="password"
                             value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            onChange={onPasswordChange}
                             className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                             placeholder="비밀번호 입력"
                             required
@@ -76,7 +54,7 @@ const SigninComponent = () => {
                         로그인
                     </button>
                     <Link to="/auth/signup" className="w-full block text-center bg-rose-50 text-gray-700 py-2 rounded-lg hover:bg-rose-200 transition font-bold">
-                        처음 방문하셨나요? 회원 가입(Sign up)
+                        회원 가입
                     </Link>
 
                     <div className="mt-6 text-center text-sm text-gray-500">
@@ -89,7 +67,7 @@ const SigninComponent = () => {
                 </form>
             </div>
         </div>
-    );
-};
+    )
+}
 
 export default SigninComponent;

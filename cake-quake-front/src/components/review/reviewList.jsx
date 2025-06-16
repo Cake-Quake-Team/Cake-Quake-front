@@ -1,7 +1,13 @@
 import React, {useCallback, useRef} from 'react';
 import ReviewItem from "./reviewItem.jsx";
 
-export default function ReviewList({reviews = [],loading,hasNext,onLoadMore, onEdit}) {
+export default function ReviewList({
+                                       reviews = [],
+                                       loading,hasNext,onLoadMore,
+                                       onEdit,
+                                       onDetail,
+                                   showEdit=true,
+                                   showReply= false}) {
     //IntersectionObserver 인스턴스를 저장할 ref
     const observer = useRef();
 
@@ -39,7 +45,12 @@ export default function ReviewList({reviews = [],loading,hasNext,onLoadMore, onE
                         // 마지막 아이템에만 lastRef 부착 → 스크롤 시 콜백 트리거
                         ref={isLast ? lastRef : null}
                     >
-                        <ReviewItem review={r} onEdit={onEdit}/>
+                        <ReviewItem review={r}
+                                    onEdit={onEdit}
+                                    onDetail={onDetail}
+                                    showEdit={showEdit}
+                                    showReply={showReply}
+                        />
                     </li>
                 );
             })}

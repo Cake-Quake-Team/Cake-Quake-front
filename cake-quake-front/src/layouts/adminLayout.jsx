@@ -77,13 +77,13 @@ export default function AdminLayout() {
 
                             <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">리뷰 관리</div>
                             <Link
-                                to="/admin/reviews"
+                                to="/admin/review-deletion-requests"
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
                                     isActive("/admin/reviews") ? "bg-blue-50 text-blue-700 font-medium" : ""
                                 }`}
                             >
-                                <span>리뷰 통계</span>
-                                {isActive("/admin/reviews")}
+                                <span>리뷰 삭제 요청</span>
+                                {isActive("/admin/review-deletion-requests")}
                             </Link>
 
                             <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">회원 관리</div>

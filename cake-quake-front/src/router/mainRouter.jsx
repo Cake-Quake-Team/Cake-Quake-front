@@ -3,13 +3,17 @@ import BasicLayout from "../layouts/BasicLayout";
 import MainPage from "../pages/mainPage";
 import {createBrowserRouter} from "react-router";
 import {Suspense} from "react";
+
+
+import buyerRouter from "./buyerRouter.jsx";
 import sellerRouter from "./sellerRouter.jsx";
 import adminRouter from "./adminRouter.jsx";
-// import buyerRouter from "./reviewRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
-import buyerRouter from "./buyerRouter.jsx";
+import reviewRouter from "./reviewRouter.jsx";
+import paymentRouter from "./paymentRouter.jsx";
+import pointRouter from "./pointRouter.jsx";
 
 
 
@@ -28,10 +32,14 @@ const mainRouter = createBrowserRouter([
 
             sellerRouter(),
             adminRouter(),
-            buyerRouter(),
+            reviewRouter(),
             authRouter(),
             memberRouter(),
             shopRouter(),
+            paymentRouter(),
+            pointRouter(),
+            buyerRouter()
+            
 
 
         ]
