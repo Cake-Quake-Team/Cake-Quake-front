@@ -10,16 +10,6 @@ const Loading = <div>로딩 중...</div>; // ✅ 이거 꼭 필요함
 
 const paymentRouter = () => ({
     path: 'payments',
-// src/router/pointRouter.jsx
-import { lazy, Suspense } from "react";
-import BasicLayout from "../layouts/basicLayout.jsx";
-
-const PointPage = lazy(() => import("../pages/buyer/point/pointPage.jsx"));
-
-const Loading = <div>Loading...</div>; // 필요 시 Spinner 컴포넌트로 교체
-
-const pointRouter = () => ({
-    path: "point",
 
     children: [
         {
