@@ -3,13 +3,13 @@ import { detailCategories } from "../../../constants/cakeCategory";
 
 function CakeBasicInfoForm({ formData, onChange }) {
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 mt-6">
             <div>
                 <label className="block text-gray-700 font-medium">상품명</label>
                 <input
                     type="text"
                     name="cname"
-                    value={formData.cname}
+                    value={formData.cname  || ''}
                     onChange={onChange}
                     className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
                     placeholder="예: 레터링 케이크"
@@ -28,7 +28,6 @@ function CakeBasicInfoForm({ formData, onChange }) {
             <div>
                 <label className="block text-gray-700 font-medium">가격 (원)</label>
                 <input
-                    type="number"
                     name="price"
                     value={formData.price}
                     onChange={onChange}

@@ -4,8 +4,9 @@ import { getAllCakeList } from "../../api/cakeApi";
 import CakeCategorySelector from "../../components/cake/categorySelectComponent.jsx";
 import {detailCategories} from "../../constants/cakeCategory.js";
 import {getShopListInfinity} from "../../api/shopApi.jsx";
-import ShopList from "../../components/shop/shopList.jsx";
-import ShopFilterBar from "../../components/shop/shopFilterBar.jsx";
+import ShopList from "../../components/shop/list/shopList.jsx";
+import ShopFilterBar from "../../components/shop/list/shopFilterBar.jsx";
+import {Link} from "react-router";
 
 // 메인 분류 목록
 const mainCategories = [
@@ -119,12 +120,13 @@ function CakeAllList() {
                 )}
 
                 {/* 케이크 목록 그리드 */}
-                {/* '매장별 분류'가 선택되었을 때는 케이크 목록을 보여주지 않거나 다른 컴포넌트 렌더링 */}
                 {selectedMainCategory !== "STORE_BY_CATEGORY" && (
                     cakes.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {cakes.map(cake => (
+                                <Link to={`/buyer/cakes/read/${cake.cakeId}`}>
                                 <CakeCard key={cake.cakeId} cake={cake} />
+                                </Link>
                             ))}
                         </div>
                     ) : (

@@ -1,13 +1,13 @@
 import React from 'react';
 
-const DEFAULT_IMAGE = '/cakeImage/default-cake.png'; // public 폴더에 있다고 가정
+const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
 
 function CakeCard({ cake }) {
-    if (!cake) return null;
 
     const { cname, price, thumbnailImageUrl } = cake;
+    const imgSrc = thumbnailImageUrl ? thumbnailImageUrl : DEFAULT_IMAGE;
 
-    const imgSrc = `http://localhost${thumbnailImageUrl}`;
+    if (!cake) return null;
 
     return (
         <div className="border rounded-xl shadow hover:shadow-lg transition duration-300 overflow-hidden">
