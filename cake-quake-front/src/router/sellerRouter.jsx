@@ -36,12 +36,6 @@ const sellerRouter = () => {
                 path: "cakes/update/:cakeId",
                 element: <Suspense fallback={Loading}><CakeUpdate /></Suspense>
             }
-            // {
-            //     path: "list", // /cake/list
-            //     element: <Suspense fallback={Loading}><CakeList /></Suspense>
-            // },
-
-
         ]
     };
 };

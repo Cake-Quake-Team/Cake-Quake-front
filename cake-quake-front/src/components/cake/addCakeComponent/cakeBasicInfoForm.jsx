@@ -45,8 +45,19 @@ function CakeBasicInfoForm({ formData, onChange }) {
                     placeholder="간단한 상품 설명을 입력하세요."
                 />
             </div>
-
-
+            <div className="flex items-center">
+                <input
+                    type="checkbox"
+                    id="isOnsale"
+                    name="isOnsale"
+                    checked={formData.isOnsale}
+                    onChange={(e) => onChange({ target: { name: "isOnsale", value: e.target.checked } })}
+                    className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isOnSale" className="text-gray-700 font-medium">
+                    품절여부
+                </label>
+            </div>
         </div>
     );
 }

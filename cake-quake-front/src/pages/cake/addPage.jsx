@@ -55,7 +55,7 @@ function CakeAddPage() {
     // 옵션 상태 및 API 호출
     const [optionTypes, setOptionTypes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const shopId = 3;   // 실제 shopId로 바꿔야 함.
+    const shopId = 1;   // 실제 shopId로 바꿔야 함.
 
     useEffect(() => {
         const fetchOptions = async () => {

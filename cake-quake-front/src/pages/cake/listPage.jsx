@@ -1,5 +1,4 @@
 import {Link} from "react-router";
-import SellerHeader from "../../components/common/sellerHeader.jsx";
 import {useEffect, useState} from "react";
 import {getAllCakeList} from "../../api/cakeApi.jsx";
 import CakeCard from "../../components/cake/cakeCard.jsx";
@@ -32,7 +31,7 @@ export default function ShopManagement() {
             <div className="flex items-center justify-center relative mb-3">
                 <h2 className="text-2xl font-semibold">매장 관리</h2>
                 <Link
-                    to="/cakes/add"
+                    to="/seller/cakes/add"
                     className="absolute right-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                 >
                     ➕ 새 상품 등록
