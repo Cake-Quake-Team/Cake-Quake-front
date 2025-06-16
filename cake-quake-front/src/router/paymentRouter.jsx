@@ -1,3 +1,15 @@
+
+import { lazy, Suspense } from "react";
+
+const TestPaymentPage = lazy(() => import('../pages/payment/testPaymentPage.jsx'));
+const KakaoApprovePage = lazy(() => import('../pages/payment/kakaoApprovePage.jsx'));
+const PaymentListPage = lazy(()=>import('../pages/payment/PaymentListPage.jsx'));
+const PaymentDetailPage = lazy(()=>import('../pages/payment/paymentDetailPage.jsx'));
+
+const Loading = <div>로딩 중...</div>; // ✅ 이거 꼭 필요함
+
+const paymentRouter = () => ({
+    path: 'payments',
 // src/router/pointRouter.jsx
 import { lazy, Suspense } from "react";
 import BasicLayout from "../layouts/basicLayout.jsx";
@@ -8,25 +20,26 @@ const Loading = <div>Loading...</div>; // 필요 시 Spinner 컴포넌트로 교
 
 const pointRouter = () => ({
     path: "point",
+
     children: [
         {
             index: true,
             element: (
                 <Suspense fallback={Loading}>
-                    <PointPage />
+
+                    <PaymentListPage/>
                 </Suspense>
-            ),
+    )
         },
-        // 예: 특정 기간 필터 경로 추가
-        // {
-        //   path: ":filter", // ex) /point/last7day
-        //   element: (
-        //     <Suspense fallback={Loading}>
-        //       <PointPage />
-        //     </Suspense>
-        //   ),
-        // },
+        {
+            path: ':paymentId',
+            element: (
+                <Suspense fallback={Loading}>
+                    <PaymentDetailPage/>
+                </Suspense>
+            )
+        }
+
     ],
 });
-
-export default pointRouter;
+export default paymentRouter;
