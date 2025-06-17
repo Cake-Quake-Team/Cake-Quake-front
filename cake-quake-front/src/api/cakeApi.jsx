@@ -28,8 +28,8 @@ export const getOptionItems = async (shopId) => {
 }
 
 // 케이크 등록
-export const addCake = async (shopId, data) => {
-    const response = await jwtAxios.post(`${prefix}/shops/${shopId}/cakes`, data, {
+export const addCake = async (data) => {
+    const response = await jwtAxios.post(`${prefix}/cakes`, data, {
         headers: {
             "Content-Type": "multipart/form-data",
         }
@@ -38,8 +38,8 @@ export const addCake = async (shopId, data) => {
 };
 
 // 케이크 상세 조회
-export const getCakeDetail = async (cakeId) => {
-    const response = await jwtAxios.get(`${prefix}/cakes/${cakeId}`);
+export const getCakeDetail = async (shopId, cakeId) => {
+    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/cakes/${cakeId}`);
     return response.data;
 }
 

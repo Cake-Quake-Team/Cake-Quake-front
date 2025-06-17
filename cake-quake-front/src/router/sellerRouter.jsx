@@ -21,19 +21,19 @@ const sellerRouter = () => {
                 element: <Suspense fallback={Loading}><SellerIndex/></Suspense>
             },
             {
-                path: "cakes/list",
+                path: "shop/:shopId/cakes/list",
                 element: <Suspense fallback={Loading}><CakeList /></Suspense>
             },
             {
-                path: "cakes/read/:cakeId",
+                path: "shop/:shopId/cakes/read/:cakeId",
                 element: <Suspense fallback={Loading}><SellerCakeRead /></Suspense>
             },
             {
-                path: "cakes/add",
+                path: "shop/:shopId/cakes/add",
                 element: <Suspense fallback={Loading}><CakeAdd /></Suspense>
             },
             {
-                path: "cakes/update/:cakeId",
+                path: "shop/:shopId/cakes/update/:cakeId",
                 element: <Suspense fallback={Loading}><CakeUpdate /></Suspense>
             }
         ]

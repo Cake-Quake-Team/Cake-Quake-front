@@ -3,10 +3,11 @@ import CakeBasicInfoForm from "../../components/cake/addCakeComponent/cakeBasicI
 import CakeImageUploadForm from "../../components/cake/addCakeComponent/cakeImageForm.jsx";
 import CakeOptionForm from "../../components/cake/addCakeComponent/cakeOptionForm.jsx";
 import {getOptionTypes, getOptionItems, addCake} from "../../api/cakeApi.jsx";
-import {Link, useNavigate} from "react-router";
+import {Link, useNavigate, useParams} from "react-router";
 
 function CakeAddPage() {
 
+    const {shopId} = useParams();
     const navigate = useNavigate();
 
     const [addCakeDTO, setAddCakeDTO] = useState({
@@ -55,7 +56,6 @@ function CakeAddPage() {
     // 옵션 상태 및 API 호출
     const [optionTypes, setOptionTypes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
-    const shopId = 1;   // 실제 shopId로 바꿔야 함.
 
     useEffect(() => {
         const fetchOptions = async () => {
@@ -66,8 +66,8 @@ function CakeAddPage() {
                 const fetchedOptionItems = await getOptionItems(shopId);
 
                 // 타입과 아이템 매핑
-                const mergedOptionTypes = fetchedOptionTypes.map(type => { // 변경된 변수명 사용
-                    const relevantItems = fetchedOptionItems.filter(item => // 변경된 변수명 사용
+                const mergedOptionTypes = fetchedOptionTypes.map(type => {
+                    const relevantItems = fetchedOptionItems.filter(item =>
                         item.optionTypeId === type.optionTypeId
                     );
 
@@ -124,14 +124,14 @@ function CakeAddPage() {
             }
 
             // 여기서 API 호출
-            const result = await addCake(shopId, formData);
+            const result = await addCake(formData);
             console.log("저장 성공!", result);
             alert("상품이 성공적으로 등록되었습니다!");
         } catch (error) {
             console.error("상품 등록 실패", error);
             alert("등록 중 오류 발생");
         }
-        navigate("/seller/cakes/list");
+        navigate(`/seller/shop/${shopId}/cakes/list`);
     };
 
     return (
