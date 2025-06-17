@@ -4,7 +4,7 @@ import UpdateCake from "../../components/cake/updateCakeComponent";
 import {getCakeDetail, updateCake, getOptionTypes, getOptionItems} from "../../api/cakeApi";
 
 function CakeUpdatePage() {
-    const {cakeId} = useParams();
+    const {shopId, cakeId} = useParams();
     const navigate = useNavigate();
 
     // 케이크 기본 정보
@@ -22,8 +22,6 @@ function CakeUpdatePage() {
     // 옵션
     const [optionTypes, setOptionTypes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
-
-    const shopId = 1;
 
     // 초기 데이터 로딩
     useEffect(() => {
@@ -50,6 +48,7 @@ function CakeUpdatePage() {
                     isThumbnail: img.isThumbnail,
                 }));
 
+                console.log('useEffect 실행 - cakeId:', cakeId, 'location:', location.pathname);
                 setImages(loadedImages); // 초기 이미지만 설정
 
                 // 기존 선택된 옵션 아이템 설정
@@ -154,7 +153,7 @@ function CakeUpdatePage() {
             throw new Error("이미지 업로드 실패");
         }
 
-        return await response.json(); // { id, url }
+        return await response.json();
     }
 
 
@@ -213,7 +212,7 @@ function CakeUpdatePage() {
             // 7. 최종 요청
             await updateCake(shopId, cakeId, formData);
             alert("케이크 수정 완료!");
-            navigate(`/seller/cakes/read/${cakeId}`);
+            navigate(`/seller/shop/${shopId}/cakes/read/${cakeId}`);
         } catch (err) {
             console.error("수정 실패", err);
             alert("케이크 수정 중 오류가 발생했습니다.");
@@ -239,7 +238,7 @@ function CakeUpdatePage() {
                 />
                 <div className="flex justify-center mt-6">
                 <Link
-                    to={`/seller/cakes/read/${cakeId}`}
+                    to={`/seller/shop/${shopId}/cakes/read/${cakeId}`}
                     className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                 >
                     취소
