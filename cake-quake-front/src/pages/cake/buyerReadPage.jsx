@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
-import {getCakeDetail, getOptionTypes, getOptionItems, API_SERVER_HOST} from "../../api/cakeApi.jsx";
+import { useEffect, useState } from "react";
+import {getCakeDetail, API_SERVER_HOST} from "../../api/cakeApi.jsx";
 import { List } from "lucide-react";
 import CakeDetailComponent from "../../components/cake/cakeDetailComponent";
 import {Link, useParams} from "react-router";
@@ -9,14 +9,10 @@ function BuyerCakeReadPage() {
     const [cake, setCake] = useState(null); // 케이크 상세 정보
     const [optionTypes, setOptionTypes] = useState([]); // 병합된 최종 옵션 타입 데이터 (CakeDetailComponent로 전달)
     const [loading, setLoading] = useState(true);
-    const [optionsLoading, setOptionsLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [optionsError, setOptionsError] = useState(null);
-    const [selectedOptions, setSelectedOptions] = useState({}); // 선택된 옵션 상태
+    const [selectedOptions, setSelectedOptions] = useState([]); // 선택된 옵션 상태
 
-    const shopId = 3; // 바꿔야됨
-
-    // 케이크 상세 정보를 가져오는 useEffect
+    // 케이크 상세 정보를 가져오는 useEffect (옵션 정보 포함)
     useEffect(() => {
         if (!cakeId) {
             setError("케이크 ID가 제공되지 않았습니다.");
@@ -28,8 +24,36 @@ function BuyerCakeReadPage() {
                 setLoading(true);
                 setError(null);
 
-                const data = await getCakeDetail(shopId, cakeId);
+                const data = await getCakeDetail(cakeId); // 백엔드에서 cakeDetailDTO와 options를 모두 받아옴
                 setCake(data);
+
+                // 백엔드에서 받은 options 데이터를 기반으로 optionTypes를 직접 구성
+                if (data && data.options) {
+                    const groupedOptions = data.options.reduce((acc, currentOption) => {
+                        // optionTypeId를 기준으로 그룹화 (백엔드에서 받은 값 활용)
+                        const typeId = currentOption.optionTypeId;
+                        const typeName = currentOption.optionTypeName || `알 수 없는 옵션 타입 ${typeId}`;
+
+                        if (!acc[typeId]) {
+                            acc[typeId] = {
+                                optionTypeId: typeId,
+                                optionType: typeName,
+                                optionItems: []
+                            };
+                        }
+                        acc[typeId].optionItems.push({
+                            optionItemId: currentOption.optionItemId,
+                            optionName: currentOption.optionName,
+                            price: currentOption.price
+                        });
+                        return acc;
+                    }, {});
+
+                    // 객체를 배열로 변환
+                    setOptionTypes(Object.values(groupedOptions));
+                } else {
+                    setOptionTypes([]); // 옵션 데이터가 없으면 빈 배열로 설정
+                }
 
             } catch (err) {
                 console.error("케이크 상세 정보를 불러오는 데 실패했습니다:", err);
@@ -40,88 +64,20 @@ function BuyerCakeReadPage() {
         };
 
         fetchCakeDetail();
-    }, [cakeId, shopId]);
+    }, [cakeId]);
 
-    // 케이크의 options에 있는 optionTypeId를 추출
-    const cakeRelevantOptionTypeIds = useMemo(() => {
-        const ids = cake?.options?.map(item => item.optionTypeId);
-        const setIds = new Set(ids);
-        return setIds;
-    }, [cake?.options]);
-
-    const cakeRelevantOptionItemIds = useMemo(() => {
-        const itemIds = cake?.options?.map(item => item.optionItemId);
-        const setItemIds = new Set(itemIds);
-        return setItemIds;
-    }, [cake?.options]);
-
-    // 옵션 타입과 아이템 정보를 가져오고 병합하는 useEffect
-    useEffect(() => {
-        // cakeId와 shopId가 모두 있어야 옵션 정보를 가져올 수 있습니다.
-        if (!cakeId || !shopId || !cake) {
-            setOptionsLoading(false); // 초기 로딩 상태 설정
-            return;
-        }
-
-        const fetchAndMergeOptions = async () => {
-            setOptionsLoading(true); // 옵션 로딩 시작
-            setOptionsError(null);     // 옵션 에러 초기화
-
-            try {
-                // api에서 임포트한 함수들을 사용
-                const fetchedOptionTypes = await getOptionTypes(shopId);
-                const fetchedOptionItems = await getOptionItems(shopId);
-
-                let mergedOptionTypes = fetchedOptionTypes.map(type => {
-                    // 해당 옵션 타입에 속하는 'shop의 모든 옵션 아이템'을 가져옵니다.
-                    const allShopItemsForThisType = fetchedOptionItems.filter(item =>
-                        item.optionTypeId === type.optionTypeId
-                    );
-
-                    // 새로 추가된 필터링: 이 케이크에 연결된 optionItemId만 필터링합니다.
-                    const cakeSpecificOptionItems = allShopItemsForThisType.filter(shopItem =>
-                        cakeRelevantOptionItemIds.has(shopItem.optionItemId)
-                    );
-
-                    return {
-                        optionTypeId: type.optionTypeId,
-                        name: type.optionType,
-                        optionValues: cakeSpecificOptionItems.map(item => ({
-                            optionValueId: item.optionItemId,
-                            name: item.optionName,
-                            price: item.price
-                        }))
-                    };
-                });
-
-                // cake의 options에 있는 optionTypeId에 해당하는 타입만 필터링
-                mergedOptionTypes = mergedOptionTypes.filter(typeGroup =>
-                    cakeRelevantOptionTypeIds.has(typeGroup.optionTypeId)
-                );
-
-                setOptionTypes(mergedOptionTypes);
-            } catch (err) {
-                console.error("옵션 데이터 불러오기 실패:", err);
-                setOptionsError("옵션 정보를 불러오는 데 실패했습니다.");
-            } finally {
-                setOptionsLoading(false);
-            }
-        };
-
-        fetchAndMergeOptions();
-    }, [cake, shopId, cakeRelevantOptionTypeIds]);
 
     // 전체 로딩 상태 및 에러 메시지 처리
-    if (loading || optionsLoading) { // 케이크 정보 또는 옵션 정보 중 하나라도 로딩 중이면
+    if (loading) { // 케이크 정보 로딩에 옵션 정보 로딩도 포함
         return (
             <div className="text-center py-8 text-gray-500">
-                {loading ? "상품 정보를 불러오는 중..." : "옵션 정보를 불러오는 중..."}
+                상품 정보를 불러오는 중...
             </div>
         );
     }
 
-    if (error || optionsError) { // 케이크 정보 또는 옵션 정보 로딩 중 에러 발생 시
-        return <div className="text-center py-8 text-red-500">{error || optionsError}</div>;
+    if (error) { // 케이크 정보 로딩 중 에러 발생 시
+        return <div className="text-center py-8 text-red-500">{error}</div>;
     }
 
     return (

@@ -38,14 +38,14 @@ export const addCake = async (shopId, data) => {
 };
 
 // 케이크 상세 조회
-export const getCakeDetail = async (shopId, cakeId) => {
-    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/cakes/${cakeId}`);
+export const getCakeDetail = async (cakeId) => {
+    const response = await jwtAxios.get(`${prefix}/cakes/${cakeId}`);
     return response.data;
 }
 
 // 케이크 삭제
-export const deleteCake = async (shopId, cakeId) => {
-    const response = await jwtAxios.delete(`${prefix}/shops/${shopId}/cakes/${cakeId}`);
+export const deleteCake = async (cakeId) => {
+    const response = await jwtAxios.delete(`${prefix}/cakes/${cakeId}`);
     return response.data;
 }
 

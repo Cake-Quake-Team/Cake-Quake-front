@@ -48,7 +48,7 @@ function CakeAllList() {
         if (selectedMainCategory !== "STORE_BY_CATEGORY") return;
 
         setLoading(true);
-        getShopListInfinity({ page, keyword }) // API 설계에 맞게 인자 조정
+        getShopListInfinity({ page, keyword })
             .then(data => {
                 setShopList(prev => [...prev, ...data.content]);
                 setHasMore(!data.last);
@@ -69,7 +69,7 @@ function CakeAllList() {
             fetchKeyword = selectedDetailKeyword;
         } else if (selectedMainCategory === "RECOMMENDED_PRODUCTS") {
             // '추천상품'이 선택되었을 때 특정 키워드 또는 전체 조회 (API에 따라 조정)
-            fetchKeyword = ""; // 또는 빈 문자열 ""
+            fetchKeyword = "";
         }
 
         getAllCakeList({ page, keyword: fetchKeyword })

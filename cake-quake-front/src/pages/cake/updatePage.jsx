@@ -13,7 +13,7 @@ function CakeUpdatePage() {
         category: "",
         price: "",
         description: "",
-        isOnSale: false
+        isOnsale: false
     });
 
     // 이미지 URL 배열 (string)
@@ -23,7 +23,7 @@ function CakeUpdatePage() {
     const [optionTypes, setOptionTypes] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
 
-    const shopId = 3;
+    const shopId = 1;
 
     // 초기 데이터 로딩
     useEffect(() => {
@@ -40,7 +40,7 @@ function CakeUpdatePage() {
                     imageUrls,
                 } = cake.cakeDetailDTO;
 
-                setUpdateDTO({ cname, category, price, description, isOnSale: isOnsale });
+                setUpdateDTO({ cname, category, price, description, isOnsale: isOnsale });
 
                 // **초기 이미지 상태 설정: 서버에서 받은 기존 이미지들만 로드**
                 const loadedImages = imageUrls.map((img) => ({
@@ -59,7 +59,7 @@ function CakeUpdatePage() {
                 // 3. 모든 옵션 타입과 모든 옵션 아이템 가져와서 매핑
                 const fetchedOptionTypes = await getOptionTypes(shopId);
                 const fetchedOptionItems = await getOptionItems(shopId);
-                console.log("모든 옵션 타입 API 응답 (getOptionTypes):", fetchedOptionTypes); // <-- 이 로그 확인
+                console.log("모든 옵션 타입 API 응답 (getOptionTypes):", fetchedOptionTypes);
 
                 const mergedOptionTypes = fetchedOptionTypes.map(type => {
                     const relevantItems = fetchedOptionItems.filter(item =>
@@ -239,7 +239,7 @@ function CakeUpdatePage() {
                 />
                 <div className="flex justify-center mt-6">
                 <Link
-                    to={`/cakes/seller/read/${cakeId}`}
+                    to={`/seller/cakes/read/${cakeId}`}
                     className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                 >
                     취소
