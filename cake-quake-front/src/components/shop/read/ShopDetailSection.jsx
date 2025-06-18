@@ -32,7 +32,7 @@ const ShopDetailSection=({shop})=>{
             {/* 목록으로 돌아가기 */}
             <div className="absolute top-4 left-4">
                 <span
-                    onClick={() => navigate('/shop')}
+                    onClick={() => navigate('/cakes')}
                     className="flex items-center text-gray-500 hover:text-blue-600 cursor-pointer text-sm transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />

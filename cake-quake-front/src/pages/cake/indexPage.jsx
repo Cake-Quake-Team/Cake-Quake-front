@@ -4,8 +4,12 @@ import { getAllCakeList } from "../../api/cakeApi";
 import CakeCategorySelector from "../../components/cake/categorySelectComponent.jsx";
 import {detailCategories} from "../../constants/cakeCategory.js";
 import {getShopListInfinity} from "../../api/shopApi.jsx";
-import ShopList from "../../components/shop/shopList.jsx";
-import ShopFilterBar from "../../components/shop/shopFilterBar.jsx";
+
+import ShopFilterBar from "../../components/shop/list/shopFilterBar.jsx";
+import ShopCard from "../../components/shop/list/shopCard.jsx";
+import ShopList from "../../components/shop/list/shopList.jsx";
+
+import {Link} from "react-router";
 
 // 메인 분류 목록
 const mainCategories = [
@@ -23,7 +27,7 @@ function CakeAllList() {
     const [selectedDetailKeyword, setSelectedDetailKeyword] = useState("LETTERING");
 
     // 매장 관련 상태
-    const [shopList, setShopList] = useState([]);
+    const [shopCard, setShopCard] = useState([]);
     const [shopPage, setShopPage] = useState(1);
     const [filter, setFilter] = useState("");
     const [sort, setSort] = useState("shopId");
@@ -43,13 +47,25 @@ function CakeAllList() {
         if (node) observer.current.observe(node);
     }, [loading, hasMore]);
 
+    //STORE_BY_CATEGORY 선택 시
     useEffect(() => {
-        if (selectedMainCategory !== "STORE_BY_CATEGORY") return;
-
+        //벗어나는 경우 매장 데이터 초기화
+        if (selectedMainCategory !== "STORE_BY_CATEGORY") {
+            setShopCard([]);
+            setShopPage(0);
+            setHasMore(true);
+            return;
+        }
         setLoading(true);
-        getShopListInfinity({ page, keyword }) // API 설계에 맞게 인자 조정
+        getShopListInfinity({ page:shopPage, keyword,filter,sort })
+
             .then(data => {
-                setShopList(prev => [...prev, ...data.content]);
+                setShopCard(prev => {
+                    const newContent = data.content.filter(newItem =>
+                        !prev.some(existingItem => existingItem.shopId === newItem.shopId)
+                    );
+                    return [...prev, ...newContent];
+                });
                 setHasMore(!data.last);
                 setLoading(false);
             })
@@ -68,7 +84,7 @@ function CakeAllList() {
             fetchKeyword = selectedDetailKeyword;
         } else if (selectedMainCategory === "RECOMMENDED_PRODUCTS") {
             // '추천상품'이 선택되었을 때 특정 키워드 또는 전체 조회 (API에 따라 조정)
-            fetchKeyword = ""; // 또는 빈 문자열 ""
+            fetchKeyword = "";
         }
 
         getAllCakeList({ page, keyword: fetchKeyword })
@@ -119,12 +135,13 @@ function CakeAllList() {
                 )}
 
                 {/* 케이크 목록 그리드 */}
-                {/* '매장별 분류'가 선택되었을 때는 케이크 목록을 보여주지 않거나 다른 컴포넌트 렌더링 */}
                 {selectedMainCategory !== "STORE_BY_CATEGORY" && (
                     cakes.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {cakes.map(cake => (
+                                <Link to={`/buyer/cakes/read/${cake.cakeId}`}>
                                 <CakeCard key={cake.cakeId} cake={cake} />
+                                </Link>
                             ))}
                         </div>
                     ) : (
@@ -143,13 +160,46 @@ function CakeAllList() {
                             setSort={setSort}
                             keyword={keyword}
                             setKeyword={setKeyword}
+                            // 필터/정렬/검색어 변경 시 shopPage를 0으로 리셋
+                            onFilterChange={() => {
+                                setShopCard([]);
+                                setShopPage(0);
+                                setHasMore(true);
+                            }}
                         />
-                        <ShopList
-                            shopList={shopList}
-                            lastShopElementRef={lastShopElementRef}
-                            loading={loading}
-                            hasMore={hasMore}
-                        />
+                        {shopCard.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+                                {shopCard.map((shopItem, index) => {
+                                   const isLastElement =shopCard.length===index+1;
+
+                                   return(
+                                       <Link
+                                           to={`/shops/read/${shopItem.shopId}`}
+                                           key={shopItem.shopId}
+                                           ref={isLastElement ? lastShopElementRef : null}
+                                           className="block rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full bg-white cursor-pointer"
+                                           style={{
+                                               textDecoration: 'none',
+                                               color: 'inherit'
+                                           }} >
+                                           <ShopCard shop={shopItem} />
+                                       </Link>
+                                   )
+                                })}
+                            </div>
+                        ) : (
+                            !loading && (
+                                <div className="text-center text-gray-500 text-lg mt-10">
+                                    선택하신 조건에 맞는 매장이 없습니다. 🏪
+                                </div>
+                            )
+                        )}
+
+                        {!hasMore && !loading && shopCard.length > 0 && (
+                            <div className="text-center text-gray-500 text-sm mt-4">
+                                모든 매장을 불러왔습니다.
+                            </div>
+                        )}
                     </>
                 )}
             </main>

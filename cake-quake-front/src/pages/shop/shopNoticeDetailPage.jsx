@@ -45,7 +45,7 @@ const ShopNoticeDetailPage = () => {
         setIsDeleteModalOpen(false);
         await deleteShopNotice(shopId, noticeId);
         alert("공지사항이 성공적으로 삭제되었습니다.");
-        navigate(`/shop/read/${shopId}/notices`);
+        navigate(`/shops/read/${shopId}/notices`);
     };
 
     const handleCancelDelete = () => {
@@ -80,13 +80,13 @@ const ShopNoticeDetailPage = () => {
 
                 <div className="mt-12 flex flex-wrap justify-center gap-4 sm:justify-end">
                     <button
-                        onClick={() => navigate(`/shop/read/${shopId}/notices`)}
+                        onClick={() => navigate(`/shops/read/${shopId}/notices`)}
                         className="px-7 py-3 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition-all duration-300 ease-in-out text-lg font-medium shadow-sm hover:shadow-md"
                     >
                         목록으로 돌아가기
                     </button>
                     <button
-                        onClick={() => navigate(`/shop/read/${shopId}/notices/${noticeId}/update`)}
+                        onClick={() => navigate(`/shops/read/${shopId}/notices/${noticeId}/update`)}
                         className="px-7 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all duration-300 ease-in-out text-lg font-medium shadow-md hover:shadow-lg"
                     >
                         공지사항 수정
