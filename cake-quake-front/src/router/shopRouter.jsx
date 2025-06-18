@@ -9,6 +9,11 @@ const ShopNoticeCreate=lazy(()=>import("../pages/shop/shopNoticeCreatePage.jsx")
 const ShopNoticeUpdate=lazy(()=>import("../pages/shop/shopNoticeUpdatePage.jsx"))
 const ShopUpdate=lazy(()=>import("../pages/shop/shopUpdatePage.jsx"))
 
+//발주
+const ProcurementListPage = lazy(()=> import("../pages/procurement/shopProcurementListPage.jsx"));
+const ProcurementCreatePage = lazy(()=>import("../pages/procurement/shopProcurementCreatePage.jsx"));
+const ProcurementDetailPage= lazy(()=>import("../pages/procurement/shopProcurementDetailPage.jsx"));
+
 const shopRouter = () => {
     return {
         path: "shops",
@@ -37,10 +42,24 @@ const shopRouter = () => {
                 path: "read/:cid/notices/:nid/update",
                 element: <Suspense fallback={Loading}><ShopNoticeUpdate /></Suspense>
             },
+
             {
                 //shops/update/5
                 path:"update/:cid",
                 element: <Suspense fallback={Loading}><ShopUpdate/></Suspense>
+            },
+            //--------------------발주--------------------
+            {
+                path: "read/:cid/procurements",
+                element: <Suspense fallback={Loading}><ProcurementListPage/></Suspense>
+            },
+            {
+                path: "read/:cid/procurements/new",
+                element:<Suspense fallback={Loading}><ProcurementCreatePage/></Suspense>
+            },
+            {
+                path: "read/:cid/procurements/:pid",
+                element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
             }
 
 

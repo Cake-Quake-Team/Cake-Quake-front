@@ -10,7 +10,6 @@ function SellerLayout() {
             <main className="flex-grow">
                 <Outlet />
             </main>
-            <Footer />
         </div>
     );
 }

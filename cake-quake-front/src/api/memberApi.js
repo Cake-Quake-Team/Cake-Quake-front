@@ -147,7 +147,7 @@ export const testToken = async() => {
 // 판매자만 접근 가능. 역할 테스트
 export const testSellerOnly = async() => {
     try {
-        const res = await jwtAxios.get(`${baseUrl}/${endpoints.sellerOnly}`, header)
+        const res = await jwtAxios.get(`${baseUrl}/${endpoints.sellerOnly}`)
 
         console.log(res.data)
         return res.data

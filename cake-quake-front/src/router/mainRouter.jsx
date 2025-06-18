@@ -3,10 +3,11 @@ import BasicLayout from "../layouts/BasicLayout";
 import MainPage from "../pages/mainPage";
 import {createBrowserRouter} from "react-router";
 import {Suspense} from "react";
-import cakeRouter from "./cakeRouter.jsx";
+
+
+import buyerRouter from "./buyerRouter.jsx";
 import sellerRouter from "./sellerRouter.jsx";
 import adminRouter from "./adminRouter.jsx";
-
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
@@ -14,7 +15,6 @@ import reviewRouter from "./reviewRouter.jsx";
 import paymentRouter from "./paymentRouter.jsx";
 import pointRouter from "./pointRouter.jsx";
 import temperatureRouter from "./temperatureRouter.jsx";
-
 
 
 
@@ -31,7 +31,6 @@ const mainRouter = createBrowserRouter([
                 element: <Suspense fallback={Loading}><MainPage /></Suspense>
             },
 
-            cakeRouter(),
             sellerRouter(),
             adminRouter(),
             reviewRouter(),
@@ -40,7 +39,9 @@ const mainRouter = createBrowserRouter([
             shopRouter(),
             paymentRouter(),
             pointRouter(),
-            temperatureRouter()
+            temperatureRouter(),
+            buyerRouter()
+            
 
 
 

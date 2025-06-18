@@ -3,13 +3,13 @@ import { detailCategories } from "../../../constants/cakeCategory";
 
 function CakeBasicInfoForm({ formData, onChange }) {
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 mt-6">
             <div>
                 <label className="block text-gray-700 font-medium">상품명</label>
                 <input
                     type="text"
                     name="cname"
-                    value={formData.cname}
+                    value={formData.cname  || ''}
                     onChange={onChange}
                     className="w-full border border-gray-300 rounded px-3 py-2 mt-1"
                     placeholder="예: 레터링 케이크"
@@ -28,7 +28,6 @@ function CakeBasicInfoForm({ formData, onChange }) {
             <div>
                 <label className="block text-gray-700 font-medium">가격 (원)</label>
                 <input
-                    type="number"
                     name="price"
                     value={formData.price}
                     onChange={onChange}
@@ -46,8 +45,19 @@ function CakeBasicInfoForm({ formData, onChange }) {
                     placeholder="간단한 상품 설명을 입력하세요."
                 />
             </div>
-
-
+            <div className="flex items-center">
+                <input
+                    type="checkbox"
+                    id="isOnsale"
+                    name="isOnsale"
+                    checked={formData.isOnsale}
+                    onChange={(e) => onChange({ target: { name: "isOnsale", value: e.target.checked } })}
+                    className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <label htmlFor="isOnSale" className="text-gray-700 font-medium">
+                    품절여부
+                </label>
+            </div>
         </div>
     );
 }
