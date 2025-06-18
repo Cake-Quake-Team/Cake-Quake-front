@@ -9,6 +9,12 @@ const beforeReq = (config) => {
     console.log("---------요청 전 작업---------")
 
     const accessToken = getCookie("access_token")
+
+    if (accessToken) {
+        const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        console.log("로그인 유저 role:", payload.role);
+    }
+
     config.headers.Authorization = `Bearer ${accessToken}`
     return config
 }
