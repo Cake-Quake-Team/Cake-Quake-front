@@ -31,7 +31,6 @@ const mainRouter = createBrowserRouter([
             authRouter(),
             memberRouter(),
             shopRouter(),
-            buyerRouter()
 
         ]
     }
