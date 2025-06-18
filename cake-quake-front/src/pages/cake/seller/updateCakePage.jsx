@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router";
-import UpdateCake from "../../components/cake/updateCakeComponent";
-import {getCakeDetail, updateCake, getOptionTypes, getOptionItems} from "../../api/cakeApi";
+import UpdateCake from "../../../components/cake/itemComponents/updateCakeComponent.jsx";
+import {getCakeDetail, updateCake, getOptionTypes, getOptionItems} from "../../../api/cakeApi.jsx";
 
 function CakeUpdatePage() {
     const {shopId, cakeId} = useParams();

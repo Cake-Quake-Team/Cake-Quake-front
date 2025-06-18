@@ -1,8 +1,8 @@
 import {useEffect, useState} from "react";
-import CakeBasicInfoForm from "../../components/cake/addCakeComponent/cakeBasicInfoForm.jsx";
-import CakeImageUploadForm from "../../components/cake/addCakeComponent/cakeImageForm.jsx";
-import CakeOptionForm from "../../components/cake/addCakeComponent/cakeOptionForm.jsx";
-import {getOptionTypes, getOptionItems, addCake} from "../../api/cakeApi.jsx";
+import CakeBasicInfoForm from "../../../components/cake/itemComponents/cakeBasicInfoForm.jsx";
+import CakeImageUploadForm from "../../../components/cake/itemComponents/cakeImageForm.jsx";
+import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
+import {getOptionTypes, getOptionItems, addCake} from "../../../api/cakeApi.jsx";
 import {Link, useNavigate, useParams} from "react-router";
 
 function CakeAddPage() {

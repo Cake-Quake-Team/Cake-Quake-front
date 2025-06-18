@@ -1,11 +1,11 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import CakeCard from "../../components/cake/cakeCard";
-import { getAllCakeList } from "../../api/cakeApi";
-import CakeCategorySelector from "../../components/cake/categorySelectComponent.jsx";
-import {detailCategories} from "../../constants/cakeCategory.js";
-import {getShopListInfinity} from "../../api/shopApi.jsx";
-import ShopList from "../../components/shop/list/shopList.jsx";
-import ShopFilterBar from "../../components/shop/list/shopFilterBar.jsx";
+import CakeCard from "../../../components/cake/itemComponents/cakeCard.jsx";
+import { getAllCakeList } from "../../../api/cakeApi.jsx";
+import CakeCategorySelector from "../../../components/cake/itemComponents/categorySelectComponent.jsx";
+import {detailCategories} from "../../../constants/cakeCategory.js";
+import {getShopListInfinity} from "../../../api/shopApi.jsx";
+import ShopList from "../../../components/shop/list/shopList.jsx";
+import ShopFilterBar from "../../../components/shop/list/shopFilterBar.jsx";
 import {Link} from "react-router";
 
 // 메인 분류 목록
@@ -124,7 +124,7 @@ function CakeAllList() {
                     cakes.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {cakes.map(cake => (
-                                <Link to={`/buyer/cakes/read/${cake.cakeId}`}>
+                                <Link to={`/buyer/shop/${cake.shopId}/cakes/read/${cake.cakeId}`}>
                                 <CakeCard key={cake.cakeId} cake={cake} />
                                 </Link>
                             ))}

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import {getCakeDetail, API_SERVER_HOST} from "../../api/cakeApi.jsx";
+import {getCakeDetail, API_SERVER_HOST} from "../../../api/cakeApi.jsx";
 import { List } from "lucide-react";
-import CakeDetailComponent from "../../components/cake/cakeDetailComponent";
+import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import {Link, useParams} from "react-router";
+import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
 
 function BuyerCakeReadPage() {
-    const { cakeId } = useParams();
+    const { shopId, cakeId } = useParams();
     const [cake, setCake] = useState(null); // 케이크 상세 정보
     const [optionTypes, setOptionTypes] = useState([]); // 병합된 최종 옵션 타입 데이터 (CakeDetailComponent로 전달)
     const [loading, setLoading] = useState(true);
@@ -24,7 +25,7 @@ function BuyerCakeReadPage() {
                 setLoading(true);
                 setError(null);
 
-                const data = await getCakeDetail(cakeId); // 백엔드에서 cakeDetailDTO와 options를 모두 받아옴
+                const data = await getCakeDetail(shopId, cakeId); // 백엔드에서 cakeDetailDTO와 options를 모두 받아옴
                 setCake(data);
 
                 // 백엔드에서 받은 options 데이터를 기반으로 optionTypes를 직접 구성
@@ -38,6 +39,7 @@ function BuyerCakeReadPage() {
                             acc[typeId] = {
                                 optionTypeId: typeId,
                                 optionType: typeName,
+                                isRequired: currentOption.isRequired,
                                 optionItems: []
                             };
                         }
@@ -103,17 +105,18 @@ function BuyerCakeReadPage() {
                     selectedOptions={selectedOptions}
                     setSelectedOptions={setSelectedOptions}
                     apiBaseUrl={API_SERVER_HOST} // 이미지 경로를 위해 API_SERVER_HOST 전달
+                    OptionComponent={CakeOptionForm}
                 />
-                    <div className="mt-6 flex justify-end">
+                    <div className="mt-6 flex justify-center">
                         <button
                             onClick={() => console.log("장바구니 담기")}
-                            className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
+                            className="min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                         >
                             장바구니 담기
                         </button>
                         <button
                             onClick={() => console.log("결제하기")}
-                            className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
+                            className="min-w-[120px] text-sm ml-5 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
                         >
                             결제하기
                         </button>

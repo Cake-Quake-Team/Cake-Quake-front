@@ -3,28 +3,14 @@ import jwtAxios from "../utils/jwtUtil.js";
 export const API_SERVER_HOST = "http://localhost:8080";
 const prefix = `${ API_SERVER_HOST }/api`;
 
+{/* 케이크 상품 */}
+
 // 케이크 목록 가져오기
 export const getAllCakeList = async ({ page = 1, keyword = "LETTERING", size = 8 }) => {
     const response = await jwtAxios.get(`${prefix}/cakes`, {
         params: { page, size, keyword },
     })
     return response.data;
-}
-
-// 옵션 타입 가져오기
-export const getOptionTypes = async (shopId) => {
-    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/options/types`);
-    return response.data.content;
-}
-
-// 옵션 값 가져오기
-export const getOptionItems = async (shopId) => {
-    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/options/items`,{
-        params: {
-            page: 1,
-            size: 1000
-        }})
-    return response.data.content;
 }
 
 // 케이크 등록
@@ -56,5 +42,43 @@ export const updateCake = async (shopId, cakeId, data) => {
             "Content-Type": "multipart/form-data",
         }
     });
+    return response.data;
+}
+
+{/* 케이크 옵션 */}
+
+// 옵션 타입 가져오기
+export const getOptionTypes = async (shopId) => {
+    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/options/types`);
+    return response.data.content;
+}
+
+// 옵션 값 가져오기
+export const getOptionItems = async (shopId) => {
+    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/options/items`,{
+        params: {
+            page: 1,
+            size: 1000
+        }})
+    return response.data.content;
+}
+
+// 옵션 타입 등록
+export const addOptionType = async (shopId, data) => {
+    const response = await jwtAxios.post(`${prefix}/shops/${shopId}/options/types`, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
+    return response.data;
+}
+
+// 옵션 값 등록
+export const addOptionItem = async (shopId, data) => {
+    const response = await jwtAxios.post(`${prefix}/shops/${shopId}/options/items`, data, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
     return response.data;
 }

@@ -1,6 +1,6 @@
-import CakeBasicInfoForm from "../../components/cake/addCakeComponent/cakeBasicInfoForm";
-import CakeImageUploadForm from "../../components/cake/addCakeComponent/cakeImageForm";
-import CakeOptionForm from "../../components/cake/addCakeComponent/cakeOptionForm";
+import CakeBasicInfoForm from "./cakeBasicInfoForm.jsx";
+import CakeImageUploadForm from "./cakeImageForm.jsx";
+import CakeOptionForm from "./cakeOptionForm.jsx";
 
 function UpdateCake({
                           formData,
