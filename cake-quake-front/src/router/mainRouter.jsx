@@ -14,6 +14,7 @@ import shopRouter from "./shopRouter.jsx";
 import reviewRouter from "./reviewRouter.jsx";
 import paymentRouter from "./paymentRouter.jsx";
 import pointRouter from "./pointRouter.jsx";
+import temperatureRouter from "./temperatureRouter.jsx";
 
 
 
@@ -33,13 +34,16 @@ const mainRouter = createBrowserRouter([
             sellerRouter(),
             adminRouter(),
             reviewRouter(),
+            buyerRouter(),
             authRouter(),
             memberRouter(),
             shopRouter(),
             paymentRouter(),
             pointRouter(),
+            temperatureRouter(),
             buyerRouter()
             
+
 
 
         ]

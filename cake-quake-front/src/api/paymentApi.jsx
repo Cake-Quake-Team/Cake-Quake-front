@@ -1,6 +1,4 @@
 // ✅ 인터셉터만 사용
-import kakaoAxios from "../utils/paymentAxios.js";
-import {getCookie} from "../utils/cookieUtil.js";
 import jwtAxios from "../utils/jwtUtil.js";
 
 export const API_SERVER_HOST = "http://localhost:8080";

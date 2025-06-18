@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { getToken } from "../../../api/memberApi";
-import { getCookie, setCookie } from "../../../utils/cookieUtil";
-import { Link, useNavigate } from "react-router";
+import { setCookie } from "../../../utils/cookieUtil";
+import { useNavigate } from "react-router";
 import SigninComponent from "../../../components/member/auth/signinComponent";
 import { useAuth } from "../../../store/AuthContext";
 import { parseJwt } from "../../../utils/parseJwt";
+import { getToken } from "../../../api/authApi";
 
 const SigninPage = () => {
 
@@ -34,15 +34,17 @@ const SigninPage = () => {
 
         try{
             // accessToken, refreshToken을 쿠키에 저장
-            const {accessToken, refreshToken} = await getToken(userId, password)
-    
-                setCookie('access_token', accessToken, 1)
-                setCookie('refresh_token', refreshToken, 7)
+            const data = await getToken(userId, password)
+
+            localStorage.setItem("userId", data.userId)
+
+            setCookie('access_token', data.accessToken, 1)
+            setCookie('refresh_token', data.refreshToken, 7)
 
             // 로그인 성공 후 메인 페이지로 이동
             console.log("로그인 성공")
-                // 받은 토큰 파싱
-            const payload = parseJwt(accessToken);
+            // 받은 토큰 파싱
+            const payload = parseJwt(data.accessToken);
 
             if (payload?.userId && payload?.uname && payload?.role) {
                 setUser({ userId: payload.userId, uname: payload.uname, role: payload.role }); // 전역 상태 등록
@@ -54,7 +56,7 @@ const SigninPage = () => {
             console.error("로그인 실패", err)
         }
     }
-    
+
     return (
         <div className="p-4">
             <SigninComponent

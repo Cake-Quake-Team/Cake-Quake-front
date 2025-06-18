@@ -2,7 +2,7 @@ import {Link} from "react-router";
 
 const ShopNoticeSection = ({ noticePreview, shopId }) => {
     // 매장 공지사항 목록 페이지 URL은 항상 필요하므로 여기에 정의합니다.
-    const allNoticesUrl = `/shop/read/${shopId}/notices`;
+    const allNoticesUrl = `/shops/read/${shopId}/notices`;
 
     // 공지사항 미리보기가 없는 경우 (noticePreview가 null/undefined이거나 title이 없는 경우)
     if (!noticePreview || !noticePreview.title) {
