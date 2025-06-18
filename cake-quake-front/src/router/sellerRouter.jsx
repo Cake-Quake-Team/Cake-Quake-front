@@ -1,31 +1,35 @@
-import { lazy, Suspense } from "react";
-import BasicLayout from "../layouts/basicLayout.jsx";
-import SellerLayout from "../layouts/sellerLayout.jsx";
+// src/router/sellerRouter.jsx
+import { lazy, Suspense } from 'react';
+import SellerLayout from '../layouts/sellerLayout.jsx';
 
+const SellerIndex = lazy(() => import('../pages/seller/indexPage.jsx'));
+const SellerOrderListPage = lazy(() => import('../pages/order/seller/SellerOrderListPage.jsx'));
+const SellerOrderDetailPage = lazy(() => import('../pages/order/seller/SellerOrderDetailPage.jsx'));
 
-const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
+const Loading = <div>Loading...</div>;
 
-
-
-const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
-
-const sellerRouter = () => {
-    return {
-        path: "seller",
-        element: <SellerLayout />,
-        children: [
-            {
-                index: true,
-                element: <Suspense fallback={Loading}><SellerIndex/></Suspense>
-            }
-            // {
-            //     path: "list", // /cake/list
-            //     element: <Suspense fallback={Loading}><CakeList /></Suspense>
-            // },
-
-
-        ]
-    };
-};
+const sellerRouter = () => ({
+    path: 'seller',
+    element: <SellerLayout />,
+    children: [
+        {
+            index: true,
+            element: <Suspense fallback={Loading}><SellerIndex /></Suspense>
+        },
+        {
+            path: 'orders',
+            children: [
+                {
+                    index: true,
+                    element: <Suspense fallback={Loading}><SellerOrderListPage /></Suspense>
+                },
+                {
+                    path: ':orderId',
+                    element: <Suspense fallback={Loading}><SellerOrderDetailPage /></Suspense>
+                }
+            ]
+        }
+    ]
+});
 
 export default sellerRouter;

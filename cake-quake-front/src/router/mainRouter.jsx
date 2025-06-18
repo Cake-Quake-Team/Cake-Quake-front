@@ -6,7 +6,7 @@ import {lazy, Suspense} from "react";
 import cakeRouter from "./cakeRouter.jsx";
 import sellerRouter from "./sellerRouter.jsx";
 import adminRouter from "./adminRouter.jsx";
-import buyerRouter from "./reviewRouter.jsx";
+import buyerRouter from "./buyerRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
@@ -31,6 +31,7 @@ const mainRouter = createBrowserRouter([
             sellerRouter(),
             adminRouter(),
             reviewRouter(),
+            buyerRouter(),
             authRouter(),
             memberRouter(),
             shopRouter()
