@@ -1,5 +1,6 @@
 import SellerLayout from "../layouts/sellerLayout.jsx";
 import {lazy, Suspense} from "react";
+import BasicLayout from "../layouts/basicLayout.jsx";
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 const ShopDetail=lazy(()=>import("../pages/shop/shopDetailPage.jsx"))
@@ -9,16 +10,25 @@ const ShopNoticeCreate=lazy(()=>import("../pages/shop/shopNoticeCreatePage.jsx")
 const ShopNoticeUpdate=lazy(()=>import("../pages/shop/shopNoticeUpdatePage.jsx"))
 const ShopUpdate=lazy(()=>import("../pages/shop/shopUpdatePage.jsx"))
 
-//발주
-const ProcurementListPage = lazy(()=> import("../pages/procurement/shopProcurementListPage.jsx"));
-const ProcurementCreatePage = lazy(()=>import("../pages/procurement/shopProcurementCreatePage.jsx"));
-const ProcurementDetailPage= lazy(()=>import("../pages/procurement/shopProcurementDetailPage.jsx"));
+
+const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
+const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
+const CakeUpdate = lazy(() => import("../pages/cake/seller/updateCakePage.jsx"));
+const SellerCakeRead = lazy(() => import("../pages/cake/seller/sellerReadPage.jsx"));
+const OptionAdd = lazy(() => import("../pages/cake/seller/addOptionPage.jsx"));
+const OptionUpdate = lazy(() => import("../pages/cake/seller/updateOptionPage.jsx"));
+const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"));
+
+//리뷰
+const SellerReviewPage = lazy(()=>import("../pages/shop/review/sellerReviewPage.jsx"));
+const SellerReviewDetailPage = lazy(()=>import("../pages/shop/review/sellerReviewDetailPage.jsx"))
+
 
 const shopRouter = () => {
     return {
         path: "shops",
+        element: <SellerLayout/>,
         children: [
-
             {
                 path: "read/:cid",
                 element: <Suspense fallback={Loading}><ShopDetail /></Suspense>
@@ -48,22 +58,56 @@ const shopRouter = () => {
                 path:"update/:cid",
                 element: <Suspense fallback={Loading}><ShopUpdate/></Suspense>
             },
-            //--------------------발주--------------------
+
+            //---------------------------------------현지
             {
-                path: "read/:cid/procurements",
-                element: <Suspense fallback={Loading}><ProcurementListPage/></Suspense>
+                path: ":shopId",
+                element: <Suspense fallback={Loading}><SellerIndex/></Suspense>
+            },
+
+            {
+                path: ":shopId/cakes/read/:cakeId",
+                element: <Suspense fallback={Loading}><SellerCakeRead /></Suspense>
             },
             {
-                path: "read/:cid/procurements/new",
-                element:<Suspense fallback={Loading}><ProcurementCreatePage/></Suspense>
+                path: ":shopId/cakes/add",
+                element: <Suspense fallback={Loading}><CakeAdd /></Suspense>
             },
             {
-                path: "read/:cid/procurements/:pid",
-                element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
+                path: ":shopId/cakes/update/:cakeId",
+                element: <Suspense fallback={Loading}><CakeUpdate /></Suspense>
+            },
+            {
+                path: ":shopId/options/add",
+                element: <Suspense fallback={Loading}><OptionAdd/></Suspense>
+            },
+            {
+                path: ":shopId/options/update/:optionId",
+                element: <Suspense fallback={Loading}><OptionUpdate/></Suspense>
+            },
+            {
+                path: ":shopId/options/read/:optionId",
+                element: <Suspense fallback={Loading}><OptionRead/></Suspense>
+            },
+
+            //----------------------------------매장 리뷰-------------------
+            {
+                index:false,
+                path: ":shopId/reviews",
+                element:(
+                    <Suspense fallback={Loading}>
+                        <SellerReviewPage/>
+                    </Suspense>
+                )
+            },
+            {
+                path: ":shopId/reviews/:reviewId",
+                element:(
+                    <Suspense fallback={Loading}>
+                        <SellerReviewDetailPage/>
+                    </Suspense>
+                )
             }
-
-
-
         ]
     };
 };

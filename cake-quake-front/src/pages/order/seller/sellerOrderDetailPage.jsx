@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSellerOrderDetail, updateOrderStatus } from "../../api/sellerOrderApi";
 import SellerOrderDetail from "../../components/order/seller/SellerOrderDetail";
