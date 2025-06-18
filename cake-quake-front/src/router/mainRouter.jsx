@@ -2,15 +2,19 @@ import BasicLayout from "../layouts/BasicLayout";
 // 필요한 페이지 컴포넌트들을 임포트합니다.
 import MainPage from "../pages/mainPage";
 import {createBrowserRouter} from "react-router";
-import {lazy, Suspense} from "react";
-import cakeRouter from "./cakeRouter.jsx";
+import {Suspense} from "react";
+
+
+import buyerRouter from "./buyerRouter.jsx";
 import sellerRouter from "./sellerRouter.jsx";
 import adminRouter from "./adminRouter.jsx";
-import buyerRouter from "./buyerRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
 import reviewRouter from "./reviewRouter.jsx";
+import paymentRouter from "./paymentRouter.jsx";
+import pointRouter from "./pointRouter.jsx";
+import temperatureRouter from "./temperatureRouter.jsx";
 
 
 
@@ -27,14 +31,19 @@ const mainRouter = createBrowserRouter([
                 element: <Suspense fallback={Loading}><MainPage /></Suspense>
             },
 
-            cakeRouter(),
             sellerRouter(),
             adminRouter(),
             reviewRouter(),
             buyerRouter(),
             authRouter(),
             memberRouter(),
-            shopRouter()
+            shopRouter(),
+            paymentRouter(),
+            pointRouter(),
+            temperatureRouter(),
+            buyerRouter()
+            
+
 
 
         ]

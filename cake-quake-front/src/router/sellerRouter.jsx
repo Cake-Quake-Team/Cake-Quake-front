@@ -1,35 +1,63 @@
-// src/router/sellerRouter.jsx
-import { lazy, Suspense } from 'react';
-import SellerLayout from '../layouts/sellerLayout.jsx';
+import { lazy, Suspense } from "react";
+import SellerLayout from "../layouts/sellerLayout.jsx";
 
-const SellerIndex = lazy(() => import('../pages/seller/indexPage.jsx'));
-const SellerOrderListPage = lazy(() => import('../pages/order/seller/SellerOrderListPage.jsx'));
-const SellerOrderDetailPage = lazy(() => import('../pages/order/seller/SellerOrderDetailPage.jsx'));
 
-const Loading = <div>Loading...</div>;
+const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
 
-const sellerRouter = () => ({
-    path: 'seller',
-    element: <SellerLayout />,
-    children: [
-        {
-            index: true,
-            element: <Suspense fallback={Loading}><SellerIndex /></Suspense>
-        },
-        {
-            path: 'orders',
-            children: [
-                {
-                    index: true,
-                    element: <Suspense fallback={Loading}><SellerOrderListPage /></Suspense>
-                },
-                {
-                    path: ':orderId',
-                    element: <Suspense fallback={Loading}><SellerOrderDetailPage /></Suspense>
-                }
-            ]
-        }
-    ]
-});
+const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
+const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
+
+const CakeAdd = lazy(() => import("../pages/cake/addPage"));
+const CakeUpdate = lazy(() => import("../pages/cake/updatePage.jsx"));
+const CakeList = lazy(() => import("../pages/cake/listPage"));
+const SellerCakeRead = lazy(() => import("../pages/cake/sellerReadPage.jsx"));
+
+
+
+const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
+
+const sellerRouter = () => {
+    return {
+        path: "seller",
+        element: <SellerLayout />,
+        children: [
+            {
+                index: true,
+                element: <Suspense fallback={Loading}><SellerIndex/></Suspense>
+            },
+            {
+                path: "profile",
+                element: <Suspense fallback={Loading}><SellerProfilePage /></Suspense>
+            },
+            {
+                path: "profile/modify/:uid",
+                element: <Suspense fallback={Loading}><SellerProfileModifyPage /></Suspense>
+            },
+            // {
+            //     path: "list", // /cake/list
+            //     element: <Suspense fallback={Loading}><CakeList /></Suspense>
+            // },
+
+
+                path: "shop/:shopId/cakes/list",
+                element: <Suspense fallback={Loading}><CakeList /></Suspense>
+            },
+            {
+                path: "shop/:shopId/cakes/read/:cakeId",
+                element: <Suspense fallback={Loading}><SellerCakeRead /></Suspense>
+            },
+            {
+                path: "shop/:shopId/cakes/add",
+                element: <Suspense fallback={Loading}><CakeAdd /></Suspense>
+            },
+            {
+                path: "shop/:shopId/cakes/update/:cakeId",
+                element: <Suspense fallback={Loading}><CakeUpdate /></Suspense>
+            }
+
+        ]
+    };
+};
 
 export default sellerRouter;
+

@@ -1,7 +1,10 @@
 import { useState } from "react"
-import { getVerificationCode, verifyCode } from "../../../api/memberApi"
+import LoadingSpinner from "../../common/loadingSpinner"
+import { getVerificationCode, verifyCode } from "../../../api/authApi"
 
 const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const [code, setCode] = useState("")
     const [sent, setSent] = useState(false)
@@ -13,6 +16,7 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
     // 인증 코드 발송
     const handleSendCode = async () => {
         try {
+            setIsLoading(true)
             const res = await getVerificationCode({
                 phoneNumber,
                 type
@@ -23,6 +27,8 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
             setSent(true)
         } catch (err) {
             setError("인증 코드 전송 실패")
+        }  finally{
+            setIsLoading(false) // 성공/실패 관계없이 로딩 종료
         }
     }
 
@@ -57,18 +63,18 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
             ) : (
                 <>
                     {sent && serverCode && (
-                    <p className="mt-2 text-sm text-gray-500">
-                        [개발용] 인증코드: <span className="font-mono">{serverCode}</span>
-                    </p>
+                        <p className="mt-2 text-sm text-gray-500">
+                            [개발용] 인증코드: <span className="font-mono">{serverCode}</span>
+                        </p>
                     )}
 
                     {!sent ? (
-                    <button
-                        onClick={handleSendCode}
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                    >
-                        인증 코드 전송
-                    </button>
+                        <button
+                            onClick={handleSendCode}
+                            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                        >
+                            인증 코드 전송
+                        </button>
                     ) : (
                         <>
                             <input
@@ -77,12 +83,16 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
                                 placeholder="인증 코드 입력"
                                 className="w-full border px-4 py-2 rounded mb-2"
                             />
-                            <button
-                                onClick={handleVerify}
-                                className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-                            >
-                                인증 확인
-                            </button>
+                            {isLoading ? (
+                                <LoadingSpinner />
+                            ) : (
+                                <button
+                                    onClick={handleVerify}
+                                    className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+                                >
+                                    인증 확인
+                                </button>
+                            )}
                         </>
                     )}
 

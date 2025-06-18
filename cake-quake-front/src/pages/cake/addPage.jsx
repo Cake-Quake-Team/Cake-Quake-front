@@ -1,11 +1,15 @@
 import {useEffect, useState} from "react";
-import SellerHeader from "../../components/common/sellerHeader";
 import CakeBasicInfoForm from "../../components/cake/addCakeComponent/cakeBasicInfoForm.jsx";
 import CakeImageUploadForm from "../../components/cake/addCakeComponent/cakeImageForm.jsx";
 import CakeOptionForm from "../../components/cake/addCakeComponent/cakeOptionForm.jsx";
 import {getOptionTypes, getOptionItems, addCake} from "../../api/cakeApi.jsx";
+import {Link, useNavigate, useParams} from "react-router";
 
 function CakeAddPage() {
+
+    const {shopId} = useParams();
+    const navigate = useNavigate();
+
     const [addCakeDTO, setAddCakeDTO] = useState({
         cname: "",
         price: "",
@@ -51,8 +55,7 @@ function CakeAddPage() {
 
     // 옵션 상태 및 API 호출
     const [optionTypes, setOptionTypes] = useState([]);
-    const [selectedOptions, setSelectedOptions] = useState({});
-    const shopId = 3;   // 실제 shopId로 바꿔야 함.
+    const [selectedOptions, setSelectedOptions] = useState([]);
 
     useEffect(() => {
         const fetchOptions = async () => {
@@ -63,17 +66,17 @@ function CakeAddPage() {
                 const fetchedOptionItems = await getOptionItems(shopId);
 
                 // 타입과 아이템 매핑
-                const mergedOptionTypes = fetchedOptionTypes.map(type => { // 변경된 변수명 사용
-                    const relevantItems = fetchedOptionItems.filter(item => // 변경된 변수명 사용
+                const mergedOptionTypes = fetchedOptionTypes.map(type => {
+                    const relevantItems = fetchedOptionItems.filter(item =>
                         item.optionTypeId === type.optionTypeId
                     );
 
                     return {
                         optionTypeId: type.optionTypeId,
-                        name: type.optionType,
-                        optionValues: relevantItems.map(item => ({
-                            optionValueId: item.optionItemId,
-                            name: item.optionName,
+                        optionType: type.optionType,
+                        optionItems: relevantItems.map(item => ({
+                            optionItemId: item.optionItemId,
+                            optionName: item.optionName,
                             price: item.price
                         }))
                     }
@@ -90,7 +93,7 @@ function CakeAddPage() {
     const handleSubmit = async () => {
         try {
             const thumbnailImage = cakeImage.find(img => img.isThumbnail);
-            const optionItemIds = Object.values(selectedOptions).flat();
+            const optionItemIds = selectedOptions.map(option => option.optionItemId);
 
             const addCakeDTOWithAll = {
                 ...addCakeDTO,
@@ -121,18 +124,18 @@ function CakeAddPage() {
             }
 
             // 여기서 API 호출
-            const result = await addCake(shopId, formData);
+            const result = await addCake(formData);
             console.log("저장 성공!", result);
             alert("상품이 성공적으로 등록되었습니다!");
         } catch (error) {
             console.error("상품 등록 실패", error);
             alert("등록 중 오류 발생");
         }
+        navigate(`/seller/shop/${shopId}/cakes/list`);
     };
 
     return (
         <div>
-            <SellerHeader/>
             <div className="container mx-auto px-6 py-10">
                 <h1 className="text-2xl font-semibold mb-6 text-center">새 상품 등록</h1>
                 <hr/>
@@ -144,12 +147,18 @@ function CakeAddPage() {
                 />
                 <CakeBasicInfoForm formData={addCakeDTO} onChange={handleChange}/>
                 <CakeOptionForm optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>
-            <button
-                onClick={handleSubmit}
-                className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-                저장하기
-            </button>
+                <Link
+                    to={"/cakes/list"}
+                    className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
+                >
+                    취소
+                </Link>
+                <button
+                    onClick={handleSubmit}
+                    className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
+                >
+                    등록
+                </button>
             </div>
         </div>
     );
