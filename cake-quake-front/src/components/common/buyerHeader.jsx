@@ -32,16 +32,18 @@ function BuyerHeader() {
                             <span className="text-sm font-semibold text-gray-700">
                                 {user.uname}님
                             </span>
+                            {/* 토글 버튼 (로그인 상태에도 보이게) */}
                             <button
-                                onClick={handleSignOut}
-                                className="w-[90px] text-sm bg-blue-100 hover:bg-blue-300 font-bold py-2 px-3 rounded-lg text-center"
+                                onClick={() => setSidebarOpen(true)}
+                                className="block  ml-2"
+                                aria-label="Open menu sidebar"
                             >
-                                로그아웃
+                                <Menu className="w-6 h-6 text-gray-700" />
                             </button>
                         </>
                     ) : (
                         <>
-                            {/* 로그인 버튼은 항상 보임 */}
+                            {/* 로그인 버튼 */}
                             <Link
                                 to="/auth/signin"
                                 className="w-[90px] text-sm text-center bg-teal-400 text-white px-3 py-2 rounded-lg hover:bg-teal-500 transition font-bold"
@@ -49,7 +51,7 @@ function BuyerHeader() {
                                 로그인
                             </Link>
 
-                            {/* 데스크탑에서는 회원가입 바로 보임 */}
+                            {/* 회원가입 - 데스크탑 */}
                             <Link
                                 to="/auth/signup"
                                 className="w-[90px] text-sm text-center bg-rose-50 text-gray-700 px-3 py-2 rounded-lg hover:bg-rose-200 transition font-bold hidden md:inline"
@@ -57,7 +59,7 @@ function BuyerHeader() {
                                 회원 가입
                             </Link>
 
-                            {/* 모바일 토글 버튼 */}
+                            {/* 모바일 메뉴 토글 */}
                             <button
                                 onClick={() => setSidebarOpen(true)}
                                 className="block md:hidden ml-2"
@@ -96,14 +98,34 @@ function BuyerHeader() {
                 </div>
 
                 <nav className="flex flex-col p-4 space-y-4">
-                    <Link
-                        to="/auth/signup"
-                        onClick={() => setSidebarOpen(false)}
-                        className="block text-center bg-rose-50 text-gray-700 px-3 py-2 rounded-lg hover:bg-rose-200 font-bold"
-                    >
-                        회원 가입
-                    </Link>
-                    {/* 여기 필요하면 다른 메뉴 항목 추가 가능 */}
+                    {user ? (
+                        <>
+                            <Link
+                                to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
+                                onClick={() => setSidebarOpen(false)}
+                                className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                            >
+                                마이페이지
+                            </Link>
+                            <button
+                                onClick={() => {
+                                    setSidebarOpen(false);
+                                    handleSignOut();
+                                }}
+                                className="block text-center bg-blue-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-blue-200 font-bold"
+                            >
+                                로그아웃
+                            </button>
+                        </>
+                    ) : (
+                        <Link
+                            to="/auth/signup"
+                            onClick={() => setSidebarOpen(false)}
+                            className="block text-center bg-rose-50 text-gray-700 px-3 py-2 rounded-lg hover:bg-rose-200 font-bold"
+                        >
+                            회원 가입
+                        </Link>
+                    )}
                 </nav>
             </aside>
         </header>

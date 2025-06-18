@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import ResultModal from "../../../components/common/resultModal";
-import { verifyBusiness } from "../../../api/memberApi";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
-import { postSellerSignupStep1 } from "../../../api/memberApi";
 import SellerSignupStep1Component from "../../../components/member/auth/signupSellerStep1Component";
+import { verifyBusiness, postSellerSignupStep1 } from "../../../api/authApi";
 
 
 const SignupSellersStep1Page = () => {
@@ -32,6 +31,7 @@ const SignupSellersStep1Page = () => {
         businessCertificate: "",
     })
 
+    // 유효성 검사 때 에러가 나왔을 때 input 상자 포커스 용
     const inputRefs = {
         userId: useRef(null),
         uname: useRef(null),

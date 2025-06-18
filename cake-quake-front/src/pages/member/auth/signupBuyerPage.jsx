@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ResultModal from "../../../components/common/resultModal";
-import { singup } from "../../../api/memberApi";
 import SignupBuyerComponent from "../../../components/member/auth/signupBuyerComponent";
 import { createBuyerSignupDTO } from "../../../dto/memberdto/signup.dto";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
+import { singup } from "../../../api/authApi";
 
 const SignupBuyerPage = () => {
 
@@ -108,13 +108,13 @@ const SignupBuyerPage = () => {
 
         try {
             setIsLoading(true)
-            const signupData = createBuyerSignupDTO(form); // form → DTO 변환
+            const signupData = createBuyerSignupDTO(form) // form → DTO 변환
             console.log(signupData)
 
             await singup(signupData)
             console.log("signupData: ", signupData)
             // 회원가입 성공 시 모달 표시
-            setModalMsg("회원가입이 완료되었습니다!")
+            setModalMsg(res.message)
             setShowModal(true)
         } catch (err) {
             const msg = err?.response?.data?.message || "회원가입 중 오류가 발생했습니다."

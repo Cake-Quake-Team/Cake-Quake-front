@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { testToken } from "../../../api/memberApi"
+import { testToken } from "../../../api/authApi"
 
 const TokenTestPage = () => {
     const [message, setMessage] = useState("")
