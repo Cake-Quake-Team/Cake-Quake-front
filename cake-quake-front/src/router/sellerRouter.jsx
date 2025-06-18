@@ -1,18 +1,16 @@
 import { lazy, Suspense } from "react";
 import SellerLayout from "../layouts/sellerLayout.jsx";
+import BasicLayout from "../layouts/basicLayout.jsx";
 
 
-const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
-const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
-const CakeUpdate = lazy(() => import("../pages/cake/seller/updateCakePage.jsx"));
-const SellerCakeRead = lazy(() => import("../pages/cake/seller/sellerReadPage.jsx"));
-const OptionAdd = lazy(() => import("../pages/cake/seller/addOptionPage.jsx"));
-const OptionUpdate = lazy(() => import("../pages/cake/seller/updateOptionPage.jsx"));
-const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"));
+
 const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
 const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
 
-
+//발주
+const ProcurementListPage = lazy(()=> import("../pages/procurement/shopProcurementListPage.jsx"));
+const ProcurementCreatePage = lazy(()=>import("../pages/procurement/shopProcurementCreatePage.jsx"));
+const ProcurementDetailPage= lazy(()=>import("../pages/procurement/shopProcurementDetailPage.jsx"));
 
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
@@ -20,14 +18,10 @@ const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌�
 const sellerRouter = () => {
     return {
         path: "seller",
-        element: <SellerLayout />,
+        element: <BasicLayout />,
         children: [
-            {
-                path: "shop/:shopId",
-                element: <Suspense fallback={Loading}><SellerIndex/></Suspense>
-            },
-            {
 
+            {
                 path: "profile",
                 element: <Suspense fallback={Loading}><SellerProfilePage /></Suspense>
             },
@@ -36,31 +30,20 @@ const sellerRouter = () => {
                 element: <Suspense fallback={Loading}><SellerProfileModifyPage /></Suspense>
             },
 
-            {
-                path: "shop/:shopId/cakes/read/:cakeId",
-                element: <Suspense fallback={Loading}><SellerCakeRead /></Suspense>
-            },
-            {
-                path: "shop/:shopId/cakes/add",
-                element: <Suspense fallback={Loading}><CakeAdd /></Suspense>
-            },
-            {
-                path: "shop/:shopId/cakes/update/:cakeId",
-                element: <Suspense fallback={Loading}><CakeUpdate /></Suspense>
-            },
-            {
-                path: "shop/:shopId/options/add",
-                element: <Suspense fallback={Loading}><OptionAdd/></Suspense>
-            },
-            {
-                path: "shop/:shopId/options/update/:optionId",
-                element: <Suspense fallback={Loading}><OptionUpdate/></Suspense>
-            },
-            {
-                path: "shop/:shopId/options/read/:optionId",
-                element: <Suspense fallback={Loading}><OptionRead/></Suspense>
-            }
 
+            //--------------------발주--------------------
+            {
+                path: "read/:shopId/procurements",
+                element: <Suspense fallback={Loading}><ProcurementListPage/></Suspense>
+            },
+            {
+                path: "read/:shopId/procurements/new",
+                element:<Suspense fallback={Loading}><ProcurementCreatePage/></Suspense>
+            },
+            {
+                path: "read/:shopId/procurements/:pid",
+                element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
+            }
         ]
     };
 };

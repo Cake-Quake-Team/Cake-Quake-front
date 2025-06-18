@@ -11,12 +11,6 @@ import adminRouter from "./adminRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
-import reviewRouter from "./reviewRouter.jsx";
-import paymentRouter from "./paymentRouter.jsx";
-import pointRouter from "./pointRouter.jsx";
-import temperatureRouter from "./temperatureRouter.jsx";
-
-
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 
@@ -24,7 +18,7 @@ const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌�
 const mainRouter = createBrowserRouter([
     {
         path: "/",
-        element: <BasicLayout />, // BasicLayout은 Header, Outlet, Footer를 포함
+        element: <BasicLayout/>,
         children: [
             {
                 index: true, // 부모 경로와 동일한 경로 (/)를 의미
@@ -33,18 +27,11 @@ const mainRouter = createBrowserRouter([
 
             sellerRouter(),
             adminRouter(),
-            reviewRouter(),
             buyerRouter(),
             authRouter(),
             memberRouter(),
             shopRouter(),
-            paymentRouter(),
-            pointRouter(),
-            temperatureRouter(),
             buyerRouter()
-            
-
-
 
         ]
     }
