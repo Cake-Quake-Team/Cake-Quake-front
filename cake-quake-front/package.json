@@ -16,6 +16,7 @@
     "axios": "^1.9.0",
     "framer-motion": "^12.18.1",
     "lucide-react": "^0.513.0",
+    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-daum-postcode": "^3.2.0",
