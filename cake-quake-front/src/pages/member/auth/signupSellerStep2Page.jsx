@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ResultModal from "../../../components/common/resultModal";
-import { postSellerSignupStep2 } from "../../../api/memberApi";
 import SignupSellerStep2Component from "../../../components/member/auth/signupSellerStep2Component";
 import PostcodePopup from "../../../components/common/postcodePopup";
+import { postSellerSignupStep2 } from "../../../api/authApi";
 
 
 const SignupSellersStep2Page = () => {

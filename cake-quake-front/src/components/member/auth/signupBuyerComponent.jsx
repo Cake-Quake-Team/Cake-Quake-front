@@ -14,11 +14,6 @@ const SignupBuyerComponent = ({
 }) => {
 
     const { userId, password, verifyPassword, uname, phoneNumber, publicInfo, alarm } = form;
-    
-    // 스크롤 제일 위로 이동
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">

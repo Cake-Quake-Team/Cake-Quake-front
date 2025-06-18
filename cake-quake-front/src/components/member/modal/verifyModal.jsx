@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { getVerificationCode, verifyCode } from "../../../api/memberApi"
 import LoadingSpinner from "../../common/loadingSpinner"
+import { getVerificationCode, verifyCode } from "../../../api/authApi"
 
 const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
 
