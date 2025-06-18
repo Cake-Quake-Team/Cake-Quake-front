@@ -32,12 +32,12 @@ const ShopNoticeForm = ({ shopId, noticeId, initialData }) => {
             // noticeId가 없으면 생성 모드
             const createdNoticeId = await createShopNotice(shopId, noticeData);
             alert("공지사항이 성공적으로 생성되었습니다.");
-            navigate(`/shop/read/${shopId}/notices/${createdNoticeId}`);
+            navigate(`/shops/read/${shopId}/notices/${createdNoticeId}`);
             setIsLoading(false);
             return;
         }
 
-        navigate(`/shop/read/${shopId}/notices/${noticeId}`);
+        navigate(`/shops/read/${shopId}/notices/${noticeId}`);
         setIsLoading(false);
     };
 

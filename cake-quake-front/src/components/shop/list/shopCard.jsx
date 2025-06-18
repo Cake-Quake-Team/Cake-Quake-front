@@ -1,6 +1,13 @@
 import React from 'react';
 
+const DEFAULT_IMAGE='/shop_default_image.jpeg';
+
+
+
 const ShopCard = ({ shop }) => {
+
+    const imgSrc = `http://localhost${shop.thumbnailUrl}`;
+
     const numericRating = parseFloat(shop.rating);
 
     // 별을 렌더링하는 함수
@@ -30,27 +37,36 @@ const ShopCard = ({ shop }) => {
     };
 
     return (
-        <div style={{ border: '1px solid #ccc', padding: '12px', borderRadius: '8px', marginBottom: '12px' }}>
-            {shop.thumbnailUrl ? ( // thumbnailUrl이 있다면 실제 이미지 표시
+        <div className="border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full bg-white">
+            <div className="relative w-full h-48 overflow-hidden">
                 <img
-                    src={shop.thumbnailUrl}
+                    src={imgSrc}
                     alt={shop.shopName}
-                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px' }}
+                    className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
+                    onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = DEFAULT_IMAGE;
+                    }}
                 />
-            ) : ( // 없다면 기본 이미지 표시
-                <img
-                    src="/shop_default_image.jpeg"
-                    alt="기본 매장 이미지"
-                    style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px' }}
-                />
-            )}
-            <h3>{shop.shopName}</h3>
-            <p>{shop.address}</p>
-            <p>
-                {renderStars(numericRating)}{' '}
-                ({numericRating.toFixed(1)})
-            </p>
+            </div>
 
+            <div className="p-4 flex flex-col justify-between flex-grow">
+                <div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-1 leading-tight">
+                        {shop.shopName}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-2 truncate" title={shop.address}>
+                        {shop.address}
+                    </p>
+                </div>
+
+                <div className="flex items-center mt-auto pt-2 border-t border-gray-100">
+                    {renderStars(numericRating)}{' '}
+                    <span className="text-sm text-gray-700 ml-2 font-medium">
+                        ({numericRating.toFixed(1)})
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };
