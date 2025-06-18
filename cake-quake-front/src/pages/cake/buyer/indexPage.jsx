@@ -1,14 +1,11 @@
 import {useCallback, useEffect, useRef, useState} from "react";
-import CakeCard from "../../components/cake/cakeCard";
-import { getAllCakeList } from "../../api/cakeApi";
-import CakeCategorySelector from "../../components/cake/categorySelectComponent.jsx";
-import {detailCategories} from "../../constants/cakeCategory.js";
-import {getShopListInfinity} from "../../api/shopApi.jsx";
-
-import ShopFilterBar from "../../components/shop/list/shopFilterBar.jsx";
-import ShopCard from "../../components/shop/list/shopCard.jsx";
-import ShopList from "../../components/shop/list/shopList.jsx";
-
+import CakeCard from "../../../components/cake/itemComponents/cakeCard.jsx";
+import { getAllCakeList } from "../../../api/cakeApi.jsx";
+import CakeCategorySelector from "../../../components/cake/itemComponents/categorySelectComponent.jsx";
+import {detailCategories} from "../../../constants/cakeCategory.js";
+import {getShopListInfinity} from "../../../api/shopApi.jsx";
+import ShopList from "../../../components/shop/list/shopList.jsx";
+import ShopFilterBar from "../../../components/shop/list/shopFilterBar.jsx";
 import {Link} from "react-router";
 
 // 메인 분류 목록
@@ -27,7 +24,7 @@ function CakeAllList() {
     const [selectedDetailKeyword, setSelectedDetailKeyword] = useState("LETTERING");
 
     // 매장 관련 상태
-    const [shopCard, setShopCard] = useState([]);
+    const [shopList, setShopList] = useState([]);
     const [shopPage, setShopPage] = useState(1);
     const [filter, setFilter] = useState("");
     const [sort, setSort] = useState("shopId");
@@ -47,25 +44,13 @@ function CakeAllList() {
         if (node) observer.current.observe(node);
     }, [loading, hasMore]);
 
-    //STORE_BY_CATEGORY 선택 시
     useEffect(() => {
-        //벗어나는 경우 매장 데이터 초기화
-        if (selectedMainCategory !== "STORE_BY_CATEGORY") {
-            setShopCard([]);
-            setShopPage(0);
-            setHasMore(true);
-            return;
-        }
-        setLoading(true);
-        getShopListInfinity({ page:shopPage, keyword,filter,sort })
+        if (selectedMainCategory !== "STORE_BY_CATEGORY") return;
 
+        setLoading(true);
+        getShopListInfinity({ page, keyword })
             .then(data => {
-                setShopCard(prev => {
-                    const newContent = data.content.filter(newItem =>
-                        !prev.some(existingItem => existingItem.shopId === newItem.shopId)
-                    );
-                    return [...prev, ...newContent];
-                });
+                setShopList(prev => [...prev, ...data.content]);
                 setHasMore(!data.last);
                 setLoading(false);
             })
@@ -139,7 +124,7 @@ function CakeAllList() {
                     cakes.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {cakes.map(cake => (
-                                <Link to={`/buyer/cakes/read/${cake.cakeId}`}>
+                                <Link to={`/buyer/shop/${cake.shopId}/cakes/read/${cake.cakeId}`}>
                                 <CakeCard key={cake.cakeId} cake={cake} />
                                 </Link>
                             ))}
@@ -160,46 +145,13 @@ function CakeAllList() {
                             setSort={setSort}
                             keyword={keyword}
                             setKeyword={setKeyword}
-                            // 필터/정렬/검색어 변경 시 shopPage를 0으로 리셋
-                            onFilterChange={() => {
-                                setShopCard([]);
-                                setShopPage(0);
-                                setHasMore(true);
-                            }}
                         />
-                        {shopCard.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
-                                {shopCard.map((shopItem, index) => {
-                                   const isLastElement =shopCard.length===index+1;
-
-                                   return(
-                                       <Link
-                                           to={`/shops/read/${shopItem.shopId}`}
-                                           key={shopItem.shopId}
-                                           ref={isLastElement ? lastShopElementRef : null}
-                                           className="block rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full bg-white cursor-pointer"
-                                           style={{
-                                               textDecoration: 'none',
-                                               color: 'inherit'
-                                           }} >
-                                           <ShopCard shop={shopItem} />
-                                       </Link>
-                                   )
-                                })}
-                            </div>
-                        ) : (
-                            !loading && (
-                                <div className="text-center text-gray-500 text-lg mt-10">
-                                    선택하신 조건에 맞는 매장이 없습니다. 🏪
-                                </div>
-                            )
-                        )}
-
-                        {!hasMore && !loading && shopCard.length > 0 && (
-                            <div className="text-center text-gray-500 text-sm mt-4">
-                                모든 매장을 불러왔습니다.
-                            </div>
-                        )}
+                        <ShopList
+                            shopList={shopList}
+                            lastShopElementRef={lastShopElementRef}
+                            loading={loading}
+                            hasMore={hasMore}
+                        />
                     </>
                 )}
             </main>

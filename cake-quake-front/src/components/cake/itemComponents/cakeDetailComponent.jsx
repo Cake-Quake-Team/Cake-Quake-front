@@ -1,9 +1,8 @@
 import React from 'react';
-import CakeOptionForm from '../../components/cake/addCakeComponent/CakeOptionForm';
 
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
 
-function CakeDetailComponent({ cake, optionTypes, selectedOptions, setSelectedOptions}) {
+function CakeDetailComponent({ cake, optionTypes, selectedOptions, setSelectedOptions, OptionComponent }) {
     if (!cake || !cake.cakeDetailDTO) {
         return <div className="text-center py-8 text-gray-500">상품 정보가 없습니다.</div>;
     }
@@ -42,11 +41,13 @@ function CakeDetailComponent({ cake, optionTypes, selectedOptions, setSelectedOp
                         <p className="text-2xl text-gray-900 mb-6">{price.toLocaleString()}원</p>
 
                         {/* CakeOptionForm 컴포넌트 사용 */}
-                        <CakeOptionForm
-                            optionTypes={optionTypes} // CakeDetailPage에서 받은 optionTypes를 그대로 전달
-                            selectedOptions={selectedOptions}
-                            setSelectedOptions={setSelectedOptions}
-                        />
+                        {OptionComponent && (
+                            <OptionComponent
+                                optionTypes={optionTypes}
+                                selectedOptions={selectedOptions}
+                                setSelectedOptions={setSelectedOptions}
+                            />
+                        )}
                     </div>
                 </div>
             </div>

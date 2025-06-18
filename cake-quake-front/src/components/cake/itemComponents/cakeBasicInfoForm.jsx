@@ -1,4 +1,4 @@
-import CakeCategorySelector from "../../cake/categorySelectComponent";
+import CakeCategorySelector from "./categorySelectComponent.jsx";
 import { detailCategories } from "../../../constants/cakeCategory";
 
 function CakeBasicInfoForm({ formData, onChange }) {

@@ -1,14 +1,15 @@
 // src/router/buyerRouter.jsx
 import { lazy, Suspense } from 'react';
-import { Navigate } from 'react-router-dom';
 import CartLayout from '../layouts/CartLayout.jsx';
 
+
+const CakeIndex = lazy(() => import("../pages/cake/buyer/indexPage.jsx"));
+const BuyerCakeRead = lazy(() => import("../pages/cake/buyer/buyerReadPage.jsx"));
 const CartPage = lazy(() => import('../pages/cart/CartPage.jsx'));
 const OrderListPage = lazy(() => import('../pages/order/buyer/orderListPage.jsx'));
 const OrderDetailPage = lazy(() => import('../pages/order/buyer/orderDetailPage.jsx'));
 const CreateOrderPage = lazy(() => import('../pages/order/buyer/createOrderPage.jsx'));
-const CakeIndex = lazy(() => import("../pages/cake/indexPage"));
-const BuyerCakeRead = lazy(() => import("../pages/cake/buyerReadPage.jsx"));
+
 
 const Loading = <div>Loading...</div>;
 
@@ -18,9 +19,11 @@ const buyerRouter = () => ({
         {
                 index: true,
                 element: <Suspense fallback={Loading}><CakeIndex/></Suspense>
-        },
-         {
-                path: "cakes/read/:cakeId",
+
+            },
+            {
+                path: "shop/:shopId/cakes/read/:cakeId",
+
                 element: <Suspense fallback={Loading}><BuyerCakeRead /></Suspense>
         },
         {
@@ -52,3 +55,5 @@ const buyerRouter = () => ({
         }
     ]
 });
+
+export default buyerRouter;

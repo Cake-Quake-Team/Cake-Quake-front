@@ -3,14 +3,15 @@ import SellerLayout from "../layouts/sellerLayout.jsx";
 
 
 const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
-
+const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
+const CakeUpdate = lazy(() => import("../pages/cake/seller/updateCakePage.jsx"));
+const SellerCakeRead = lazy(() => import("../pages/cake/seller/sellerReadPage.jsx"));
+const OptionAdd = lazy(() => import("../pages/cake/seller/addOptionPage.jsx"));
+const OptionUpdate = lazy(() => import("../pages/cake/seller/updateOptionPage.jsx"));
+const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"));
 const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
 const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
 
-const CakeAdd = lazy(() => import("../pages/cake/addPage"));
-const CakeUpdate = lazy(() => import("../pages/cake/updatePage.jsx"));
-const CakeList = lazy(() => import("../pages/cake/listPage"));
-const SellerCakeRead = lazy(() => import("../pages/cake/sellerReadPage.jsx"));
 
 
 
@@ -22,10 +23,11 @@ const sellerRouter = () => {
         element: <SellerLayout />,
         children: [
             {
-                index: true,
+                path: "shop/:shopId",
                 element: <Suspense fallback={Loading}><SellerIndex/></Suspense>
             },
             {
+
                 path: "profile",
                 element: <Suspense fallback={Loading}><SellerProfilePage /></Suspense>
             },
@@ -33,15 +35,7 @@ const sellerRouter = () => {
                 path: "profile/modify/:uid",
                 element: <Suspense fallback={Loading}><SellerProfileModifyPage /></Suspense>
             },
-            // {
-            //     path: "list", // /cake/list
-            //     element: <Suspense fallback={Loading}><CakeList /></Suspense>
-            // },
 
-
-                path: "shop/:shopId/cakes/list",
-                element: <Suspense fallback={Loading}><CakeList /></Suspense>
-            },
             {
                 path: "shop/:shopId/cakes/read/:cakeId",
                 element: <Suspense fallback={Loading}><SellerCakeRead /></Suspense>
@@ -53,6 +47,18 @@ const sellerRouter = () => {
             {
                 path: "shop/:shopId/cakes/update/:cakeId",
                 element: <Suspense fallback={Loading}><CakeUpdate /></Suspense>
+            },
+            {
+                path: "shop/:shopId/options/add",
+                element: <Suspense fallback={Loading}><OptionAdd/></Suspense>
+            },
+            {
+                path: "shop/:shopId/options/update/:optionId",
+                element: <Suspense fallback={Loading}><OptionUpdate/></Suspense>
+            },
+            {
+                path: "shop/:shopId/options/read/:optionId",
+                element: <Suspense fallback={Loading}><OptionRead/></Suspense>
             }
 
         ]

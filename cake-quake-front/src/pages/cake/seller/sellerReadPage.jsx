@@ -1,8 +1,9 @@
 import {useEffect, useState} from "react";
-import {getCakeDetail, API_SERVER_HOST, deleteCake} from "../../api/cakeApi.jsx";
+import {getCakeDetail, API_SERVER_HOST, deleteCake} from "../../../api/cakeApi.jsx";
 import {List} from "lucide-react";
-import CakeDetailComponent from "../../components/cake/cakeDetailComponent";
+import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import {Link, useNavigate, useParams} from "react-router";
+import CakeOptionList from "../../../components/cake/optionComponents/optionListComponent.jsx";
 
 function SellerCakeReadPage() {
     const { shopId, cakeId } = useParams();
@@ -139,18 +140,19 @@ function SellerCakeReadPage() {
                     selectedOptions={selectedOptions}
                     setSelectedOptions={setSelectedOptions}
                     apiBaseUrl={API_SERVER_HOST} // 이미지 경로를 위해 API_SERVER_HOST 전달
+                    OptionComponent={CakeOptionList}
                 />
-                <div className="mt-6 flex justify-end">
+                <div className="mt-6 flex justify-center">
                     <button
                         onClick={handleDelete}
-                        className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
+                        className="border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                     >
                         삭제
                     </button>
                     {shopId && (
                         <Link
                             to={`/seller/shop/${shopId}/cakes/update/${cakeId}`}
-                            className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
+                            className="ml-5 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
                         >
                             수정
                         </Link>
