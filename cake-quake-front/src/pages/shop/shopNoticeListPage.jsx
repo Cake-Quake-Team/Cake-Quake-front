@@ -111,7 +111,7 @@ const ShopNoticeListPage = () => {
                 <p>등록된 공지사항이 없습니다.</p>
                 <div className="mt-6">
                     <button
-                        onClick={() => navigate(`/shop/read/${cid}/notices/new`)}
+                        onClick={() => navigate(`/shops/read/${cid}/notices/new`)}
                         className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors text-lg"
                     >
                         새 공지사항 작성
@@ -133,7 +133,7 @@ const ShopNoticeListPage = () => {
             <div className="flex justify-between items-center mb-8">
                 <div className="flex justify-between items-center mb-8">
                 <span
-                    onClick={() => navigate(`/shop/read/${cid}`)}
+                    onClick={() => navigate(`/shops/read/${cid}`)}
                     className="flex items-center text-gray-500 hover:text-blue-600 cursor-pointer text-sm transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />
@@ -141,7 +141,7 @@ const ShopNoticeListPage = () => {
                 </span>
                 </div>
                 <button
-                    onClick={() => navigate(`/shop/read/${cid}/notices/new`)}
+                    onClick={() => navigate(`/shops/read/${cid}/notices/new`)}
                     className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors text-md"
                 >
                     새 공지사항 작성
@@ -155,7 +155,7 @@ const ShopNoticeListPage = () => {
                         className="border border-gray-200 p-6 rounded-xl shadow-sm bg-white hover:shadow-md hover:border-blue-300 transition-all duration-200 cursor-pointer" >
                         <Link
 
-                            to={`/shop/read/${cid}/notices/${notice.shopNoticeId}`}
+                            to={`/shops/read/${cid}/notices/${notice.shopNoticeId}`}
                             className="block"
                             style={{ textDecoration: 'none', color: 'inherit' }}
                         >
