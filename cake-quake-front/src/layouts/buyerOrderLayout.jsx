@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import BuyerHeader from "../components/common/BuyerHeader";
 import Footer from "../components/common/Footer";
 

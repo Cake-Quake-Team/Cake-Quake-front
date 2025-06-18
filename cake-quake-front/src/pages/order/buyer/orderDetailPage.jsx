@@ -1,6 +1,6 @@
 // src/pages/order/buyer/orderDetailPage.jsx
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 const OrderDetailPage = () => {
     const { orderId } = useParams();

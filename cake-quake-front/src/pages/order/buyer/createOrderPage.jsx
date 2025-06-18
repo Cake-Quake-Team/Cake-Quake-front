@@ -1,7 +1,7 @@
 import CreateOrder from '../../../components/order/buyer/createOrder';
 import  useCart  from '../../../hooks/useCart';
 import { useAuth } from '../../../store/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export default function CreateOrderPage() {
     const { user } = useAuth();
