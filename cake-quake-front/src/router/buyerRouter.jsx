@@ -44,7 +44,7 @@ const buyerRouter = () => ({
 
         //---------------------------상품 상세 보기------------------------------------
         {
-                path: "shop/:shopId/cakes/read/:cakeId",
+                path: "shops/:shopId/cakes/read/:cakeId",
                 element: <Suspense fallback={Loading}><BuyerCakeRead /></Suspense>
         },
 

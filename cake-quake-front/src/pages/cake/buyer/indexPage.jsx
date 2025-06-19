@@ -124,7 +124,7 @@ function CakeAllList() {
                     cakes.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {cakes.map(cake => (
-                                <Link to={`/buyer/shop/${cake.shopId}/cakes/read/${cake.cakeId}`}>
+                                <Link to={`/buyer/shops/${cake.shopId}/cakes/read/${cake.cakeId}`}>
                                 <CakeCard key={cake.cakeId} cake={cake} />
                                 </Link>
                             ))}
