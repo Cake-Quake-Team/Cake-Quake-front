@@ -16,7 +16,6 @@ const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
 const CakeUpdate = lazy(() => import("../pages/cake/seller/updateCakePage.jsx"));
 const SellerCakeRead = lazy(() => import("../pages/cake/seller/sellerReadPage.jsx"));
 const OptionAdd = lazy(() => import("../pages/cake/seller/addOptionPage.jsx"));
-const OptionUpdate = lazy(() => import("../pages/cake/seller/updateOptionPage.jsx"));
 const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"));
 
 //리뷰
@@ -80,10 +79,6 @@ const shopRouter = () => {
             {
                 path: ":shopId/options/add",
                 element: <Suspense fallback={Loading}><OptionAdd/></Suspense>
-            },
-            {
-                path: ":shopId/options/update/:optionId",
-                element: <Suspense fallback={Loading}><OptionUpdate/></Suspense>
             },
             {
                 path: ":shopId/options/read/:optionId",

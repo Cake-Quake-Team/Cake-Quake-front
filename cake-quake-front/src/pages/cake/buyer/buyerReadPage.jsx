@@ -40,6 +40,8 @@ function BuyerCakeReadPage() {
                                 optionTypeId: typeId,
                                 optionType: typeName,
                                 isRequired: currentOption.isRequired,
+                                minSelection: currentOption.minSelection,
+                                maxSelection: currentOption.maxSelection,
                                 optionItems: []
                             };
                         }

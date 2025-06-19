@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions }) {
-    const toggleOptionValue = (optionTypeId, optionItemId) => {
+    const [errorOptionTypeIds, setErrorOptionTypeIds] = useState([]); // 최대 초과 옵션
+
+    const toggleOptionValue = (optionTypeId, optionItemId, maxSelection) => {
         setSelectedOptions(prev => {
             const isSelected = prev.some(
                 (item) => item.optionTypeId === optionTypeId && item.optionItemId === optionItemId
@@ -13,8 +15,17 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
                 newSelectedOptions = prev.filter(
                     (item) => !(item.optionTypeId === optionTypeId && item.optionItemId === optionItemId)
                 );
+                setErrorOptionTypeIds(prev => prev.filter(id => id !== optionTypeId));
             } else {
-                // 선택 추가
+                const countForType = prev.filter(item => item.optionTypeId === optionTypeId).length;
+                if (countForType >= maxSelection) {
+                    // 최대 초과 시 에러 표시
+                    if (!errorOptionTypeIds.includes(optionTypeId)) {
+                        setErrorOptionTypeIds(prev => [...prev, optionTypeId]);
+                    }
+                    return prev;
+                }
+
                 const itemToAdd = optionTypes
                     .find(type => type.optionTypeId === optionTypeId)
                     ?.optionItems.find(item => item.optionItemId === optionItemId);
@@ -24,9 +35,7 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
                         optionItemId: itemToAdd.optionItemId,
                         optionName: itemToAdd.optionName,
                         price: itemToAdd.price,
-                        optionTypeId: optionTypeId,
-                        minSelection: itemToAdd.minSelection,
-                        maxSelection: itemToAdd.maxSelection,
+                        optionTypeId: optionTypeId
                     }];
                 } else {
                     newSelectedOptions = prev;
@@ -45,14 +54,7 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
             ) : (
                 <div className="space-y-4">
                     {optionTypes.map((optionType) => {
-                        const selectedCountForType = selectedOptions.filter(
-                            (item) => item.optionTypeId === optionType.optionTypeId
-                        ).length;
-
-                        const isOverMax =
-                            optionType.optionItems.maxSelection &&
-                            selectedCountForType > optionType.optionItems.maxSelection;
-
+                        const isMaxExceeded = errorOptionTypeIds.includes(optionType.optionTypeId);
                         return (
                             <div
                                 key={optionType.optionTypeId}
@@ -62,19 +64,9 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
                                     <summary className="flex justify-between items-center py-3 px-4 cursor-pointer text-gray-700 font-medium bg-gray-50 border-b border-gray-200">
                                         <span className="flex items-center text-lg">
                                             {optionType.optionType}
-                                            {optionType.isRequired && (
-                                                <span className="text-gray-500 text-xs ml-2">*필수선택</span>
-                                            )}
-                                            {optionType.optionItems.minSelection && (
-                                                <span className="text-gray-400 text-xs ml-2">
-                                                    최소 {optionType.optionItems.minSelection}개 선택
-                                                </span>
-                                            )}
-                                            {optionType.optionItems.maxSelection && (
-                                                <span className="text-gray-400 text-xs ml-2">
-                                                    최대 {optionType.optionItems.maxSelection}개 선택
-                                                </span>
-                                            )}
+                                            <span className="text-gray-500 text-xs ml-2">
+                                                {optionType.isRequired && `*필수선택 (최소 ${optionType.minSelection}개)`}
+                                            </span>
                                         </span>
                                         <svg
                                             className="h-5 w-5 text-gray-500 transform transition-transform duration-200 ui-open:rotate-180"
@@ -104,10 +96,10 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
                                                     );
 
                                                     const overMax =
-                                                        optionType.optionItems.maxSelection &&
+                                                        optionType.maxSelection &&
                                                         selectedOptions.filter(
                                                             (item) => item.optionTypeId === optionType.optionTypeId
-                                                        ).length >= optionType.optionItems.maxSelection;
+                                                        ).length >= optionType.maxSelection;
 
                                                     return (
                                                         <label
@@ -122,7 +114,8 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
                                                                     onChange={() =>
                                                                         toggleOptionValue(
                                                                             optionType.optionTypeId,
-                                                                            optionItem.optionItemId
+                                                                            optionItem.optionItemId,
+                                                                            optionType.maxSelection
                                                                         )
                                                                     }
                                                                     className="form-checkbox h-4 w-4 text-gray-500 focus:ring-gray-300 rounded"
@@ -144,10 +137,9 @@ function CakeOptionForm({ optionTypes = [], selectedOptions, setSelectedOptions 
                                             </p>
                                         )}
 
-                                        {/* 최대 선택 초과 안내 메시지 */}
-                                        {isOverMax && (
-                                            <p className="text-red-500 text-sm px-4 pt-2 pb-4 font-medium">
-                                                최대 선택 개수({optionType.maxSelection})를 초과하였습니다.
+                                        {isMaxExceeded && (
+                                            <p className="text-sm text-red-500 px-4 py-2 font-medium">
+                                                ⚠ 최대 선택 개수를 초과하였습니다.
                                             </p>
                                         )}
                                     </div>

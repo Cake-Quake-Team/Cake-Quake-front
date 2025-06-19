@@ -212,7 +212,7 @@ function CakeUpdatePage() {
             // 7. 최종 요청
             await updateCake(shopId, cakeId, formData);
             alert("케이크 수정 완료!");
-            navigate(`/seller/shop/${shopId}/cakes/read/${cakeId}`);
+            navigate(`/shops/${shopId}/cakes/read/${cakeId}`);
         } catch (err) {
             console.error("수정 실패", err);
             alert("케이크 수정 중 오류가 발생했습니다.");
@@ -238,7 +238,7 @@ function CakeUpdatePage() {
                 />
                 <div className="flex justify-center mt-6">
                 <Link
-                    to={`/seller/shop/${shopId}/cakes/read/${cakeId}`}
+                    to={`/shops/${shopId}/cakes/read/${cakeId}`}
                     className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                 >
                     취소

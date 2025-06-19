@@ -40,7 +40,6 @@ function CakeDetailComponent({ cake, optionTypes, selectedOptions, setSelectedOp
                         <h2 className="text-2xl font-bold text-gray-900 mb-2">{cname}</h2>
                         <p className="text-2xl text-gray-900 mb-6">{price.toLocaleString()}원</p>
 
-                        {/* CakeOptionForm 컴포넌트 사용 */}
                         {OptionComponent && (
                             <OptionComponent
                                 optionTypes={optionTypes}
