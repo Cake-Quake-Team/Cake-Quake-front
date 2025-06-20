@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import CartLayout from '../layouts/CartLayout.jsx';
 import AdminLayout from "../layouts/adminLayout.jsx";
 import BasicLayout from "../layouts/basicLayout.jsx";
+import AiRecommendPage from "../pages/ai/aiRecommendPage.jsx";
 
 
 const CakeIndex = lazy(() => import("../pages/cake/buyer/indexPage.jsx"));
@@ -27,6 +28,9 @@ const PaymentDetailPage = lazy(()=>import('../pages/payment/paymentDetailPage.js
 const TemperaturePage = lazy(() => import("../pages/buyer/temperature/temperaturePage.jsx"));
 //포인트
 const PointPage = lazy(() => import("../pages/buyer/point/pointPage.jsx"));
+
+//---------------------AI
+const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
 
 
 const Loading = <div>Loading...</div>;
@@ -169,6 +173,16 @@ const buyerRouter = () => ({
 
           ]
         },
+
+        //-------------------------AI 추천-------------------------------
+        {
+            path: "ai",
+            element:(
+                <Suspense fallback={Loading}>
+                    <AIRecommendPage/>
+                </Suspense>
+    )
+        }
 
 
     ]

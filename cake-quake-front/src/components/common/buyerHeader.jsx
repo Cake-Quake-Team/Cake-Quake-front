@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import {Search, ShoppingCart, Menu, X} from "lucide-react";
+import {Search, ShoppingCart, Menu, X, Bot} from "lucide-react";
 import { useAuth } from "../../store/AuthContext";
 import { useState } from "react";
 
@@ -20,13 +20,25 @@ function BuyerHeader() {
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
+                    <Link to="/buyer">
                     <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
+                    </Link>
                     <h1 className="text-2xl font-bold">Cake Quake</h1>
+
                 </div>
 
                 <div className="flex items-center space-x-4">
+
+                    {/* GPT 아이콘 - BUYER만 보임 */}
+                    {user?.role === "BUYER" && (
+                        <Link to="/buyer/ai" title="CQ봇">
+                            <Bot className="w-5 h-5 text-pink-500 hover:text-pink-600 cursor-pointer" />
+                        </Link>
+                    )}
+
                     <Search className="w-5 h-5 cursor-pointer" />
                     <ShoppingCart className="w-5 h-5 cursor-pointer" />
+
                     {user ? (
                         <>
                             <span className="text-sm font-semibold text-gray-700">
