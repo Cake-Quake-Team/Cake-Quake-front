@@ -1,25 +1,58 @@
 import AdminLayout from "../layouts/adminLayout.jsx";
 import Shops from "../pages/admin/shops.jsx";
-import Reviews from "../pages/admin/deletionRequestAdminPage.jsx";
-import mainRouter from "./mainRouter.jsx";
-import {lazy} from "react";
+import {lazy, Suspense} from "react";
 
 
 const DeletionRequestAdminPage = lazy(() => import("../pages/admin/deletionRequestAdminPage.jsx"));
+const IngredientListPage = lazy(()=> import("../pages/admin/IngredientListPage.jsx"));
+const IngredientFormPage = lazy(()=> import("../pages/admin/IngredientFormPage.jsx"));
 
-const adminRouter  = ()=> {
-    return {
-        path: "/admin",
-        element: <AdminLayout/>,
-        children: [
-            {path: "shops", element: <Shops/>},      // /admin/shops
+const Loading = <div>Loading...</div>;
 
-            {path: "review-deletion-requests", element: <DeletionRequestAdminPage />},  // /admin/reviews
-
-        ]
-
-    }
-}
+const adminRouter = () => ({
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+        { path: "shops", element: <Shops /> },
+        {
+            path: "review-deletion-requests",
+            element: (
+                <Suspense fallback={Loading}>
+                    <DeletionRequestAdminPage />
+                </Suspense>
+            ),
+        },
+        {
+            path: "ingredients",
+            children: [
+                {
+                    index: true,
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <IngredientListPage />
+                        </Suspense>
+                    ),
+                },
+                {
+                    path: "new",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <IngredientFormPage />
+                        </Suspense>
+                    ),
+                },
+                {
+                    path: ":ingredientId/edit",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <IngredientFormPage />
+                        </Suspense>
+                    ),
+                },
+            ],
+        },
+    ],
+});
 
 
 export default adminRouter ;
