@@ -33,15 +33,15 @@ const sellerRouter = () => {
 
             //--------------------발주--------------------
             {
-                path: "read/:shopId/procurements",
+                path: ":shopId/procurements",
                 element: <Suspense fallback={Loading}><ProcurementListPage/></Suspense>
             },
             {
-                path: "read/:shopId/procurements/new",
+                path: ":shopId/procurements/create",
                 element:<Suspense fallback={Loading}><ProcurementCreatePage/></Suspense>
             },
             {
-                path: "read/:shopId/procurements/:pid",
+                path: ":shopId/procurements/:procurementId",
                 element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
             }
         ]
