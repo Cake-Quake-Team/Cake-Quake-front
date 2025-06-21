@@ -1,76 +1,96 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { Upload } from 'lucide-react';
-import { getShopDetail, updateShop } from '../../../api/shopApi.jsx'; // API 호출 함수 임포트
 import ConfirmationModal from '../ConfirmationModal.jsx'; // 확인 모달 컴포넌트 임포트
 
-const ShopImageEditor = ({ shopId, onClose }) => {
-    // 이미지를 관리하는 상태. 기존 이미지는 URL을, 새로 추가된 이미지는 File 객체와 임시 URL을 가집니다.
-    const [images, setImages] = useState([]);
+const ShopImageEditor = ({
+                             images, // 부모로부터 받은 이미지 배열
+                             setImages, // 이미지 배열을 업데이트하는 함수
+                             thumbnailIndex, // 부모로부터 받은 썸네일 인덱스
+                             setThumbnailIndex, // 썸네일 인덱스를 업데이트하는 함수
+                         }) => {
+    const inputRef = useRef(null); // 파일 입력 참조
+    const scrollRef = useRef(null); // 이미지 갤러리 스크롤 참조
+
     // 사용자에게 보여줄 이미지 삭제 확인 모달 관련 상태
     const [deleteTargetIndex, setDeleteTargetIndex] = useState(null);
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-    // 썸네일로 선택된 이미지의 인덱스를 추적하는 상태
-    const [thumbnailIndex, setThumbnailIndex] = useState(null);
 
-    useEffect(() => {
-        const fetchImages = async () => {
-            try {
-                const data = await getShopDetail(shopId);
-                // 기존 이미지를 불러와 상태에 설정합니다.
-                setImages(data.imageUrls || []);
-                // 불러온 이미지 중 썸네일이 있으면 해당 인덱스를 설정합니다.
-                const initialThumbnail = (data.imageUrls || []).findIndex(img => img.isThumbnail);
-                setThumbnailIndex(initialThumbnail !== -1 ? initialThumbnail : null);
-            } catch (error) {
-                console.error("매장 상세 정보를 불러오는 데 실패했습니다:", error);
-            }
-        };
+    // 새 파일 추가 또는 기존 파일 변경 시 호출 (CakeImageUploadForm의 handleChange와 유사)
+    const handleFileAddOrChange = (e, targetIndex = null) => {
+        const files = Array.from(e.target.files);
 
-        if (shopId) fetchImages();
-    }, [shopId]);
+        if (files.length === 0) return;
 
-    // 파일 입력 변경을 처리하는 함수
-    const handleFileChange = (e, index) => {
-        const file = e.target.files[0]; // 선택된 파일
-        if (file) {
-            // 파일을 읽어서 미리보기 URL을 생성합니다.
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const updatedImages = [...images];
-                // 기존 이미지를 업데이트하거나, 새 이미지에 File 객체와 미리보기 URL을 추가합니다.
-                updatedImages[index] = {
-                    ...updatedImages[index],
-                    shopImageUrl: reader.result, // 미리보기 URL (base64)
-                    file: file, // 실제 File 객체
-                    isNew: true, // 새로운 파일임을 표시
-                };
-                setImages(updatedImages);
+        const newImagesToProcess = files.map(file => ({
+            shopImageId: null, // 새로운 파일이므로 ID 없음
+            shopImageUrl: '', // 초기 URL 비워두고 FileReader로 채움
+            isThumbnail: false,
+            isNew: true, // 새로운 파일임을 표시
+            file: file, // 실제 File 객체
+        }));
 
-                // 만약 이 위치가 썸네일로 설정되어 있지 않았다면, 새로운 파일이므로
-                // 썸네일 상태를 갱신할 필요가 없습니다. (썸네일은 radio 버튼으로 별도 선택)
-            };
-            reader.readAsDataURL(file); // 파일을 Data URL로 읽습니다.
+        // Promise.all을 사용하여 모든 파일의 Data URL 읽기가 완료될 때까지 기다림
+        Promise.all(
+            newImagesToProcess.map(img => {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        resolve({
+                            ...img,
+                            shopImageUrl: reader.result, // 미리보기 URL (base64)
+                        });
+                    };
+                    reader.readAsDataURL(img.file);
+                });
+            })
+        ).then(processedNewImages => {
+            setImages(prevImages => {
+                let updatedImages;
+                if (targetIndex !== null) { // 기존 이미지 교체
+                    updatedImages = [...prevImages];
+                    updatedImages[targetIndex] = {
+                        ...updatedImages[targetIndex],
+                        ...processedNewImages[0], // 첫 번째 파일로 교체 (handleFileChange와 유사하게 동작)
+                    };
+                } else { // 새 이미지 추가
+                    updatedImages = [...prevImages, ...processedNewImages];
+                }
+
+                // 만약 썸네일이 없고, 추가/교체된 이미지가 첫 번째 이미지라면 썸네일로 설정
+                if (thumbnailIndex === null && updatedImages.length > 0) {
+                    const currentThumbnail = updatedImages.find(img => img.isThumbnail);
+                    if (!currentThumbnail) {
+                        updatedImages[0].isThumbnail = true;
+                        setThumbnailIndex(0);
+                    }
+                }
+                return updatedImages;
+            });
+        });
+
+        // 파일 입력 초기화
+        if (inputRef.current) {
+            inputRef.current.value = null;
         }
     };
 
-    // 이미지 추가 버튼 클릭 시 호출
-    const handleAddImage = () => {
-        // 새로운 이미지 객체를 추가합니다. isNew: true는 이 이미지가 새로 추가되었음을 나타냅니다.
-        setImages((prev) => [...prev, { shopImageId: null, shopImageUrl: '', isThumbnail: false, isNew: true }]);
+    // 이미지 추가 버튼 클릭 시 호출 (실제 파일 입력 클릭)
+    const handleAddImageClick = () => {
+        inputRef.current.click(); // 숨겨진 파일 입력 필드 클릭
     };
 
     // 썸네일 라디오 버튼 변경을 처리하는 함수
     const handleThumbnailChange = (index) => {
-        setThumbnailIndex(index); // 선택된 썸네일의 인덱스 업데이트
+        setThumbnailIndex(index);
         setImages((prev) =>
             prev.map((img, i) => ({
                 ...img,
-                isThumbnail: i === index, // 선택된 인덱스만 썸네일로 설정
+                isThumbnail: i === index,
             }))
         );
     };
 
-    // 이미지 삭제 클릭 처리
+    // 이미지 삭제 클릭 처리 (모달 사용)
     const handleDeleteClick = (index) => {
         setDeleteTargetIndex(index);
         setIsConfirmOpen(true);
@@ -79,14 +99,27 @@ const ShopImageEditor = ({ shopId, onClose }) => {
     // 이미지 삭제 확인 처리
     const handleConfirmDelete = () => {
         const updatedImages = images.filter((_, i) => i !== deleteTargetIndex);
-        setImages(updatedImages);
 
-        // 썸네일 인덱스 조정: 삭제된 항목이 썸네일이었거나, 삭제된 항목 앞에 있었을 경우
-        if (thumbnailIndex !== null && deleteTargetIndex < thumbnailIndex) {
-            setThumbnailIndex(prev => prev - 1);
-        } else if (thumbnailIndex === deleteTargetIndex) {
-            setThumbnailIndex(null); // 썸네일이 삭제된 경우
+        // 썸네일 인덱스 조정 로직
+        let newThumbnailIndex = thumbnailIndex;
+        if (thumbnailIndex !== null) {
+            if (deleteTargetIndex < thumbnailIndex) {
+                newThumbnailIndex = thumbnailIndex - 1;
+            } else if (deleteTargetIndex === thumbnailIndex) {
+                newThumbnailIndex = null; // 썸네일이 삭제되면 썸네일 없음
+                // 만약 삭제 후 이미지가 남아있다면 첫 번째 이미지를 새 썸네일로 설정
+                if (updatedImages.length > 0) {
+                    newThumbnailIndex = 0;
+                    updatedImages[0].isThumbnail = true;
+                }
+            }
         }
+        setThumbnailIndex(newThumbnailIndex);
+        setImages(updatedImages.map((img, i) => ({
+            ...img,
+            isThumbnail: i === newThumbnailIndex // 새 썸네일 인덱스에 따라 isThumbnail 업데이트
+        })));
+
 
         setDeleteTargetIndex(null);
         setIsConfirmOpen(false);
@@ -98,101 +131,84 @@ const ShopImageEditor = ({ shopId, onClose }) => {
         setIsConfirmOpen(false);
     };
 
-    // 매장 정보 수정 제출 처리
-    const handleSubmit = async () => {
-        // 백엔드로 보낼 이미지 데이터 필터링 및 준비
-        const dtoImageUrls = images
-            .filter(img => img.shopImageId && !img.isNew) // 기존 이미지 중 수정되지 않은 것
-            .map((img) => ({
-                shopImageId: img.shopImageId,
-                shopImageUrl: img.shopImageUrl, // 기존 이미지의 URL
-                isThumbnail: img.isThumbnail,
-            }));
-
-        // 새로 추가된 파일들만 추출
-        const filesToUpload = images
-            .filter(img => img.isNew && img.file) // 새로 추가되고 실제 파일이 있는 경우
-            .map(img => img.file);
-
-
-        const shopUpdateDTO = {
-            imageUrls: dtoImageUrls,
-        };
-
-        try {
-            await updateShop(shopId, {
-                dto: shopUpdateDTO,
-                files: filesToUpload,
-            });
-            alert('매장 이미지가 성공적으로 수정되었습니다.');
-            onClose(); // 수정 완료 후 모달 닫기
-        } catch (err) {
-            alert('이미지 수정 중 오류가 발생했습니다.');
-            console.error(err);
+    // 이미지가 변경될 때마다 스크롤을 가장 오른쪽으로 이동
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
         }
-    };
+    }, [images]);
 
     return (
-        <div>
+        <div className="bg-white mt-6 rounded-xl p-6"> {/* 기존 ShopImageEditor의 p-6 패딩을 여기에 통합 */}
+            <h3 className="text-xl font-bold mb-4">매장 사진 편집</h3>
+
             {images.length === 0 && <p className="text-gray-500 mb-4">현재 등록된 이미지가 없습니다.</p>}
 
-            {images.map((img, i) => (
-                <div key={img.shopImageId || `new-${i}`} className="mb-4 flex flex-col sm:flex-row items-center gap-2 border p-3 rounded-md shadow-sm">
-                    {/* 이미지 미리보기 */}
-                    {img.shopImageUrl && (
-                        <img
-                            src={img.shopImageUrl}
-                            alt={`Shop Image ${i + 1}`}
-                            className="w-16 h-16 object-cover rounded-md flex-shrink-0"
-                        />
-                    )}
+            <div
+                ref={scrollRef}
+                className="flex gap-5 overflow-x-auto max-w-full pb-2 custom-scrollbar" /* custom-scrollbar 클래스 유지 */
+                style={{ height: "140px", overflowY: "hidden" }} /* 높이 조정 */
+            >
+                {images.map((img, i) => {
+                    // 기존 이미지인 경우 img.shopImageUrl을 직접 사용하고, 새 파일인 경우 URL.createObjectURL 사용
+                    const src = img.isNew && img.file ? URL.createObjectURL(img.file) : img.shopImageUrl;
+                    return (
+                        <div key={img.shopImageId || `new-${i}`} className="relative w-32 h-32 flex-shrink-0"> {/* 크기 조정 */}
+                            <img
+                                src={src}
+                                alt={`Shop Image ${i + 1}`}
+                                className={`w-full h-24 object-cover rounded-lg border-2 ${
+                                    img.isThumbnail ? "border-blue-500" : "border-transparent"
+                                }`}
+                            />
+                            <div className="text-center mt-1">
+                                <input
+                                    type="radio"
+                                    name="thumbnail"
+                                    checked={i === thumbnailIndex}
+                                    onChange={() => handleThumbnailChange(i)}
+                                    className="form-radio text-blue-600"
+                                />
+                                <span className="ml-1 text-sm text-gray-700">썸네일</span>
+                            </div>
+                            <button
+                                onClick={() => handleDeleteClick(i)}
+                                className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-opacity-80"
+                                title="삭제"
+                            >
+                                ×
+                            </button>
+                            {/* 기존 파일 입력 필드를 각 이미지에 연결 (이미지 교체 기능) */}
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleFileAddOrChange(e, i)} // 특정 이미지 인덱스를 전달하여 교체
+                                className="absolute inset-0 opacity-0 cursor-pointer"
+                                title="이미지 교체"
+                            />
+                        </div>
+                    );
+                })}
 
-                    {/* 파일 입력 필드 */}
+                <div className="flex-shrink-0 flex items-center justify-center w-32 h-32"> {/* 크기 조정 */}
                     <input
                         type="file"
-                        accept="image/*" // 이미지 파일만 허용
-                        onChange={(e) => handleFileChange(e, i)}
-                        className="flex-grow border p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        accept="image/*"
+                        multiple // 여러 파일 선택 가능
+                        onChange={handleFileAddOrChange} // 새 파일 추가 로직
+                        className="hidden"
+                        id="imageUploadInput"
+                        ref={inputRef}
                     />
-
-                    {/* 썸네일 라디오 버튼 */}
-                    <label className="flex items-center gap-1 text-gray-700 flex-shrink-0">
-                        <input
-                            type="radio"
-                            checked={i === thumbnailIndex} // 현재 인덱스와 썸네일 인덱스가 같으면 체크
-                            onChange={() => handleThumbnailChange(i)}
-                            className="form-radio text-blue-600"
-                        />
-                        <span className="text-sm">썸네일</span>
-                    </label>
-
-                    {/* 삭제 버튼 */}
-                    <button
-                        onClick={() => handleDeleteClick(i)}
-                        className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-200 flex-shrink-0"
+                    <label
+                        htmlFor="imageUploadInput"
+                        className="cursor-pointer bg-gray-100 px-6 py-12 rounded-md text-sm text-gray-600 hover:bg-gray-200 transition text-center whitespace-nowrap block w-full h-full flex items-center justify-center"
+                        onClick={handleAddImageClick} // 레이블 클릭 시 input 클릭
                     >
-                        삭제
-                    </button>
+                        <Upload size={24} className="mr-2" /> {/* 아이콘 크기 조정 */}
+                        이미지 추가
+                    </label>
                 </div>
-            ))}
-
-            <div className="flex justify-between mt-4">
-                {/* 이미지 추가 버튼 */}
-                <button
-                    onClick={handleAddImage}
-                    className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-md flex items-center gap-2 text-sm text-gray-700"
-                >
-                    <Upload size={16} />
-                    이미지 추가
-                </button>
-
-                {/* 사진 수정 완료 버튼 */}
-                <button
-                    onClick={handleSubmit}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-200"
-                >
-                    사진 수정 완료
-                </button>
             </div>
 
             {/* 확인 모달 */}
