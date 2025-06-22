@@ -1,7 +1,7 @@
 import LoadingSpinner from "../../common/loadingSpinner";
 
-const SellerProfileModifyComponent = ({
-    sellerProfile,
+const BuyerProfileDetailsModifyComponent = ({
+    buyerProfile,
     form,
     buttonLoading,
     errorMessage,
@@ -10,11 +10,10 @@ const SellerProfileModifyComponent = ({
     handleModify,
     openVerifyModal,
     isVerified,
-    inputRefs,
+    inputRefs
 }) => {
 
-    
-    const { userId } = sellerProfile || {}
+    const { userId } = buyerProfile || {}
     const {uname, phoneNumber } = form || {}
 
     // 아이디랑 휴대폰 번호만 수정 가능. (테두리 색을 다르게 강조)
@@ -24,7 +23,6 @@ const SellerProfileModifyComponent = ({
             <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-center">정보 수정</h2>
                 <form onSubmit={handleModify} className="space-y-4">
-
                     <input
                         type="text"
                         id="userId"
@@ -83,7 +81,7 @@ const SellerProfileModifyComponent = ({
                             type="submit"
                             className="w-full px-4 py-2 bg-violet-400 text-white font-bold rounded hover:bg-violet-600"
                         >
-                            완료
+                            다음 단계로
                         </button>
                     )}
                 </form>
@@ -93,4 +91,4 @@ const SellerProfileModifyComponent = ({
 
 }
 
-export default SellerProfileModifyComponent;
+export default BuyerProfileDetailsModifyComponent;

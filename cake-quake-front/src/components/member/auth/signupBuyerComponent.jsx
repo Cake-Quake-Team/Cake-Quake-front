@@ -13,7 +13,7 @@ const SignupBuyerComponent = ({
     isVerified
 }) => {
 
-    const { userId, password, verifyPassword, uname, phoneNumber, publicInfo, alarm } = form;
+    const { userId, password, verifyPassword, uname, phoneNumber, publicInfo, alarm } = form
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">
@@ -127,7 +127,7 @@ const SignupBuyerComponent = ({
                 </form>
             </div>
         </div>
-    );
+    )
 }
 
 export default SignupBuyerComponent;

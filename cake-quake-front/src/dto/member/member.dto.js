@@ -11,3 +11,10 @@ export const createBuyerSignupDTO = (formData) => {
     }
 }
 
+export const PasswordChangeDTO = (formData) => {
+    return {
+        currentPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+    }
+}
+
