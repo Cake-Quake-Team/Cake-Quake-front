@@ -9,14 +9,13 @@ const ShopNoticeDetail=lazy(()=>import("../pages/shop/shopNoticeDetailPage.jsx")
 const ShopNoticeCreate=lazy(()=>import("../pages/shop/shopNoticeCreatePage.jsx"))
 const ShopNoticeUpdate=lazy(()=>import("../pages/shop/shopNoticeUpdatePage.jsx"))
 const ShopUpdate=lazy(()=>import("../pages/shop/shopUpdatePage.jsx"))
-
+const ShopList=lazy(()=>import("../pages/shop/shopListPage.jsx"))
 
 const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
 const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
 const CakeUpdate = lazy(() => import("../pages/cake/seller/updateCakePage.jsx"));
 const SellerCakeRead = lazy(() => import("../pages/cake/seller/sellerReadPage.jsx"));
 const OptionAdd = lazy(() => import("../pages/cake/seller/addOptionPage.jsx"));
-const OptionUpdate = lazy(() => import("../pages/cake/seller/updateOptionPage.jsx"));
 const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"));
 
 //리뷰
@@ -58,7 +57,11 @@ const shopRouter = () => {
                 path:"update/:cid",
                 element: <Suspense fallback={Loading}><ShopUpdate/></Suspense>
             },
-
+            {
+                //shops/update/5
+                path:"shoplist",
+                element: <Suspense fallback={Loading}><ShopList/></Suspense>
+            },
             //---------------------------------------현지
             {
                 path: ":shopId",
@@ -80,10 +83,6 @@ const shopRouter = () => {
             {
                 path: ":shopId/options/add",
                 element: <Suspense fallback={Loading}><OptionAdd/></Suspense>
-            },
-            {
-                path: ":shopId/options/update/:optionId",
-                element: <Suspense fallback={Loading}><OptionUpdate/></Suspense>
             },
             {
                 path: ":shopId/options/read/:optionId",

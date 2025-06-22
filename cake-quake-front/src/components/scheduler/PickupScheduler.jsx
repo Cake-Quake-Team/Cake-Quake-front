@@ -2,6 +2,7 @@ import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import {useEffect, useState} from "react";
 import{getAvailableTimes,getAvailableShops} from "../../api/scheduleApi.jsx";
+import ShopSelectionModal from "./ShopSelectionModal.jsx";
 
 function PickupScheduler() {
     const [selectedDate, setSelectedDate] = useState(null);
@@ -11,25 +12,35 @@ function PickupScheduler() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedShop, setSelectedShop] = useState(null);
 
-    const currentShopId = 1;
+    const currentShopId = 5;
 
 
     // 1. selectedDate 또는 currentShopId가 변경될 때, 예약 가능한 시간 조회
     useEffect(() => {
         if (selectedDate && currentShopId) {
             const fetchTimes = async () => {
-                const formattedDate = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+                const formattedDate = selectedDate.toISOString().split('T')[0];
+                try {
                     const times = await getAvailableTimes(currentShopId, formattedDate);
+                    console.log("API에서 받은 시간 목록 (useEffect 내부):", times); // <-- 이 로그는 여기에 두세요.
                     setAvailableTimes(times);
                     // 날짜 변경 시 이전 선택 초기화
                     setSelectedTime(null);
+                    setSelectedShop(null);
                     setAvailableShops([]);
                     setIsModalOpen(false);
+                } catch (error) {
+                    console.error("가능한 시간 조회 중 오류 발생:", error);
+                    setAvailableTimes([]);
+                    setSelectedTime(null);
                     setSelectedShop(null);
+                    setAvailableShops([]);
+                    setIsModalOpen(false);
+                }
             };
             fetchTimes();
         } else {
-            // selectedDate가 없으면 시간 목록 초기화
+            // 날짜가 선택되지 않았을 때 모든 관련 상태 초기화
             setAvailableTimes([]);
             setSelectedTime(null);
             setAvailableShops([]);
@@ -42,15 +53,18 @@ function PickupScheduler() {
     useEffect(() => {
         if (selectedDate && selectedTime) {
             const fetchShops = async () => {
-                const formattedDate = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
-                // LocalTime은 HH:MM:SS 형식을 선호하므로, HH:MM만 있는 경우 :00 추가
+                const formattedDate = selectedDate.toISOString().split('T')[0];
                 const formattedTime = selectedTime.length === 5 ? selectedTime + ':00' : selectedTime;
 
+                try {
                     const shops = await getAvailableShops(formattedDate, formattedTime);
                     setAvailableShops(shops);
-                    setIsModalOpen(true); // 매장 선택 모달 열기
+                    setIsModalOpen(true);
+                } catch (error) {
+                    console.error("가능한 매장 조회 중 오류 발생:", error);
                     setAvailableShops([]);
-                    setIsModalOpen(false); // 에러 발생 시 모달 열지 않음
+                    setIsModalOpen(false);
+                }
 
             };
             fetchShops();
@@ -62,32 +76,24 @@ function PickupScheduler() {
 
     // --- 핸들러 함수들 ---
 
-    // react-calendar의 날짜 변경 핸들러
     const handleDateChange = (date) => {
         setSelectedDate(date);
     };
 
-    // 시간 버튼 클릭 핸들러
     const handleTimeSelect = (time) => {
         setSelectedTime(time);
     };
 
-    // 모달에서 매장 선택 핸들러
     const handleShopSelect = (shop) => {
         setSelectedShop(shop);
-        setIsModalOpen(false); // 모달 닫기
+        setIsModalOpen(false);
         alert(`선택된 매장: ${shop.shopName}, 픽업: ${selectedDate.toLocaleDateString()} ${selectedTime}`);
-        // TODO: 여기에서 선택된 날짜, 시간, 매장 정보를 가지고 주문 페이지로 이동하거나 최종 주문 생성 로직 실행
-        // 예: navigate('/order-summary', { state: { selectedDate, selectedTime, selectedShop } });
     };
 
-    // 달력에서 이전 날짜 비활성화 (선택 불가능하게)
     const tileDisabled = ({ date, view }) => {
-        // 'month' 뷰에서만 작동
         if (view === 'month') {
-            // 오늘 날짜 이전은 비활성화 (시분초 무시하고 날짜만 비교)
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작점으로 설정
+            today.setHours(0, 0, 0, 0);
             return date < today;
         }
         return false;
@@ -102,10 +108,10 @@ function PickupScheduler() {
                 <Calendar
                     onChange={handleDateChange}
                     value={selectedDate}
-                    minDate={new Date()} // 오늘 날짜부터 선택 가능
-                    tileDisabled={tileDisabled} // 이전 날짜 비활성화 로직 적용
-                    locale="ko-KR" // 한국어 로케일 설정
-                    className="custom-calendar" // 커스텀 스타일링을 위한 클래스 (선택 사항)
+                    minDate={new Date()}
+                    tileDisabled={tileDisabled}
+                    locale="ko-KR"
+                    className="custom-calendar"
                 />
                 {selectedDate && (
                     <p style={{ marginTop: '15px', textAlign: 'center', fontSize: '1.1em', fontWeight: 'bold' }}>
@@ -114,9 +120,10 @@ function PickupScheduler() {
                 )}
             </div>
 
-            {selectedDate && ( // 날짜가 선택되었을 때만 시간 선택 섹션 표시
+            {selectedDate && (
                 <div style={{ marginBottom: '25px' }}>
                     <h3 style={{ marginBottom: '15px', color: '#555' }}>2. 픽업 시간 선택:</h3>
+                    {/* console.log("availableTimes 상태:", availableTimes); <-- 이 줄을 제거했습니다! */}
                     {availableTimes.length > 0 ? (
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center' }}>
                             {availableTimes.map((time) => (
@@ -138,7 +145,7 @@ function PickupScheduler() {
                                     onMouseOver={e => e.currentTarget.style.transform = 'translateY(-2px)'}
                                     onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}
                                 >
-                                    {time.substring(0, 5)} {/* HH:MM:SS에서 HH:MM만 표시 */}
+                                    {time.substring(0, 5)}
                                 </button>
                             ))}
                         </div>
@@ -148,7 +155,6 @@ function PickupScheduler() {
                 </div>
             )}
 
-            {/* 매장 선택 모달 컴포넌트 */}
             <ShopSelectionModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -156,7 +162,7 @@ function PickupScheduler() {
                 onSelectShop={handleShopSelect}
             />
 
-            {selectedShop && selectedDate && selectedTime && ( // 모든 정보가 선택되었을 때만 최종 요약 표시
+            {selectedShop && selectedDate && selectedTime && (
                 <div style={{ marginTop: '30px', padding: '20px', border: '1px dashed #28a745', borderRadius: '8px', backgroundColor: '#e6ffe6', boxShadow: '0 2px 5px rgba(40, 167, 69, 0.2)' }}>
                     <h3 style={{ color: '#28a745', marginBottom: '15px' }}>✅ 최종 픽업 정보 요약:</h3>
                     <p style={{ fontSize: '1.1em', lineHeight: '1.6' }}>
@@ -166,7 +172,6 @@ function PickupScheduler() {
                         <br />
                         <strong style={{ color: '#333' }}>매장:</strong> <span style={{ color: '#007bff' }}>{selectedShop.shopName}</span> ({selectedShop.address})
                     </p>
-                    {/* TODO: 여기에 "주문 진행하기" 버튼 등 최종 주문 로직을 추가합니다. */}
                     <button
                         style={{
                             marginTop: '20px',

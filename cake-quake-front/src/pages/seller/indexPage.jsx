@@ -15,7 +15,7 @@ export default function ShopManagement() {
 
     const [cakes, setCakes] = useState([]);
     const [page] = useState(1);
-    const [selectedShopCategory, setSelectedShopCategory] = useState("RECOMMENDED_PRODUCTS");
+    const [selectedShopCategory, setSelectedShopCategory] = useState("SHOP_MANAGEMENT");
 
     {/*상품 관리 목록 가져오기*/}
     useEffect(() => {
@@ -68,7 +68,7 @@ export default function ShopManagement() {
                 <div className="flex items-center justify-center relative mb-3">
                     <h2 className="text-2xl font-semibold">매장 관리</h2>
                     <Link
-                        to={`/seller/shop/${shopId}/cakes/add`}
+                        to={`cakes/add`}
                         className="absolute right-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                     >
                         ➕ 새 상품 등록
@@ -110,7 +110,7 @@ export default function ShopManagement() {
                         cakes.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {cakes.map(cake => (
-                                    <Link to={`/seller/shop/${shopId}/cakes/read/${cake.cakeId}`}>
+                                    <Link to={`cakes/read/${cake.cakeId}`}>
                                         <CakeCard key={cake.cakeId} cake={cake}/>
                                     </Link>
                                 ))}

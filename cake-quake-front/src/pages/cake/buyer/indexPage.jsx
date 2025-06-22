@@ -24,41 +24,10 @@ function CakeAllList() {
     const [selectedDetailKeyword, setSelectedDetailKeyword] = useState("LETTERING");
 
     // 매장 관련 상태
-    const [shopList, setShopList] = useState([]);
-    const [shopPage, setShopPage] = useState(1);
     const [filter, setFilter] = useState("");
     const [sort, setSort] = useState("shopId");
     const [keyword, setKeyword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true);
 
-    const observer = useRef();
-    const lastShopElementRef = useCallback(node => {
-        if (loading) return;
-        if (observer.current) observer.current.disconnect();
-        observer.current = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting && hasMore) {
-                setShopPage(prev => prev + 1);
-            }
-        });
-        if (node) observer.current.observe(node);
-    }, [loading, hasMore]);
-
-    useEffect(() => {
-        if (selectedMainCategory !== "STORE_BY_CATEGORY") return;
-
-        setLoading(true);
-        getShopListInfinity({ page, keyword })
-            .then(data => {
-                setShopList(prev => [...prev, ...data.content]);
-                setHasMore(!data.last);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("매장 목록 불러오기 실패", err);
-                setLoading(false);
-            });
-    }, [shopPage, filter, sort, keyword, selectedMainCategory]);
 
     useEffect(() => {
         if (selectedMainCategory === "STORE_BY_CATEGORY") return;
@@ -124,7 +93,7 @@ function CakeAllList() {
                     cakes.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {cakes.map(cake => (
-                                <Link to={`/buyer/shop/${cake.shopId}/cakes/read/${cake.cakeId}`}>
+                                <Link to={`/buyer/shops/${cake.shopId}/cakes/read/${cake.cakeId}`}>
                                 <CakeCard key={cake.cakeId} cake={cake} />
                                 </Link>
                             ))}
@@ -147,11 +116,10 @@ function CakeAllList() {
                             setKeyword={setKeyword}
                         />
                         <ShopList
-                            shopList={shopList}
-                            lastShopElementRef={lastShopElementRef}
-                            loading={loading}
-                            hasMore={hasMore}
-                        />
+                            filter={filter}
+                            sort={sort}
+                            keyword={keyword}
+                            />
                     </>
                 )}
             </main>

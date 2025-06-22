@@ -1,6 +1,9 @@
 // src/router/buyerRouter.jsx
 import { lazy, Suspense } from 'react';
 import CartLayout from '../layouts/CartLayout.jsx';
+import AdminLayout from "../layouts/adminLayout.jsx";
+import BasicLayout from "../layouts/basicLayout.jsx";
+import AiRecommendPage from "../pages/ai/aiRecommendPage.jsx";
 
 
 const CakeIndex = lazy(() => import("../pages/cake/buyer/indexPage.jsx"));
@@ -29,6 +32,9 @@ const BuyerProfileDetailsPage = lazy(() => import("../pages/member/buyer/buyerPr
 const BuyerProfileDetailsModifyPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsModifyPage.jsx"));
 const BuyerProfileDetailsModifyAlarmPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsAlarmPage.jsx"));
 
+//---------------------AI
+const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
+
 
 const Loading = <div>Loading...</div>;
 
@@ -45,7 +51,7 @@ const buyerRouter = () => ({
 
         //---------------------------상품 상세 보기------------------------------------
         {
-                path: "shop/:shopId/cakes/read/:cakeId",
+                path: "shops/:shopId/cakes/read/:cakeId",
                 element: <Suspense fallback={Loading}><BuyerCakeRead /></Suspense>
         },
 
@@ -185,6 +191,16 @@ const buyerRouter = () => ({
 
             ]
         },
+
+        //-------------------------AI 추천-------------------------------
+        {
+            path: "ai",
+            element:(
+                <Suspense fallback={Loading}>
+                    <AIRecommendPage/>
+                </Suspense>
+    )
+        }
 
 
     ]
