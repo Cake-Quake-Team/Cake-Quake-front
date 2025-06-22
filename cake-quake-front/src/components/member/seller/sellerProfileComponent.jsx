@@ -3,7 +3,8 @@ const SellerProfileComponent = ({
     isLoading,
     errorMessage,
     sellerData,
-    handleModifyProfile
+    handleModifyProfile,
+    handleWithdraw,
 }) => {
 
     if (isLoading) return <p>로딩 중입니다...</p>
@@ -40,7 +41,9 @@ const SellerProfileComponent = ({
 
             {/* 탈퇴 버튼 */}
             <div className="flex justify-end mt-4">
-                <button className="text-xs px-2 py-1 border border-red-500 text-red-500 rounded-lg hover:bg-red-50">
+                <button
+                    onClick={handleWithdraw}
+                    className="text-xs px-2 py-1 border border-red-500 text-red-500 rounded-lg hover:bg-red-50">
                     탈퇴
                 </button>
             </div>

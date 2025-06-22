@@ -1,16 +1,16 @@
 import { useNavigate, useParams } from "react-router";
-import SellerProfileModifyComponent from "../../../components/member/seller/sellerProfileModifyComponent";
 import useMemberStore from "../../../store/useMemberStore";
 import { useEffect, useRef, useState } from "react";
-import { getSellerProfile, modifySellerProfile } from "../../../api/memberApi";
 import { useAuth } from "../../../store/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../../../components/common/loadingSpinner";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
 import ResultModal from "../../../components/common/resultModal";
+import { getBuyerProfile, modifyBuyerProfile } from "../../../api/memberApi";
+import BuyerProfileDetailsModifyComponent from "../../../components/member/buyer/buyerProfileDetailsModifyComponent";
 
 
-const SellerProfileModifyPage = () => {
+const BuyerProfileDetailsModifyPage = () => {
 
     // 스크롤 제일 위로 이동
     useEffect(() => {
@@ -27,12 +27,12 @@ const SellerProfileModifyPage = () => {
         phoneNumber: "",
     })
 
-    // profile이 없을 경우 API 호출
-    const { data: sellerData, isLoading, isError, error } = useQuery({
-        queryKey: ['sellerProfile'],
+    // store에 저장된 profile이 없을 경우 API 호출
+    const { data: buyerData, isLoading, isError, error } = useQuery({
+        queryKey: ['buyerProfile'],
         queryFn: async () => {
             console.log("---------------query run 판매자 마이페이지 조회-------------------")
-            const res = await getSellerProfile()
+            const res = await getBuyerProfile()
             return res.data
         },
         enabled: !profile && !!user && !!user.userId,
@@ -40,16 +40,16 @@ const SellerProfileModifyPage = () => {
         retry: false
     })
 
-    // sellerData가 있을 때 상태 업데이트
+    // buyerData 있을 때 상태 업데이트
     useEffect(() => {
-        if (sellerData) {
-            setProfile(sellerData)
+        if (buyerData) {
+            setProfile(buyerData)
             setForm({
-                uname: sellerData.uname,
-                phoneNumber: sellerData.phoneNumber
+                uname: buyerData.uname,
+                phoneNumber: buyerData.phoneNumber
             })
         }
-    }, [sellerData, setProfile])
+    }, [buyerData, setProfile])
 
     const [showModal, setShowModal] = useState(false)
     const [modalMsg, setModalMsg] = useState("")
@@ -143,7 +143,7 @@ const SellerProfileModifyPage = () => {
         try {
             setButtonLoading(true)
             
-            const res = await modifySellerProfile(uid, form)
+            const res = await modifyBuyerProfile(uid, form)
 
             setModalMsg(res.message)
             setShowModal(true)
@@ -159,7 +159,7 @@ const SellerProfileModifyPage = () => {
     const closeResultModal = () => {
         setShowModal(false)
         clearProfile() // store 상태 초기화
-        navigate("/seller/profile")
+        navigate("/buyer/profile/details")
     }
     
 
@@ -167,9 +167,9 @@ const SellerProfileModifyPage = () => {
         <div>
             {isLoading && <LoadingSpinner />} {/* 로딩 스피너 */}
             {isError && <div className="text-red-500">오류 발생: {error.message}</div>} {/* 오류 메시지 */}
-            {!isLoading && !isError && sellerData && (
-                <SellerProfileModifyComponent
-                    sellerProfile={profile}
+            {!isLoading && !isError && buyerData && (
+                <BuyerProfileDetailsModifyComponent
+                    buyerProfile={profile}
                     form={form}
                     buttonLoading={buttonLoading}
                     errorMessage={errorMessage}
@@ -184,7 +184,7 @@ const SellerProfileModifyPage = () => {
             {isVerifyModalOpen  && (
                 <VerifyModal
                     phoneNumber={form.phoneNumber}
-                    type={"SIGNUP"}
+                    type={"CHANGE"}
                     onClose={closeVerifyModal}
                     onSuccess={handleVerificationSuccess}
                 />
@@ -194,6 +194,7 @@ const SellerProfileModifyPage = () => {
         </div>
     )
 
+
 }
 
-export default SellerProfileModifyPage;
+export default BuyerProfileDetailsModifyPage;

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import ResultModal from "../../../components/common/resultModal";
 import SignupBuyerComponent from "../../../components/member/auth/signupBuyerComponent";
-import { createBuyerSignupDTO } from "../../../dto/memberdto/signup.dto";
+import { createBuyerSignupDTO } from "../../../dto/member/member.dto";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
 import { singup } from "../../../api/authApi";
 
@@ -109,10 +109,9 @@ const SignupBuyerPage = () => {
         try {
             setIsLoading(true)
             const signupData = createBuyerSignupDTO(form) // form → DTO 변환
-            console.log(signupData)
 
-            await singup(signupData)
             console.log("signupData: ", signupData)
+            const res = await singup(signupData)
             // 회원가입 성공 시 모달 표시
             setModalMsg(res.message)
             setShowModal(true)

@@ -8,10 +8,11 @@ const endpoints = {
     signupSellerStep1: 'auth/signup/sellers/step1',
     signupSellerStep2: 'auth/signup/sellers/step2',
     signin: 'auth/signin',
-    signout: 'auth/signout',
     otpSend: 'auth/otp/send',
     otpVerify: 'auth/otp/verify',
     verifyBusiness: 'auth/business/verify',
+    verifyPassword: 'auth/password/verify',
+    password: 'auth/password',
 
     // 토큰-시큐리티 어노테이션 접근 테스트용 url
     tokenTest: 'auth/token-test',
@@ -104,7 +105,7 @@ export const verifyBusiness = async(businessData) => {
         const res = await axios.post(`${baseUrl}/${endpoints.verifyBusiness}`, payload, {
             headers: { 'Content-Type': 'application/json' }
         })
-        console.log(res.data)
+        // console.log(res.data)
         return res.data
 
     } catch (error) {
@@ -127,10 +128,37 @@ export const getToken = async(userId, password) => {
     }
 }
 
+// (탈퇴 전)비밀번호 확인
+export const verifyPassword = async(form) => {
+    try {
+        const res = await jwtAxios.post(`${baseUrl}/${endpoints.verifyPassword}`, form)
 
-/*
-    테스트용
-*/
+        console.log(res.data)
+        return res.data
+    } catch (error) {
+        console.log("접근 오류:")
+        throw error
+    }
+}
+
+// 비밀번호 변경
+export const changePassword = async(form) => {
+    try {
+        const res = await jwtAxios.patch(`${baseUrl}/${endpoints.password}`, form)
+
+        console.log(res.data)
+        return res.data
+    } catch (error) {
+        console.log("접근 오류:")
+        throw error
+    }
+}
+
+
+
+
+// ---------------------------테스트용------------------------------
+
 // 로그인 -> 쿠키에 저장된 토큰으로 다른 경로 접근
 export const testToken = async() => {
     try {

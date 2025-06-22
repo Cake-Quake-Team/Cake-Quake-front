@@ -1,8 +1,6 @@
 // src/router/buyerRouter.jsx
 import { lazy, Suspense } from 'react';
 import CartLayout from '../layouts/CartLayout.jsx';
-import AdminLayout from "../layouts/adminLayout.jsx";
-import BasicLayout from "../layouts/basicLayout.jsx";
 
 
 const CakeIndex = lazy(() => import("../pages/cake/buyer/indexPage.jsx"));
@@ -27,6 +25,9 @@ const PaymentDetailPage = lazy(()=>import('../pages/payment/paymentDetailPage.js
 const TemperaturePage = lazy(() => import("../pages/buyer/temperature/temperaturePage.jsx"));
 //포인트
 const PointPage = lazy(() => import("../pages/buyer/point/pointPage.jsx"));
+const BuyerProfileDetailsPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsPage.jsx"));
+const BuyerProfileDetailsModifyPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsModifyPage.jsx"));
+const BuyerProfileDetailsModifyAlarmPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsAlarmPage.jsx"));
 
 
 const Loading = <div>Loading...</div>;
@@ -123,51 +124,66 @@ const buyerRouter = () => ({
         },
         //-----------------------결제 내역
         {
-          path: "payments",
-          children: [
-              {
-                  index: true,
-                  element: (
-                      <Suspense fallback={Loading}>
-                          <PaymentListPage/>
-                      </Suspense>
-                  )
-              },
-              {
-                  path: ':paymentId',
-                  element: (
-                      <Suspense fallback={Loading}>
-                          <PaymentDetailPage/>
-                      </Suspense>
-                  )
-              }
-          ]
+            path: "payments",
+            children: [
+                {
+                    index: true,
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <PaymentListPage/>
+                        </Suspense>
+                    )
+                },
+                {
+                    path: ':paymentId',
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <PaymentDetailPage/>
+                        </Suspense>
+                    )
+                }
+            ]
         },
 
         //-------------------구매자 마이페이지----------------------------
         {
-          path: "profile",
-          children: [
-              {
-                  //포인트
-                  path: "points",
-                  element:(
-                      <Suspense fallback={Loading}>
-                          <PointPage/>
-                      </Suspense>
-                  )
-              } ,
-              {
-                  //온도
-                  path: "temperature",
-                  element:(
-                      <Suspense fallback={Loading}>
-                          <TemperaturePage/>
-                      </Suspense>
-                  )
-              }
+            path: "profile",
+            children: [
+                {
+                    //포인트
+                    path: "points",
+                    element:(
+                        <Suspense fallback={Loading}>
+                            <PointPage/>
+                        </Suspense>
+                    )
+                } ,
+                {
+                    //온도
+                    path: "temperature",
+                    element:(
+                        <Suspense fallback={Loading}>
+                            <TemperaturePage/>
+                        </Suspense>
+                    )
+                },
+                {
+                    // 유저 정보 - id, 전화번호 등
+                    path: "details",
+                    element: <Suspense fallback={Loading}><BuyerProfileDetailsPage /></Suspense>,
+                },
+                {
+                    // 유저 정보 수정
+                    path: "details/modify/:uid",
+                    element: <Suspense fallback={Loading}><BuyerProfileDetailsModifyPage /></Suspense>
+                },
+                {
+                    // 유저 알람 수정
+                    path: "details/alarmsettings/:uid",
+                    element: <Suspense fallback={Loading}><BuyerProfileDetailsModifyAlarmPage /></Suspense>
+                },
 
-          ]
+            ]
         },
 
 

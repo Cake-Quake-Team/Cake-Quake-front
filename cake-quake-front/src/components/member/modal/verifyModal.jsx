@@ -23,10 +23,11 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
             })
             console.log(res)
             setServerCode(res.data.verificationCode)
-            setModalMsg(""); // 이전 메시지 초기화
+            setModalMsg("") // 이전 메시지 초기화
             setSent(true)
         } catch (err) {
-            setError("인증 코드 전송 실패")
+            const errorMessage = err.response.data?.message || "인증 코드 전송 실패"
+            setError(errorMessage)
         }  finally{
             setIsLoading(false) // 성공/실패 관계없이 로딩 종료
         }
@@ -40,13 +41,13 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
                 code: String(code),
                 type
             })
-            setModalMsg(res.message);
+            setModalMsg(res.message)
 
             // 잠시 후 onSuccess 실행
             setTimeout(() => {
-                onSuccess(); // 예: setIsVerified(true)
-                onClose();
-            }, 1500); // 1.5초 후 자동 종료
+                onSuccess() // 예: setIsVerified(true)
+                onClose()
+            }, 1500) // 1.5초 후 자동 종료
         } catch {
             setError("인증 실패")
         }
@@ -57,7 +58,7 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
         style={{ backgroundColor: 'rgba(169, 169, 169, 0.7)' }}>
         <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
             <h2 className="text-xl font-bold mb-4">휴대폰 인증</h2>
-            {/* ✅ 인증 완료 메시지 표시 */}
+            {/* 인증 완료 메시지 표시 */}
             {modalMsg ? (
                 <p className="text-green-600 text-center">{modalMsg}</p>
             ) : (
@@ -71,7 +72,7 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
                     {!sent ? (
                         <button
                             onClick={handleSendCode}
-                            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                            className="w-full bg-blue-400 text-white py-2 rounded hover:bg-blue-600"
                         >
                             인증 코드 전송
                         </button>
