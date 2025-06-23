@@ -13,7 +13,7 @@ function AiResultBox({ chatHistory, loading }) {
         <div className="w-full max-w-2xl mx-auto flex flex-col gap-6">
             {chatHistory.length === 0 && !loading && (
                 <p className="text-center text-gray-400 italic">
-                    AI의 답변이 여기에 표시됩니다.
+                    안녕하세요 CQ봇입니다 무엇을 도와드릴까요?
                 </p>
             )}
             {chatHistory.map(({ question, answer }, idx) => (
