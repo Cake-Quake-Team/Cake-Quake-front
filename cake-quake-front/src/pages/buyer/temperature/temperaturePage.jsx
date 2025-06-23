@@ -75,8 +75,7 @@ export default function TemperaturePage() {
 
     const filtered = history.filter(item => {
         if (filter === "all") return true;
-        // changeType 필드가 문자열일 경우 toLowerCase() 사용 (백엔드 DTO 확인 필요)
-        return item.changeType.toLowerCase() === filter;
+        return item.reason?.toUpperCase() === filter;
     });
 
     useEffect(() => {
@@ -91,8 +90,17 @@ export default function TemperaturePage() {
             {error && <p className="text-red-500 text-center">{error}</p>}
 
             {temperature !== null && (
-                <div className="text-center text-xl font-semibold text-indigo-600">
-                    현재 온도: {temperature} {/* data.temperature로 수정했는지 확인 */}
+                <div className="bg-white rounded-xl shadow-2xl p-8 text-center transform transition-transform duration-300 hover:scale-105">
+                    <h2 className="text-3xl font-bold mb-4 flex items-center justify-center text-gray-800">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mr-3 animate-pulse text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.727A8 8 0 016.343 7.273L17.657 16.727zm0 0l-1.357 1.357L14.49 14.88l1.357-1.357-1.357-1.357-1.357 1.357-1.357-1.357 1.357-1.357-1.357 1.357-1.357-1.357 1.357 1.357-1.357 1.357-1.357 1.357 1.357 1.357-1.357 1.357-1.357 1.357z" />
+                        </svg>
+                        현재 온도
+                    </h2>
+                    <p className="text-7xl font-extrabold tracking-tight text-indigo-600">
+                        {temperature}°C
+                    </p>
+                    <p className="text-sm mt-3 opacity-80 text-gray-600">실시간으로 측정된 온도입니다.</p>
                 </div>
             )}
 
