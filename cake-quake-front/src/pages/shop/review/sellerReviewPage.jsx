@@ -53,7 +53,7 @@ export default function SellerReviewsPage() {
 
     // 4. 상세 페이지 이동
     const handleDetail = reviewId => {
-        navigate(`/seller/shops/${shopId}/reviews/${reviewId}`);
+        navigate(`/shops/${shopId}/reviews/${reviewId}`);
     };
 
     return (

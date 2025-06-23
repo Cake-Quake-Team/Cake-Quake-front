@@ -7,9 +7,15 @@ import RequireAuth from "../components/common/requireAuth.jsx";
     25.06.23 Admin 역할만 접근 가능하게 변경
 */
 const DeletionRequestAdminPage = lazy(() => import("../pages/admin/deletionRequestAdminPage.jsx"));
+
+//----------------발주 아이템
 const IngredientListPage = lazy(()=> import("../pages/admin/IngredientListPage.jsx"));
 const IngredientFormPage = lazy(()=> import("../pages/admin/IngredientFormPage.jsx"));
 const PendingSellerListPage = lazy(()=> import("../pages/admin/pendingSellerListPage.jsx"));
+
+//----------------------발주
+const ProcurementConfirmPage = lazy(()=> import("../pages/admin/adminProcurementConfirmPage.jsx"));
+const AdminProcurementListPage = lazy(() => import("../pages/admin/adminProcurementListPage.jsx"));
 
 const Loading = <div>Loading...</div>;
 
@@ -71,10 +77,32 @@ const adminRouter = () => ({
                         </Suspense>
                     ),
                 },
+                {
+                    path: "procurements",
+                    children: [
+                        {
+                            index: true,
+                            element: (
+                                <Suspense fallback={Loading}>
+                                    <AdminProcurementListPage />
+                                </Suspense>
+                            ),
+                        },
+                        {
+                            path: ":procurementId/confirm",
+                            element: (
+                                <Suspense fallback={Loading}>
+                                    <ProcurementConfirmPage />
+                                </Suspense>
+                            ),
+                        },
+                    ],
+                },
             ],
         }
     ]
 });
+
 
 
 export default adminRouter ;

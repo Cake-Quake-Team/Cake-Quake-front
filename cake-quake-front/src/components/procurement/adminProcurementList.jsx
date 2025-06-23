@@ -1,34 +1,21 @@
+// src/components/procurement/AdminProcurementList.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
 import {
     FolderOpenIcon,
-    ClockIcon,
-    ChevronRightIcon,
-    PlusIcon
+    BuildingOffice2Icon,
+    ChevronRightIcon
 } from '@heroicons/react/24/outline';
 
-export function ProcurementListComponent({
-                                             requests,
-                                             hasNext,
-                                             onLoadMore,
-                                             onClickItem,
-                                             onCreate,        // 추가
-                                         }) {
+export function AdminProcurementList({
+                                         requests,
+                                         hasNext,
+                                         onLoadMore,
+                                         onClickItem
+                                     }) {
     return (
         <div>
-            {/* 새 발주 버튼 */}
-            <div className="flex justify-end mb-4">
-                <button
-                    type="button"
-                    onClick={onCreate}
-                    className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                >
-                    <PlusIcon className="h-5 w-5 mr-2" />
-                    새 발주
-                </button>
-            </div>
-
             <div className="space-y-4">
                 {requests.map(req => {
                     const createdDate = req.regDate
@@ -54,17 +41,18 @@ export function ProcurementListComponent({
                             <div className="flex items-center space-x-3">
                                 <FolderOpenIcon className="h-6 w-6 text-indigo-600" />
                                 <div>
-                                    <h3 className="text-lg font-semibold text-gray-800">
-                                        발주 #{req.procurementId}
+                                    <h3 className="text-lg font-semibold text-gray-800 flex items-center space-x-1">
+                                        <BuildingOffice2Icon className="h-5 w-5 text-gray-500" />
+                                        <span>
+                      발주 #{req.procurementId} — {req.shopName}
+                    </span>
                                     </h3>
                                     <p className="text-sm text-gray-600">요청일: {createdDate}</p>
                                     <p className="text-sm text-gray-600">예정일: {scheduledDate}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                <span
-                    className={`px-2 py-0.5 rounded-full text-sm font-medium ${statusClass}`}
-                >
+                <span className={`px-2 py-0.5 rounded-full text-sm font-medium ${statusClass}`}>
                   {req.status}
                 </span>
                                 <ChevronRightIcon className="h-5 w-5 text-gray-400" />
@@ -86,18 +74,17 @@ export function ProcurementListComponent({
     );
 }
 
-ProcurementListComponent.propTypes = {
+AdminProcurementList.propTypes = {
     requests: PropTypes.arrayOf(
         PropTypes.shape({
             procurementId: PropTypes.number.isRequired,
-            regDate:        PropTypes.string,
-            scheduleDate:   PropTypes.string,
-            status:         PropTypes.string.isRequired,
-            note:           PropTypes.string,
+            shopName:      PropTypes.string.isRequired,
+            regDate:       PropTypes.string,
+            scheduleDate:  PropTypes.string,
+            status:        PropTypes.string.isRequired
         })
     ).isRequired,
     hasNext:    PropTypes.bool.isRequired,
     onLoadMore: PropTypes.func.isRequired,
-    onClickItem:PropTypes.func.isRequired,
-    onCreate:   PropTypes.func.isRequired,  // 추가
+    onClickItem:PropTypes.func.isRequired
 };

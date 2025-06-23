@@ -1,7 +1,8 @@
-import { Link, useNavigate } from "react-router";
+import {Link, useNavigate, useParams} from "react-router";
 import {Search, ShoppingCart, Menu, X, Bot} from "lucide-react";
 import { useAuth } from "../../store/AuthContext";
 import { useState } from "react";
+import NotificationBell from "./notificationBell.jsx";
 
 function BuyerHeader() {
     const {user, signOut} = useAuth()
@@ -20,10 +21,27 @@ function BuyerHeader() {
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
+                    {user?.role === "BUYER" && (
                     <Link to="/buyer">
                     <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
                     </Link>
-                    <h1 className="text-2xl font-bold">Cake Quake</h1>
+                    )}
+                    {user?.role === "SELLER" && (
+                         // <Link to={`shops/${shopId}`}>
+                            <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
+                        //</Link>
+                    )}
+                    {user?.role === "BUYER" && (
+                        <Link to="/buyer">
+                            <h1 className="text-2xl font-bold">Cake Quake</h1>
+                        </Link>
+                    )}
+                    {user?.role === "SELLER" && (
+                        // <Link to={`shops/${shopId}`}>
+                        <h1 className="text-2xl font-bold">Cake Quake</h1>
+                        //</Link>
+                    )}
+
 
                 </div>
 
@@ -35,6 +53,9 @@ function BuyerHeader() {
                             <Bot className="w-5 h-5 text-pink-500 hover:text-pink-600 cursor-pointer" />
                         </Link>
                     )}
+
+                    {/* 🔔 알림 종 아이콘 추가 */}
+                    <NotificationBell />
 
                     <Search className="w-5 h-5 cursor-pointer" />
                     <ShoppingCart className="w-5 h-5 cursor-pointer" />

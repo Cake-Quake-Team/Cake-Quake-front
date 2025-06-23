@@ -1,42 +1,38 @@
 // src/pages/shop/ShopProcurementDetailPage.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { getRequestDetail } from '../../api/procurementApi.jsx';
-import { getAllIngredients } from '../../api/ingredientApi.jsx';          // 재료 API
+import { getRequestDetail, cancelRequestBySeller } from '../../api/procurementApi.jsx';
+import { getAllIngredients } from '../../api/ingredientApi.jsx';
 import { ProcurementDetailComponent } from '../../components/procurement/procurementDetail.jsx';
+import { CancelProcurementComponent } from '../../components/procurement/CancelProcurementComponent.jsx';
 
 export default function ShopProcurementDetailPage() {
     const { shopId, procurementId } = useParams();
     const navigate = useNavigate();
 
-    const [ingredients, setIngredients] = useState([]); // 재료 단가 리스트
-    const [data,        setData]        = useState(null);
-    const [loading,     setLoading]     = useState(true);
-    const [error,       setError]       = useState(null);
+    const [ingredients, setIngredients]     = useState([]);
+    const [data,        setData]            = useState(null);
+    const [loading,     setLoading]         = useState(true);
+    const [error,       setError]           = useState(null);
+    const [cancelLoading, setCancelLoading] = useState(false);
 
-    // 1) 마운트 시 재료+발주 상세 동시 로딩 및 병합
+    // 취소 폼 토글
+    const [showCancelForm, setShowCancelForm] = useState(false);
+
     useEffect(() => {
         let isMounted = true;
         (async () => {
             try {
-                // 1-1) 재료 전체 조회 (단가 포함)
                 const ingResp = await getAllIngredients({ page: 1, size: 1000 });
                 const ingList = Array.isArray(ingResp.content) ? ingResp.content : ingResp;
                 if (!isMounted) return;
                 setIngredients(ingList);
 
-                // 1-2) 발주 상세 조회
                 const res = await getRequestDetail(shopId, procurementId);
-
-                // 1-3) items마다 단가(price_per_unit) 병합
                 const enrichedItems = (res.items || []).map(item => {
                     const found = ingList.find(x => x.ingredientId === item.ingredientId);
-                    return {
-                        ...item,
-                        pricePerUnit: found?.pricePerUnit ?? 0,
-                    };
+                    return { ...item, pricePerUnit: found?.pricePerUnit ?? 0 };
                 });
-
                 if (!isMounted) return;
                 setData({ ...res, items: enrichedItems });
             } catch (err) {
@@ -48,7 +44,6 @@ export default function ShopProcurementDetailPage() {
         return () => { isMounted = false; };
     }, [shopId, procurementId]);
 
-    // 2) useMemo로 총합 계산
     const totalPrice = useMemo(() => {
         if (!data?.items) return 0;
         return data.items.reduce(
@@ -56,6 +51,21 @@ export default function ShopProcurementDetailPage() {
             0
         );
     }, [data]);
+
+    const handleCancel = async reason => {
+        if (!window.confirm('정말 이 발주를 취소하시겠습니까?')) return;
+        setCancelLoading(true);
+        try {
+            await cancelRequestBySeller(shopId, procurementId, { reason });
+            alert('발주가 취소되었습니다.');
+            navigate(`/seller/${shopId}/procurements`);
+        } catch (err) {
+            console.error('취소 실패', err);
+            alert('발주 취소에 실패했습니다.');
+        } finally {
+            setCancelLoading(false);
+        }
+    };
 
     if (loading) {
         return <p className="p-4 text-center">로딩 중...</p>;
@@ -68,7 +78,6 @@ export default function ShopProcurementDetailPage() {
                     onClick={() => {
                         setLoading(true);
                         setError(null);
-                        // 간단 재시도
                         getRequestDetail(shopId, procurementId)
                             .then(res => setData(res))
                             .catch(err => setError(err))
@@ -83,18 +92,36 @@ export default function ShopProcurementDetailPage() {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="container mx-auto p-4 space-y-6">
             <button
                 onClick={() => navigate(-1)}
-                className="mb-4 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
             >
                 ← 뒤로
             </button>
-            {/* data와 totalPrice를 컴포넌트에 넘김 */}
+
             <ProcurementDetailComponent
                 data={data}
                 totalPrice={totalPrice}
             />
+
+            {/* 취소 토글 버튼 */}
+            {!showCancelForm && (
+                <button
+                    onClick={() => setShowCancelForm(true)}
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                    발주 취소하기
+                </button>
+            )}
+
+            {/* 취소 폼 */}
+            {showCancelForm && (
+                <CancelProcurementComponent
+                    onCancel={handleCancel}
+                    loading={cancelLoading}
+                />
+            )}
         </div>
     );
 }

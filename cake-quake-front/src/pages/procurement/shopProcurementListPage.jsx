@@ -1,39 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { getStoreRequests } from '../../api/procurementApi.jsx';
+import {
+    getStoreRequests,
+    getStoreRequestByStatus
+} from '../../api/procurementApi.jsx';
 import { ProcurementListComponent } from '../../components/procurement/procurementList.jsx';
+
+const STATUS_OPTIONS = [
+    { value: '', label: '전체' },
+    { value: 'REQUESTED', label: '요청됨' },
+    { value: 'SCHEDULED', label: '일정지정' },
+    { value: 'SHIPPED', label: '발송됨' },
+    { value: 'DELIVERED', label: '도착완료' },
+    { value: 'CANCELLED', label: '취소됨' },
+];
 
 export default function ShopProcurementListPage() {
     const { shopId } = useParams();
     const navigate   = useNavigate();
 
+    const [status, setStatus]   = useState('');
     const [requests, setRequests] = useState([]);
-    const [page, setPage]         = useState(1);
-    const [hasNext, setHasNext]   = useState(false);
+    const [page, setPage]       = useState(1);
+    const [hasNext, setHasNext] = useState(false);
 
-    // 1) 최초 마운트 시에는 항상 page=1만 fetch
+    // 1) 상태 변경 시 초기 로드
     useEffect(() => {
-        (async () => {
-            try {
-                const { content, hasNext } = await getStoreRequests(shopId, { page: 1, size: 10 });
-                setRequests(content);      // 덮어쓰기
-                setHasNext(hasNext);
-                setPage(2);                // 다음 호출부터 page=2
-            } catch (err) {
-                console.error('발주 목록 로딩 실패', err);
-            }
-        })();
-    }, [shopId]);
+        setRequests([]);
+        setPage(1);
+        loadPage(1, true);
+    }, [shopId, status]);
 
-    // 2) 더 보기 클릭 시, page 상태에 따라 append
-    const handleLoadMore = async () => {
+    // 2) 페이지 로드 (append 논리 내장)
+    const loadPage = async (pageToLoad = page, reset = false) => {
         try {
-            const { content, hasNext } = await getStoreRequests(shopId, { page, size: 10 });
-            setRequests(prev => [...prev, ...content]);
-            setHasNext(hasNext);
-            setPage(prev => prev + 1);
+            const params = { page: pageToLoad, size: 10 };
+            const res = status
+                ? await getStoreRequestByStatus(shopId, status, params)
+                : await getStoreRequests(shopId, params);
+
+            setRequests(prev =>
+                reset
+                    ? res.content
+                    : [...prev, ...res.content]
+            );
+            setHasNext(res.hasNext);
+            setPage(pageToLoad + 1);
         } catch (err) {
-            console.error('더 보기 실패', err);
+            console.error('발주 목록 로딩 실패', err);
         }
     };
 
@@ -41,20 +55,43 @@ export default function ShopProcurementListPage() {
         navigate(`/seller/${shopId}/procurements/${id}`);
     };
 
-    // 발주 생성 버튼 클릭 핸들러
     const handleCreate = () => {
         navigate(`/seller/${shopId}/procurements/create`);
     };
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-3xl mb-4">발주 목록</h1>
+        <div className="container mx-auto p-4 space-y-4">
+            <h1 className="text-3xl">발주 목록</h1>
+
+            <div className="flex items-center space-x-4">
+                <button
+                    onClick={handleCreate}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                >
+                    새 발주 생성
+                </button>
+
+                <div>
+                    <label className="mr-2 font-medium">상태 필터:</label>
+                    <select
+                        value={status}
+                        onChange={e => setStatus(e.target.value)}
+                        className="border rounded px-2 py-1"
+                    >
+                        {STATUS_OPTIONS.map(opt => (
+                            <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
             <ProcurementListComponent
                 requests={requests}
                 hasNext={hasNext}
-                onLoadMore={handleLoadMore}
+                onLoadMore={() => loadPage()}
                 onClickItem={handleClickItem}
-                onCreate={handleCreate}
             />
         </div>
     );

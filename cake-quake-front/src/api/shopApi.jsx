@@ -10,6 +10,7 @@ export const getShopListInfinity = async ({ page = 1, size = 8 ,keyword="",filte
     const response = await jwtAxios.get(`${prefix}/shops`, {
         params: { page, size, keyword ,filter,sort},
     })
+
     return response.data;
 }
 
@@ -55,7 +56,7 @@ export const updateShopNotice=async(shopId,noticeId,noticeData)=>{
     return response.data;
 }
 
-//매장 정보 수정
+//매장 정보 수정 -> 수정해야함
 export const updateShop=async (shopId,data)=>{
     console.log("api/shopApi - updateShop 호출됨"); // <--- 새로 추가
     console.log("api/shopApi - data 파라미터:", data); // <--- 새로 추가
