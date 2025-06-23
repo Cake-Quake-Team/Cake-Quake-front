@@ -21,7 +21,7 @@ export default function SellerReviewDetailPage() {
             } catch (e) {
                 console.error('리뷰 상세 로드 실패', e);
                 alert('리뷰를 불러올 수 없습니다.');
-                nav(`/seller/shops/${shopId}/reviews`);
+                nav(`/shops/${shopId}/reviews`);
             }
         })();
     }, [shopId, reviewId, nav]);
@@ -51,7 +51,7 @@ export default function SellerReviewDetailPage() {
         try {
             await requestDeleteShopReview(shopId, reviewId, deleteReason);
             alert('삭제 요청이 전송되었습니다.');
-            nav(`/seller/shops/${shopId}/reviews`);
+            nav(`/shops/${shopId}/reviews`);
         } catch (e) {
             console.error(e);
             alert('삭제 요청에 실패했습니다.');
