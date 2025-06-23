@@ -110,7 +110,7 @@ function SellerCakeReadPage() {
             try {
                 await deleteCake(cakeId);
                 alert("상품이 삭제되었습니다.");
-                navigate(`/shops/${shopId}/cakes/list`);
+                navigate(`/shops/${shopId}`);
             } catch (err) {
                 console.error("상품 삭제 실패:", err);
                 alert("상품 삭제에 실패했습니다.");
@@ -124,7 +124,7 @@ function SellerCakeReadPage() {
                 <div className="flex items-center justify-center relative mb-3">
                     {shopId && (
                         <Link
-                            to={`/shops/${shopId}/cakes/list`}
+                            to={`/shops/${shopId}`}
                             className="absolute left-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                             title="목록으로"
                         >
