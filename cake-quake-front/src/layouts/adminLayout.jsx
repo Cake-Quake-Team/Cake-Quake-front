@@ -86,6 +86,27 @@ export default function AdminLayout() {
                                 {isActive("/admin/review-deletion-requests")}
                             </Link>
 
+                            <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">발주 관리</div>
+                            <Link
+                                to="/admin/procurements" // Assuming a list page for "회원 목록/등급"
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
+                                    isActive("/admin/procurements") ? "bg-blue-50 text-blue-700 font-medium" : ""
+                                }`}
+                            >
+                                <span>발주 관리</span>
+                                {isActive("/admin/procurements")}
+                            </Link>
+                            <Link
+                                to="/admin/ingredients" // Assuming points management related to users
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
+                                    isActive("/admin/ingredients") ? "bg-blue-50 text-blue-700 font-medium" : ""
+                                }`}
+                            >
+                                <span>발주 아이템</span> {/* Adjusted text based on typical admin panel structure */}
+                                {isActive("/admin/ingredients")}
+                            </Link>
+
+
                             <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">회원 관리</div>
                             <Link
                                 to="/admin/users/list" // Assuming a list page for "회원 목록/등급"
