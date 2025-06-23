@@ -31,7 +31,17 @@ function BuyerHeader() {
                             <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
                         //</Link>
                     )}
-                    <h1 className="text-2xl font-bold">Cake Quake</h1>
+                    {user?.role === "BUYER" && (
+                        <Link to="/buyer">
+                            <h1 className="text-2xl font-bold">Cake Quake</h1>
+                        </Link>
+                    )}
+                    {user?.role === "SELLER" && (
+                        // <Link to={`shops/${shopId}`}>
+                        <h1 className="text-2xl font-bold">Cake Quake</h1>
+                        //</Link>
+                    )}
+
 
                 </div>
 
