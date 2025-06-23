@@ -1,10 +1,10 @@
 import React from 'react';
 
 function OptionAdd({
-                       optionItems,
+                       optionItems = [],
                        selectedOptionTypeId,
                        setSelectedOptionTypeId,
-                       existingOptionTypes,
+                       existingOptionTypes = [],
                        newOptionTypeName,
                        showNewOptionTypeInput,
                        handleSubmit,

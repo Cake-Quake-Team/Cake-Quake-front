@@ -1,6 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { MapPin, Clock, Phone, Star, Heart, Share2 ,ArrowLeft,Pencil} from 'lucide-react';
 import {Navigate, useNavigate} from "react-router";
+import MapModal from "./mapModal.jsx";
 
 
 //평점 별 채우기
@@ -26,6 +27,7 @@ const renderStars=(rating)=> {
 const ShopDetailSection=({shop})=>{
     const numericRating =parseFloat(shop.rating);
     const navigate =useNavigate();
+    const [showMap, setShowMap] = useState(false);
     return(
 
         <div className="relative text-center mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
@@ -59,10 +61,21 @@ const ShopDetailSection=({shop})=>{
                 {/*<span className="ml-2 text-gray-600 text-base">리뷰 {shop.reviewCount}개</span>*/}
             </div>
             {/*기본 정보*/}
-            <p className="text-lg text-gray-700 mb-1 flex items-center justify-center">
+            <p
+                className="text-lg text-gray-700 mb-1 flex items-center justify-center cursor-pointer hover:text-blue-500"
+                onClick={() =>{
+                    setShowMap(true);} }
+            >
                 <MapPin className="mr-2 text-gray-500 w-5 h-5" />
                 <span>{shop.address}</span>
             </p>
+
+            {showMap && (
+                <MapModal
+                    address={shop.address}
+                    onClose={() => setShowMap(false)}
+                />
+            )}
             <p className="text-lg text-gray-700 mb-1 flex items-center justify-center">
                 <Clock className="mr-2 text-gray-500 w-5 h-5" />
                 <span>{shop.openTime} ~ {shop.closeTime} {shop.closeDays ? `(${shop.closeDays} 휴무)` : '(연중무휴)'}</span>

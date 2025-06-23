@@ -131,7 +131,7 @@ function CakeAddPage() {
             console.error("상품 등록 실패", error);
             alert("등록 중 오류 발생");
         }
-        navigate(`/shops/${shopId}/cakes/list`);
+        navigate(`/shops/${shopId}`);
     };
 
     return (
