@@ -43,6 +43,14 @@ export const createRequest = async (shopId, {note, items}) =>{
     return res.data
 }
 
+//판매자용 발주 취소
+export const cancelRequestBySeller = async (shopId,procurementId, {reason}) =>{
+    const res = await jwtAxios.post(
+        `${prefix}/shops/${shopId}/procurements/${procurementId}/cancel`,
+        { reason }
+    );
+    return res.data
+}
 
 // -------------------관리자 관련 발주
 //관리자 발주 확정(일정 지정)
@@ -64,4 +72,13 @@ export const getAllRequests = async ({page = 1, size = 10, sortField="procuremen
         params: {page,size,sortField}
     });
     return res.data
+}
+
+// 관리자용 발주 취소
+export const cancelRequestByAdmin = async (procurementId, {reason}) => {
+    const res = await jwtAxios.post(
+        `${prefix}/procurements/${procurementId}/cancel`,
+        {reason}
+    );
+    return res.data;
 }
