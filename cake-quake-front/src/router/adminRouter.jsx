@@ -4,8 +4,14 @@ import {lazy, Suspense} from "react";
 
 
 const DeletionRequestAdminPage = lazy(() => import("../pages/admin/deletionRequestAdminPage.jsx"));
+
+//----------------발주 아이템
 const IngredientListPage = lazy(()=> import("../pages/admin/IngredientListPage.jsx"));
 const IngredientFormPage = lazy(()=> import("../pages/admin/IngredientFormPage.jsx"));
+
+//----------------------발주
+const ProcurementConfirmPage = lazy(()=> import("../pages/admin/adminProcurementConfirmPage.jsx"));
+const AdminProcurementListPage = lazy(() => import("../pages/admin/adminProcurementListPage.jsx"));
 
 const Loading = <div>Loading...</div>;
 
@@ -51,8 +57,30 @@ const adminRouter = () => ({
                 },
             ],
         },
+        {
+            path: "procurements",
+            children: [
+                {
+                    index: true,
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <AdminProcurementListPage />
+                        </Suspense>
+                    ),
+                },
+                {
+                    path: ":procurementId/confirm",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <ProcurementConfirmPage />
+                        </Suspense>
+                    ),
+                },
+            ],
+        },
     ],
 });
+
 
 
 export default adminRouter ;
