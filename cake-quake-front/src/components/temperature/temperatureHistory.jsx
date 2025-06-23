@@ -9,43 +9,52 @@ export default function temHistoryList({
         return <p className="text-center py-4 text-gray-500">내역이 없습니다.</p>;
     }
     return (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full text-left">
-                <thead className="bg-gray-100">
-                <tr>
-                    <th className="p-2">날짜</th>
-                    <th className="p-2">변동 원인</th>
-                    <th className="p-2">변화량</th>
-                    <th className="p-2">최종 온도</th>
-                </tr>
-                </thead>
-                <tbody>
-                {items.map(item => (
-                    <tr key={item.historyId} className="border-t">
-                        <td className="p-2">
-                            {new Date(item.regDate).toLocaleDateString("ko-KR")}
-                        </td>
-                        <td className="p-2">{item.reason}</td>
-                        <td
-                            className={`p-2 ${
+        <div className="space-y-4"> {/* 각 카드 사이의 간격을 위해 space-y 사용 */}
+            {items.map(item => (
+                <div
+                    key={item.historyId}
+                    className="bg-white rounded-lg shadow-md p-5 border border-gray-200"
+                >
+                    <div className="flex justify-between items-start mb-2">
+                        {/* 날짜 */}
+                        <p className="text-sm text-gray-500 font-medium">
+                            {new Date(item.regDate).toLocaleDateString("ko-KR", {
+                                year: 'numeric', month: 'long', day: 'numeric'
+                            })}
+                        </p>
+                        {/* 변화량 */}
+                        <p
+                            className={`text-lg font-bold ${
                                 item.changeAmount > 0 ? "text-green-600" : "text-red-600"
                             }`}
                         >
                             {item.changeAmount > 0 ? "+" : ""}
-                            {item.changeAmount}P
-                        </td>
-                        <td className="p-2">{item.afterTemperature}P</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+                            {item.changeAmount}°C {/* P 대신 °C로 변경, 또는 실제 단위 사용 */}
+                        </p>
+                    </div>
+
+                    {/* 변동 원인 */}
+                    <p className="text-base font-semibold text-gray-800 mb-2">
+                        원인: {item.reason}
+                    </p>
+
+                    {/* 최종 온도 */}
+                    <div className="flex justify-end items-center mt-3 pt-3 border-t border-gray-100">
+                        <span className="text-sm text-gray-600 mr-2">최종 온도:</span>
+                        <span className="text-xl font-bold text-indigo-700">
+                            {item.afterTemperature}°C
+                        </span>
+                    </div>
+                </div>
+            ))}
+
             {hasNext && (
                 <div className="p-4 text-center">
                     <button
                         onClick={onLoadMore}
-                        className="py-2 px-4 border border-indigo-600 rounded hover:bg-indigo-50"
+                        className="py-3 px-6 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50"
                     >
-                        더 보기
+                        더 많은 내역 보기
                     </button>
                 </div>
             )}

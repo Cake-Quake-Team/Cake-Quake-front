@@ -25,23 +25,32 @@ const ShopEditor = ({ shopId }) => {
     const [editorImages, setEditorImages] = useState([]);
     const [editorThumbnailIndex, setEditorThumbnailIndex] = useState(null);
 
-    // 컴포넌트 마운트 시 또는 shopId 변경 시 매장 정보 불러오기
+    console.log("➡️ ShopEditor.jsx 컴포넌트 렌더링 시작");
+
+
     useEffect(() => {
         const fetchShop = async () => {
             try {
                 const data = await getShopDetail(shopId);
+                console.log("🎉 ShopEditor: getShopDetail 성공. 불러온 원본 데이터:", data); // 원본 데이터 확인
+                console.log("🔍 ShopEditor: data.images 값 직접 확인:", data.images); // images 필드 값 직접 확인
+                console.log("🔍 ShopEditor: typeof data.images:", typeof data.images); // data.images의 타입 확인
+                console.log("🔍 ShopEditor: Array.isArray(data.images):", Array.isArray(data.images)); // 배열인지 확인
+
+                const initialImages = data.images || []; // data.images가 undefined일 경우 빈 배열 사용
                 setForm({
                     ...data,
-                    imageUrls: data.imageUrls || [],
+                    imageUrls: initialImages, // images 필드 사용
                 });
-                // ShopImageEditor에서 사용할 이미지 상태도 초기화
-                setEditorImages(data.imageUrls || []);
-                // 초기 썸네일 인덱스 설정
-                const initialThumbnail = (data.imageUrls || []).findIndex(img => img.isThumbnail);
+
+                setEditorImages(initialImages); // images 필드 사용
+                console.log("✨ ShopEditor: setEditorImages로 초기화됨. 초기 이미지:", initialImages); // 초기화된 값 확인
+
+                const initialThumbnail = (initialImages).findIndex(img => img.isThumbnail);
                 setEditorThumbnailIndex(initialThumbnail !== -1 ? initialThumbnail : null);
 
             } catch (error) {
-                console.error("매장 상세 정보를 불러오는 데 실패했습니다:", error);
+                console.error("🚨 ShopEditor: 매장 상세 정보를 불러오는 데 실패했습니다:", error);
                 alert("매장 정보를 불러오는 중 오류가 발생했습니다.");
             }
         };
@@ -49,6 +58,9 @@ const ShopEditor = ({ shopId }) => {
             fetchShop();
         }
     }, [shopId]);
+
+// return 문 직전 (렌더링 직전)
+    console.log("➡️ ShopEditor.jsx 렌더링 중. 현재 editorImages:", editorImages);
 
     // ShopInfoForm에서 입력 값이 변경될 때 호출되는 핸들러
     const handleFormChange = (newFormData) => {
@@ -101,7 +113,7 @@ const ShopEditor = ({ shopId }) => {
                 ...updatedData,
                 imageUrls: updatedData.imageUrls || []
             });
-            setEditorImages(updatedData.imageUrls || []);
+            setEditorImages(updatedData.images || []);
             const updatedThumbnail = (updatedData.imageUrls || []).findIndex(img => img.isThumbnail);
             setEditorThumbnailIndex(updatedThumbnail !== -1 ? updatedThumbnail : null);
 
@@ -123,14 +135,7 @@ const ShopEditor = ({ shopId }) => {
             {/* --- */}
             <hr className="my-6 border-gray-300" />
 
-            {/* 현재 매장 이미지 갤러리 */}
-            <h2 className="text-2xl font-bold mb-4">현재 매장 이미지</h2>
-            <ShopImageGallery images={form.imageUrls} />
-
-            {/* --- */}
-            <hr className="my-6 border-gray-300" />
-
-            {/* 매장 사진 편집 컴포넌트 */}
+            {/* 매장 사진 편집 컴포넌트: 이제 이 컴포넌트가 모든 이미지 관리를 담당 */}
             <h2 className="text-2xl font-bold mb-4">매장 사진 편집</h2>
             <ShopImageEditor
                 images={editorImages}
@@ -138,7 +143,6 @@ const ShopEditor = ({ shopId }) => {
                 thumbnailIndex={editorThumbnailIndex}
                 setThumbnailIndex={setEditorThumbnailIndex}
             />
-
             {/* --- */}
             <hr className="my-6 border-gray-300" />
 

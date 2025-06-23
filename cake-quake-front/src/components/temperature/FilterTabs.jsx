@@ -1,5 +1,5 @@
 const tab=[
-    {key :"all",label: "리뷰 작성" },
+    {key :"all",label: "--" },
     {key :"REVIEW_WRITTEN",label: "리뷰 작성" },
     {key :"RESERVATION_CANCELLED",label: "예약 취소" },
     {key :"NO_SHOW",label: "노쇼" },
@@ -9,16 +9,20 @@ const tab=[
 
 export default function FilterTabs({ filter, onChange }) {
     return (
-        <div className="flex space-x-4 text-sm">
+        <div className="flex justify-center flex-wrap gap-3 p-2 bg-gray-50 rounded-lg shadow-sm">
             {tab.map(t => (
                 <button
                     key={t.key}
                     onClick={() => onChange(t.key)}
-                    className={`pb-1 ${
+                    className={`
+                        px-4 py-2 rounded-full text-sm font-medium
+                        transition-all duration-300 ease-in-out
+                        ${
                         filter === t.key
-                            ? "border-b-2 border-indigo-600 text-indigo-600"
-                            : "text-gray-500"
-                    }`}
+                            ? "bg-indigo-600 text-white shadow-md transform scale-105"
+                            : "text-gray-700 hover:bg-gray-200 hover:text-gray-900"
+                    }
+                    `}
                 >
                     {t.label}
                 </button>

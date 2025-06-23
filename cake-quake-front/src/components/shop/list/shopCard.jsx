@@ -44,7 +44,7 @@ const ShopCard = ({ shop }) => {
         <div className="border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full bg-white">
             <div className="relative w-full h-48 overflow-hidden">
                 <img
-                    src={imgSrc}
+                    src={`http://localhost/${imgSrc}`}
                     alt={shopName}
                     className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
