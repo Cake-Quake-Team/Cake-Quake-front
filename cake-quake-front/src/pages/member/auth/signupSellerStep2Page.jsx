@@ -147,10 +147,10 @@ const SignupSellersStep2Page = () => {
 
         try {
             setIsLoading(true)
-            // console.log("FormData 내부 확인:")
-            // formData.forEach((value, key) => {
-            //     console.log(`${key}:`, value)
-            // })
+            console.log("FormData 내부 확인:")
+            formData.forEach((value, key) => {
+                console.log(`${key}:`, value)
+            })
             const res = await postSellerSignupStep2(formData)
 
             // 회원가입 성공 시 모달 표시
