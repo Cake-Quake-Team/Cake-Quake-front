@@ -76,6 +76,7 @@ const SignupSellerStep2Component = ({
                         />
                     </div>
 
+                    <label htmlFor="shopPhoneNumber" className="block mt-3 mb-1 font-medium">※매장 전화는 생략 가능 합니다.</label>
                     <input
                         type="text"
                         id="shopPhoneNumber"
@@ -83,7 +84,6 @@ const SignupSellerStep2Component = ({
                         value={shopPhoneNumber}
                         onChange={handleChange}
                         placeholder="매장 전화번호 (051-XXX(X)-XXXX)"
-                        required
                         maxLength={14}
                         inputMode="numeric" // 모바일 숫자 키패드 유도
                         className="w-full px-4 py-2 border rounded-lg"
