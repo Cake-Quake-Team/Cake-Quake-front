@@ -3,6 +3,8 @@ import jwtAxios from "../utils/jwtUtil.js";
 export const API_SERVER_HOST = "http://localhost:8080";
 const prefix = `${API_SERVER_HOST}/api`;
 
+
+//-------------------------매장 관련 발주
 //매장별 발주 목록
 export const getStoreRequests = async (shopId,{page =1 , size = 10, sortField = "procurementId"} ={})=>{
     const res = await jwtAxios.get(`${prefix}/shops/${shopId}/procurements`,{
@@ -41,8 +43,42 @@ export const createRequest = async (shopId, {note, items}) =>{
     return res.data
 }
 
-//관리자 발주 확정(일정 지정)
-export const confirmRequest =async (procurementId, {confirmDate}) =>{
-    const res =await jwtAxios.post(`${prefix}/procurements/${procurementId}/confirm`,{confirmDate});
+//판매자용 발주 취소
+export const cancelRequestBySeller = async (shopId,procurementId, {reason}) =>{
+    const res = await jwtAxios.post(
+        `${prefix}/shops/${shopId}/procurements/${procurementId}/cancel`,
+        { reason }
+    );
     return res.data
+}
+
+// -------------------관리자 관련 발주
+//관리자 발주 확정(일정 지정)
+export const confirmRequest =async (procurementId, {scheduledDate}) =>{
+    const res =await jwtAxios.post(`${prefix}/procurements/${procurementId}/confirm`,{scheduledDate});
+    return res.data
+}
+
+
+//관리자: 단건 발주 조회
+export const getAdminRequestDetail =async (procurementId) =>{
+    const res = await jwtAxios.get(`${prefix}/procurements/${procurementId}`);
+    return res.data
+}
+
+//관리자: 발주 전체 조회
+export const getAllRequests = async ({page = 1, size = 10, sortField="procurementId"}={}) =>{
+    const res = await jwtAxios.get(`${prefix}/procurements`,{
+        params: {page,size,sortField}
+    });
+    return res.data
+}
+
+// 관리자용 발주 취소
+export const cancelRequestByAdmin = async (procurementId, {reason}) => {
+    const res = await jwtAxios.post(
+        `${prefix}/procurements/${procurementId}/cancel`,
+        {reason}
+    );
+    return res.data;
 }
