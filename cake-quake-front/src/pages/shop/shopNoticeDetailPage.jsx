@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router";
 import {deleteShopNotice, getShopNoticeDetail} from "../../api/shopApi.jsx";
 import ConfirmationModal from "../../components/shop/confirmationModal.jsx";
-
+//판매자용
 const ShopNoticeDetailPage = () => {
     // URL에서 매장 ID (cid)와 공지사항 ID (nid)를 가져와 바로 shopId와 noticeId로 할당
     const {cid: shopId, nid: noticeId} = useParams();

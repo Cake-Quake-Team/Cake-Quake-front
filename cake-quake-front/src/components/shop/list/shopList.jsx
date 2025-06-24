@@ -123,7 +123,7 @@ const ShopList = ({ filter, sort, keyword }) => { // props로 filter, sort, keyw
                 {/* shopList가 항상 배열임을 보장하므로 map 사용 */}
                 {shopList.map((shop, index) => (
                     <Link
-                        to={`/shops/read/${shop.shopId}`} // `/shops/read/` 경로가 올바른지 다시 확인하세요.
+                        to={`/buyer/shops/${shop.shopId}`} // `/shops/read/` 경로가 올바른지 다시 확인하세요.
                         key={shop.shopId} // React 리스트 렌더링을 위한 고유 key
                         // 목록의 마지막 요소에만 ref 할당하여 Intersection Observer가 감지하도록 함
                         ref={index === shopList.length - 1 ? lastShopElementRef : null}

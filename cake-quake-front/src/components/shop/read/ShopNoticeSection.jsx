@@ -1,9 +1,5 @@
-import {Link} from "react-router";
 
-const ShopNoticeSection = ({ noticePreview, shopId }) => {
-    // 매장 공지사항 목록 페이지 URL은 항상 필요하므로 여기에 정의합니다.
-    const allNoticesUrl = `/shops/read/${shopId}/notices`;
-
+const ShopNoticeSection = ({ noticePreview, onViewAllNotices }) => {
     // 공지사항 미리보기가 없는 경우 (noticePreview가 null/undefined이거나 title이 없는 경우)
     if (!noticePreview || !noticePreview.title) {
         return (
@@ -13,12 +9,13 @@ const ShopNoticeSection = ({ noticePreview, shopId }) => {
                     아직 등록된 공지사항이 없습니다.
                 </p>
                 <div className="text-right">
-                    <Link
-                        to={allNoticesUrl}
+                    {/* 버튼 클릭 시 onViewAllNotices 콜백 함수 호출 */}
+                    <button
+                        onClick={onViewAllNotices}
                         className="text-blue-600 hover:underline font-medium text-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
                     >
                         공지사항 목록 &gt;
-                    </Link>
+                    </button>
                 </div>
             </div>
         );
@@ -36,12 +33,13 @@ const ShopNoticeSection = ({ noticePreview, shopId }) => {
                 {displayedContent}
             </p>
             <div className="text-right">
-                <Link
-                    to={allNoticesUrl}
+                {/* 버튼 클릭 시 onViewAllNotices 콜백 함수 호출 */}
+                <button
+                    onClick={onViewAllNotices}
                     className="text-blue-600 hover:underline font-medium text-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
                 >
-                    상세 보기 &gt;
-                </Link>
+                    공지사항 목록 &gt;
+                </button>
             </div>
         </div>
     );
