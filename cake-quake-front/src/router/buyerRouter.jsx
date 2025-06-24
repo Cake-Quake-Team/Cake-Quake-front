@@ -26,6 +26,7 @@ const PaymentListPage = lazy(()=>import('../pages/payment/PaymentListPage.jsx'))
 const PaymentDetailPage = lazy(()=>import('../pages/payment/paymentDetailPage.jsx'));
 
 //---------------------마이페이지
+const BuyerProfilePage = lazy(() => import("../pages/buyer/profile/buyerProfilePage.jsx"));
 //온도
 const TemperaturePage = lazy(() => import("../pages/buyer/temperature/temperaturePage.jsx"));
 //포인트
@@ -179,6 +180,14 @@ const buyerRouter = () => ({
         {
             path: "profile",
             children: [
+                {
+                    index: true,
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <BuyerProfilePage/>
+                        </Suspense>
+                    )
+                },
                 {
                     //포인트
                     path: "points",
