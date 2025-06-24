@@ -50,7 +50,7 @@ export default function DeletionRequestAdminPage() {
     const handleApprove = async id => {
         try {
             await approveDeletionRequest(id);
-            setRequests(prev => prev.filter(r => r.id !== id));
+            setRequests(prev => prev.filter(r => r.requestId !== id));
         } catch (err) {
             console.error(err);
             if (err.response?.status === 401) {
@@ -64,7 +64,7 @@ export default function DeletionRequestAdminPage() {
     const handleReject = async id => {
         try {
             await rejectDeletionRequest(id);
-            setRequests(prev => prev.filter(r => r.id !== id));
+            setRequests(prev => prev.filter(r => r.requestId !== id));
         } catch (err) {
             console.error(err);
             if (err.response?.status === 401) {
