@@ -61,29 +61,33 @@ export default function ShopProcurementListPage() {
 
     return (
         <div className="container mx-auto p-4 space-y-4">
-            <h1 className="text-3xl">발주 목록</h1>
+            {/* 헤더: 왼쪽에 타이틀, 오른쪽에 버튼+필터 */}
+            <div className="flex items-center justify-between">
+                {/* 왼쪽 끝: 발주 목록 타이틀 */}
+                <h1 className="text-3xl font-bold">발주 목록</h1>
 
-            <div className="flex items-center space-x-4">
-                <button
-                    onClick={handleCreate}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-                >
-                    새 발주 생성
-                </button>
-
-                <div>
-                    <label className="mr-2 font-medium">상태 필터:</label>
-                    <select
-                        value={status}
-                        onChange={e => setStatus(e.target.value)}
-                        className="border rounded px-2 py-1"
+                {/* 오른쪽 끝: 새 발주 생성 버튼 + 상태 필터 */}
+                <div className="flex items-center space-x-4">
+                    <button
+                        onClick={handleCreate}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                     >
-                        {STATUS_OPTIONS.map(opt => (
-                            <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                            </option>
-                        ))}
-                    </select>
+                        새 발주 생성
+                    </button>
+                    <div className="flex items-center">
+                        <label className="mr-2 font-medium">상태 필터:</label>
+                        <select
+                            value={status}
+                            onChange={e => setStatus(e.target.value)}
+                            className="border rounded px-2 py-1"
+                        >
+                            {STATUS_OPTIONS.map(opt => (
+                                <option key={opt.value} value={opt.value}>
+                                    {opt.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
