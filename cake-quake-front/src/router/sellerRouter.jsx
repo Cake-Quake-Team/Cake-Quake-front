@@ -8,8 +8,8 @@ const SellerProfileDetailsPage = lazy(() => import("../pages/member/seller/selle
 const SellerProfileDetailsModifyPage = lazy(() => import("../pages/member/seller/sellerProfileDetailsModifyPage.jsx"))
 
 const SellerProfilePages = lazy(()=>import("../pages/seller/sellerProfilePages.jsx"))
-const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
-const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
+// const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
+// const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
 
 
 //발주
