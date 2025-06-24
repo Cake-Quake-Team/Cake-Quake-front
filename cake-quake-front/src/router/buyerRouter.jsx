@@ -35,6 +35,10 @@ const BuyerProfileDetailsModifyAlarmPage = lazy(() => import("../pages/member/bu
 //---------------------AI
 const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
 
+//-------------------buyer/shops
+const BuyerNoticeListPage=lazy(()=>import("../pages/buyer/shop/buyerNoticeListPage.jsx"));
+const BuyerNoticeDetailPage = lazy(()=>import("../pages/buyer/shop/buyerNoticeDetailPage.jsx"));
+const BuyerShopDetailPage=lazy(()=>import("../pages/buyer/shop/buyerShopDetailPage.jsx"));
 
 const Loading = <div>Loading...</div>;
 
@@ -48,6 +52,24 @@ const buyerRouter = () => ({
                 element: <Suspense fallback={Loading}><CakeIndex/></Suspense>
 
         },
+        //---------------------------매장 상세 보기------------------------------------
+        {
+            path: "shops/:shopId",
+            element: <Suspense fallback={Loading}><BuyerShopDetailPage /></Suspense>
+        },
+
+        //---------------------------공지사항 목록 보기------------------------------------
+        {
+            path: "shops/:shopId/notices",
+            element: <Suspense fallback={Loading}><BuyerNoticeListPage /></Suspense>
+        },
+
+        { //공지사항 상세보기
+            path: "shops/:shopId/notices/:noticeId",
+            element: <Suspense fallback={Loading}><BuyerNoticeDetailPage/></Suspense>
+        },
+
+
 
         //---------------------------상품 상세 보기------------------------------------
         {

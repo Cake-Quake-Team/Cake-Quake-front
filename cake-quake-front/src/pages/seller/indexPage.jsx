@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import {getAllCakeList, getOptionItems, getOptionTypes} from "../../api/cakeApi.jsx";
 import CakeCard from "../../components/cake/itemComponents/cakeCard.jsx";
 import CakeOptionList from "../../components/cake/optionComponents/optionListComponent.jsx";
+import SellerShopDetail from "../../components/shop/sellerShopDetail.jsx";
 
 // 메인 분류 목록
 const shopCategories = [
@@ -99,11 +100,7 @@ export default function ShopManagement() {
                 <ul>
                     {/*카테고리가 매장관리일 경우*/}
                     {selectedShopCategory === "SHOP_MANAGEMENT" && (
-                        <>
-                            <div className="text-center text-gray-500 text-lg mt-10">
-                                선택하신 분류에 해당하는 매장 정보가 없습니다. 🍰
-                            </div>
-                        </>
+                        <SellerShopDetail className="mt-8" />
                     )}
                     {/*카테고리가 상품관리일 경우*/}
                     {selectedShopCategory === "CAKE_MANAGEMENT" && (

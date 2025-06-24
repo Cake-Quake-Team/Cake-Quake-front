@@ -58,7 +58,7 @@ const shopRouter = () => {
                 element: <Suspense fallback={Loading}><ShopUpdate/></Suspense>
             },
             {
-                //shops/update/5
+                //지울꺼임
                 path:"shoplist",
                 element: <Suspense fallback={Loading}><ShopList/></Suspense>
             },

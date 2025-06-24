@@ -25,20 +25,10 @@ const renderStars=(rating)=> {
 
 const ShopDetailSection=({shop})=>{
     const numericRating =parseFloat(shop.rating);
-    const navigate =useNavigate();
+
     return(
 
         <div className="relative text-center mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-            {/* 목록으로 돌아가기 */}
-            <div className="absolute top-4 left-4">
-                <span
-                    onClick={() => navigate('/buyer')}
-                    className="flex items-center text-gray-500 hover:text-blue-600 cursor-pointer text-sm transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    목록으로 돌아가기
-                </span>
-            </div>
             {/* 프로필 이미지 (원형) */}
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden mx-auto mb-5 border-4 border-blue-200 shadow-xl">
                 <img
@@ -78,13 +68,6 @@ const ShopDetailSection=({shop})=>{
                 </button>
                 <button className="flex items-center text-gray-700 hover:text-blue-500 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg bg-gray-50 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50">
                     <Share2 className="mr-2 w-6 h-6" /> 공유하기
-                </button>
-
-                <button
-                    onClick={() => navigate(`/shops/update/${shop.shopId}`)} // 수정 페이지로 이동
-                    className="flex items-center text-gray-700 hover:text-green-500 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg bg-gray-50 hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50"
-                >
-                    <Pencil className="mr-2 w-6 h-6" /> 매장 수정
                 </button>
             </div>
 
