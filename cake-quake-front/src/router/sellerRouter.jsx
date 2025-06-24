@@ -12,13 +12,18 @@ const ProcurementListPage = lazy(()=> import("../pages/procurement/shopProcureme
 const ProcurementCreatePage = lazy(()=>import("../pages/procurement/shopProcurementCreatePage.jsx"));
 const ProcurementDetailPage= lazy(()=>import("../pages/procurement/shopProcurementDetailPage.jsx"));
 
+//주문 관련
+const SellerOrderListPage = lazy(() => import("../pages/order/seller/sellerOrderListPage.jsx"));
+const SellerOrderDetailPage = lazy(() => import("../pages/order/seller/sellerOrderDetailPage.jsx"));
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 
 const sellerRouter = () => {
     return {
         path: "seller",
+
         // element: <BasicLayout />,
+
         children: [
 
             {
@@ -47,6 +52,15 @@ const sellerRouter = () => {
             {
                 path: ":shopId/procurements/:procurementId",
                 element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
+            },
+            //--------------------------판매자 주문 관련 라우트--------------------//
+            {
+                path: "shops/:shopId/orders",
+                element: <Suspense fallback={Loading}><SellerOrderListPage/></Suspense>
+            },
+            {
+                path: "shops/:shopId/orders/:orderId",
+                element: <Suspense fallback={Loading}><SellerOrderDetailPage/></Suspense>
             }
         ]
     };
