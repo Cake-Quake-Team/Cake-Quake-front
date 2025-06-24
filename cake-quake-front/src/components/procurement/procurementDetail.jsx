@@ -28,9 +28,9 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
 
     // 상태 배지 클래스
     const statusClasses = {
-        완료: 'bg-green-100 text-green-800',
-        대기: 'bg-yellow-100 text-yellow-800',
-        취소: 'bg-red-100 text-red-800',
+        REQUESTED:  'bg-yellow-100 text-yellow-800',
+        SCHEDULED:  'bg-green-100  text-green-800',
+        CANCELLED:  'bg-red-100    text-red-800'
     };
     const statusClass = statusClasses[status] || 'bg-gray-100 text-gray-800';
 
