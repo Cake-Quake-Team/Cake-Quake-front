@@ -1,6 +1,8 @@
 import { useSearchParams } from "react-router";
 import { getpendingSellerList } from "../../api/adminApi";
 import PendingSellerListComponent from "../../components/member/admin/pendingSellerListComponent";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../components/common/loadingSpinner";
 
 
 const PendingSellerListPage = () => {
@@ -10,26 +12,45 @@ const PendingSellerListPage = () => {
     const sizeStr = searchParams.get("size") || "10"
     // 검색 처리 추가 필요
 
-    try {
-        const {isFetching, isError, error} = useQuery({
-            queryKey: ['pendingSellerList', pageStr, sizeStr],
-            queryFn: async() => {
-                console.log("---------------query run-------------------")
-                // await new Promise(resolve => setTimeout(resolve, 2000)); // 로딩 확인용
-    
+ 
+    const query = useQuery({
+        queryKey: ['pendingSellerList', pageStr, sizeStr],
+        queryFn: async() => {
+            console.log("---------------query run-------------------")
+            // await new Promise(resolve => setTimeout(resolve, 2000)) // 로딩 확인용
+
+            try {
                 const res = await getpendingSellerList(pageStr, sizeStr)
-                return res
-            },
-            staleTime: 10 * 60 * 1000, // 적절한가
-            retry: false
-        })
-        
-    } catch (error) {
-        
-    }
+                if (!res || !res.data) {
+                    // 데이터가 없을 경우 빈 객체 반환
+                    return { content: [], hasNext: false, totalCount: 0 }
+                }
+                return res// 정상적으로 데이터를 반환
+            } catch (error) {
+                console.error("API 호출 오류:", error)
+                // 오류 발생 시 빈 객체 반환
+                return { content: [], hasNext: false, totalCount: 0 }
+            }
+        },
+        staleTime: 10 * 60 * 1000, // 적절한가
+        retry: false
+    })
+   
+    const { isFetching, data, error } = query;
+    console.log("page data: ", data)
 
     return (
-        <PendingSellerListComponent />
+        <div>
+            {isFetching && <LoadingSpinner />} {/* 로딩 스피너 */}
+            {error && <div className="text-red-500">오류 발생: {error.message}</div>} {/* 오류 메시지 */}
+            {!isFetching && !error && data && (
+                <PendingSellerListComponent
+                    data={data}
+                    isFetching={isFetching}
+                    error={error}
+                />
+            )}
+        </div>
     )
 }
 

@@ -1,5 +1,5 @@
-import SellerProfileComponent from "../../../components/member/seller/sellerProfileComponent";
-import { getSellerProfile } from "../../../api/memberApi";
+import SellerProfileDetailsComponent from "../../../components/member/seller/sellerProfileDetailsComponent";
+
 import { useAuth } from "../../../store/AuthContext";
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from "react";
@@ -7,9 +7,11 @@ import { useNavigate } from "react-router";
 import useMemberStore from "../../../store/useMemberStore";
 import LoadingSpinner from "../../../components/common/loadingSpinner";
 import WithdrawConfirmModal from "../../../components/member/modal/withdrawConfirmModal";
+import { getSellerProfile } from "../../../api/memberApi";
 
 
-const SellerProfilePage = () => {
+
+const SellerProfileDetailsPage = () => {
 
     // 스크롤 제일 위로 이동
     useEffect(() => {
@@ -25,7 +27,7 @@ const SellerProfilePage = () => {
         queryFn: async () => {
             await new Promise(resolve => setTimeout(resolve, 2000)); // 로딩 확인용
 
-            console.log("---------------query run-------------------")
+            console.log("---------------query run getSellerProfile()-------------------")
 
             const res = await getSellerProfile()
             return res.data // ApiResponseDTO → data
@@ -47,7 +49,7 @@ const SellerProfilePage = () => {
 
     // 정보 수정
     const handleModifyProfile = () => {
-        navigate(`/seller/profile/modify/${sellerData.uid}`)
+        navigate(`/seller/profile/details/modify/${sellerData.uid}`)
     }
 
     // 비밀번호 확인 후 탈퇴 처리 모달 불러오기
@@ -64,7 +66,7 @@ const SellerProfilePage = () => {
             {isLoading && <LoadingSpinner />} {/* 로딩 스피너 */}
             {isError && <div className="text-red-500">오류 발생: {error.message}</div>} {/* 오류 메시지 */}
             {!isLoading && !isError && sellerData && (
-                <SellerProfileComponent
+                <SellerProfileDetailsComponent
                     isLoading={isLoading}
                     errorMessage={isError ? "판매자 정보를 불러오는 데 실패했습니다." : ''}
                     sellerData={sellerData}
@@ -83,4 +85,4 @@ const SellerProfilePage = () => {
 
 }
 
-export default SellerProfilePage;
+export default SellerProfileDetailsPage;

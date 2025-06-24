@@ -1,5 +1,5 @@
 
-const SellerProfileComponent = ({
+const SellerProfileDetailsComponent = ({
     isLoading,
     errorMessage,
     sellerData,
@@ -73,4 +73,4 @@ const SellerProfileComponent = ({
     )
 }
 
-export default SellerProfileComponent;
+export default SellerProfileDetailsComponent;

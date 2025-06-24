@@ -71,7 +71,7 @@ const BuyerProfileDetailsPage = () => {
 
     const closeResultModal = () => {
         setShowModal(false)
-        // navigate("/buyer/profile/details")
+        navigate("/buyer/profile/details")
     }
 
     const closeWithdrawConfirmModal = () => {

@@ -6,6 +6,9 @@ export default function AdminLayout() {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true); // 사이드바 상태
 
+    const [page, setPage] = useState(1);
+    const [size, setSize] = useState(10);
+
     // 현재 경로를 보고 체크 표시를 줄 함수 (예: /admin/shops 일 때 체크 표시)
     const isActive = (path) => location.pathname === path;
 
@@ -56,13 +59,13 @@ export default function AdminLayout() {
                         <nav className="flex flex-col space-y-1" style={{ width: '16rem' }}>
                             <div className="text-sm font-semibold text-gray-500 mb-2">매장 승인/거부</div>
                             <Link
-                                to="/admin/shops"
+                                to={`/admin/sellers/pending?page=${page}&size=${size}`}
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/shops") ? "bg-blue-50 text-blue-700 font-medium" : ""
+                                    isActive("/admin/sellers/pending") ? "bg-blue-50 text-blue-700 font-medium" : ""
                                 }`}
                             >
                                 <span>문서 관리</span>
-                                {isActive("/admin/shops")}
+                                {isActive("/admin/sellers/pending")}
                             </Link>
                             <Link
                                 to="/admin/shops/description" // Assuming a description page
