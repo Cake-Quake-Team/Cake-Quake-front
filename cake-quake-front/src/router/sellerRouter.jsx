@@ -7,9 +7,8 @@ import BasicLayout from "../layouts/basicLayout.jsx";
 const SellerProfileDetailsPage = lazy(() => import("../pages/member/seller/sellerProfileDetailsPage.jsx"))
 const SellerProfileDetailsModifyPage = lazy(() => import("../pages/member/seller/sellerProfileDetailsModifyPage.jsx"))
 
-const SellerProfilePages = lazy(()=>import("../pages/seller/sellerProfilePages.jsx"))
-// const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
-// const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
+const SellerProfilePage = lazy(()=>import("../pages/seller/sellerProfilePage.jsx"))
+
 
 
 //발주
@@ -29,13 +28,13 @@ const sellerRouter = () => {
         // element: <BasicLayout />,
         children: [
             {
-                path:"mypage",
-                element:<Suspense fallback={Loading}><SellerProfilePages/></Suspense>
-            },
-            {
                 path: "profile",
                 // element: < />,
                 children: [
+                    {
+                        index:true,
+                        element:<Suspense fallback={Loading}><SellerProfilePage/></Suspense>
+                    },
                     {
                         path: "details",
                         element: <Suspense fallback={Loading}><SellerProfileDetailsPage /></Suspense>
