@@ -2,8 +2,7 @@ import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 import {useCallback, useEffect, useState} from "react";
 import{getAvailableTimes,getAvailableShops} from "../../api/scheduleApi.jsx";
-import ShopSelectionModal from "./ShopSelectionModal.jsx";
-import {useNavigate, useParams} from "react-router";
+import TimeSelection from "./TimeSelection.jsx";
 
 function PickupScheduler() {
     const [selectedDate, setSelectedDate] = useState(null);
@@ -129,7 +128,6 @@ function PickupScheduler() {
                     <p><strong>날짜:</strong> {selectedDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}</p>
                     <p><strong>매장:</strong> {selectedShop.shopName} ({selectedShop.address})</p>
 
-                    {/* 시간 선택 컴포넌트 렌더링 */}
                     {selectedShop && selectedDate && (
                         <TimeSelection
                             shopId={selectedShop.shopId}
@@ -137,14 +135,11 @@ function PickupScheduler() {
                             onSelectTime={handleTimeSelect}
                         />
                     )}
-
-                    {/* 최종 예약 확인 버튼 (시간까지 선택되었을 때만 활성화) */}
                     {selectedTime && (
                         <button
                             onClick={() => {
                                 alert(`최종 예약! 날짜: ${selectedDate.toLocaleDateString()}, 매장: ${selectedShop.shopName}, 시간: ${selectedTime.substring(0, 5)}`);
-                                // TODO: 최종 예약 생성 API 호출 및 다음 페이지 (예: 케이크 선택 또는 결제)로 이동
-                                // 예: navigate('/order-confirmation', { state: { selectedDate, selectedShop, selectedTime } });
+                                // navigate('/order-confirmation', { state: { selectedDate, selectedShop, selectedTime } });
                             }}
                             style={{
                                 marginTop: '20px',
