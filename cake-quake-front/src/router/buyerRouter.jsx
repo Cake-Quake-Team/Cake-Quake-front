@@ -3,13 +3,14 @@ import { lazy, Suspense } from 'react';
 import CartLayout from '../layouts/CartLayout.jsx';
 import AdminLayout from "../layouts/adminLayout.jsx";
 import BasicLayout from "../layouts/basicLayout.jsx";
+import OrderDetailPage from "../pages/order/buyer/orderDetailPage.jsx";
 
 
 const CakeIndex = lazy(() => import("../pages/cake/buyer/indexPage.jsx"));
 const BuyerCakeRead = lazy(() => import("../pages/cake/buyer/buyerReadPage.jsx"));
 const CartPage = lazy(() => import('../pages/cart/CartPage.jsx'));
 const OrderListPage = lazy(() => import('../pages/order/buyer/orderListPage.jsx'));
-const OrderDetailPage = lazy(() => import('../pages/order/buyer/orderDetailPage.jsx'));
+//const OrderDetailPage = lazy(() => import('../pages/order/buyer/orderDetailPage.jsx'));
 const CreateOrderPage = lazy(() => import('../pages/order/buyer/createOrderPage.jsx'));
 
 //-----------------리뷰------------------

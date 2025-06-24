@@ -16,16 +16,31 @@ export const getCartItems = async () => {
 
 // 장바구니에 아이템 추가
 export const addCartItem = async (payload) => {
-    const res = await jwtAxios.post(`${prefix}/buyer/cart`, payload);
+    // POST 요청 시 명시적으로 Content-Type 설정
+    const res = await jwtAxios.post(
+        `${prefix}/buyer/cart`,
+        payload,
+        {
+            headers: {
+                'Content-Type': 'application/json' // ⭐ 이 헤더를 명시적으로 추가 ⭐
+            }
+        }
+    );
     return res.data;
 };
 
 
 // 장바구니 아이템 수량 업데이트
-export const updateCartItem = async (cartItemId, payload) => {
+export const updateCartItem = async (payload) => {
+    // PATCH 요청 시 명시적으로 Content-Type 설정
     const res = await jwtAxios.patch(
-        `${prefix}/buyer/cart`,   // ✅ 슬래시 제거!
-        payload
+        `${prefix}/buyer/cart`,
+        payload,
+        {
+            headers: {
+                'Content-Type': 'application/json' // ⭐ 이 헤더를 명시적으로 추가 ⭐
+            }
+        }
     );
     return res.data;
 };
@@ -40,7 +55,7 @@ export const removeCartItem = async (cartItemId) => {
 };
 
 
-// (선택) 여러 아이템 한 번에 삭제
+// (선택) 여러 아이템 한 번에 삭제(일단 지웠음)
 export const removeAllCartItems = async () => {
     const res = await jwtAxios.delete(`${prefix}/buyer/cart`, {
         data: { }

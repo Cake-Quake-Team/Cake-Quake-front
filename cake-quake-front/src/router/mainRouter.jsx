@@ -1,5 +1,4 @@
 import BasicLayout from "../layouts/BasicLayout";
-// 필요한 페이지 컴포넌트들을 임포트합니다.
 import MainPage from "../pages/mainPage";
 import {createBrowserRouter} from "react-router";
 import {Suspense} from "react";
