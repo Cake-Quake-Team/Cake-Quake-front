@@ -1,16 +1,17 @@
 import { useNavigate, useParams } from "react-router";
-import SellerProfileModifyComponent from "../../../components/member/seller/sellerProfileModifyComponent";
+import SellerProfileDetailsModifyComponent from "../../../components/member/seller/sellerProfileDetailsModifyComponent";
 import useMemberStore from "../../../store/useMemberStore";
 import { useEffect, useRef, useState } from "react";
 import { getSellerProfile, modifySellerProfile } from "../../../api/memberApi";
 import { useAuth } from "../../../store/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../../../components/common/loadingSpinner";
 import VerifyModal from "../../../components/member/modal/VerifyModal";
 import ResultModal from "../../../components/common/resultModal";
 
 
-const SellerProfileModifyPage = () => {
+
+const SellerProfileDetailsModifyPage = () => {
 
     // 스크롤 제일 위로 이동
     useEffect(() => {
@@ -21,6 +22,9 @@ const SellerProfileModifyPage = () => {
     const { user } = useAuth() // 로그인한 유저 정보
     const { uid } = useParams()
     const { profile, setProfile, clearProfile } = useMemberStore()
+    const queryClient = useQueryClient()
+
+    const [initialPhoneNumber, setInitialPhoneNumber] = useState("") // 최초 전화번호
 
     const [form, setForm] = useState({
         uname: "",
@@ -48,6 +52,7 @@ const SellerProfileModifyPage = () => {
                 uname: sellerData.uname,
                 phoneNumber: sellerData.phoneNumber
             })
+            setInitialPhoneNumber(sellerData.phoneNumber) // 최초 전화번호 저장
         }
     }, [sellerData, setProfile])
 
@@ -110,9 +115,10 @@ const SellerProfileModifyPage = () => {
             inputRefs.phoneNumber.current?.focus()
             return "전화번호는 010-XXX(X)-XXXX 형식이어야 합니다."
         } 
-        if (!isVerified) {
+        // 전화번호가 변경된 경우에만 인증 여부 확인
+        if (phoneNumber !== initialPhoneNumber && !isVerified) {
             inputRefs.phoneNumber.current?.focus()
-            return "휴대폰 인증을 완료해주세요."
+            return "변경된 전화번호에 대한 인증을 완료해주세요."
         }
 
         return null
@@ -158,8 +164,10 @@ const SellerProfileModifyPage = () => {
 
     const closeResultModal = () => {
         setShowModal(false)
+        // page에 수정 반영을 위해 React Query 캐시 무효화
+        queryClient.invalidateQueries(['buyerProfile'])
         clearProfile() // store 상태 초기화
-        navigate("/seller/profile")
+        navigate("/seller/profile/details")
     }
     
 
@@ -168,7 +176,7 @@ const SellerProfileModifyPage = () => {
             {isLoading && <LoadingSpinner />} {/* 로딩 스피너 */}
             {isError && <div className="text-red-500">오류 발생: {error.message}</div>} {/* 오류 메시지 */}
             {!isLoading && !isError && sellerData && (
-                <SellerProfileModifyComponent
+                <SellerProfileDetailsModifyComponent
                     sellerProfile={profile}
                     form={form}
                     buttonLoading={buttonLoading}
@@ -196,4 +204,4 @@ const SellerProfileModifyPage = () => {
 
 }
 
-export default SellerProfileModifyPage;
+export default SellerProfileDetailsModifyPage;

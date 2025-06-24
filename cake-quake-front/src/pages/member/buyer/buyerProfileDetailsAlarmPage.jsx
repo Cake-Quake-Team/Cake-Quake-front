@@ -3,7 +3,7 @@ import { getBuyerProfile, modifyBuyerAlarmSettings } from "../../../api/memberAp
 import { useAuth } from "../../../store/AuthContext"
 import useMemberStore from "../../../store/useMemberStore"
 import { useEffect, useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import BuyerProfileDetailsAlarmComponent from "../../../components/member/buyer/buyerProfileDetailsAlarmComponent"
 import ResultModal from "../../../components/common/resultModal"
 
@@ -18,6 +18,7 @@ const BuyerProfileDetailsAlarmPage = () => {
     const { user } = useAuth() // 로그인한 유저 정보
     const { uid } = useParams()
     const { profile, setProfile, clearProfile } = useMemberStore()
+    const queryClient = useQueryClient()
 
     const [form, setForm] = useState({
         allAlarm: false
@@ -83,6 +84,8 @@ const BuyerProfileDetailsAlarmPage = () => {
 
     const closeResultModal = () => {
         setShowModal(false)
+        // React Query 캐시 무효화
+        queryClient.invalidateQueries(['buyerProfile'])
         clearProfile() // store 상태 초기화
         navigate("/buyer/profile/details")
     }
@@ -90,14 +93,18 @@ const BuyerProfileDetailsAlarmPage = () => {
 
     return(
         <div>
-            <BuyerProfileDetailsAlarmComponent
-                buyerProfile={profile}
-                form={form}
-                buttonLoading={buttonLoading}
-                errorMessage={errorMessage}
-                handleChange={handleChange}
-                handleModify={handleModify}
-            />
+            {isLoading && <LoadingSpinner />} {/* 로딩 스피너 */}
+            {isError && <div className="text-red-500">오류 발생: {error.message}</div>} {/* 오류 메시지 */}
+            {!isLoading && !isError && buyerData && (
+                <BuyerProfileDetailsAlarmComponent
+                    buyerProfile={profile}
+                    form={form}
+                    buttonLoading={buttonLoading}
+                    errorMessage={errorMessage}
+                    handleChange={handleChange}
+                    handleModify={handleModify}
+                />
+            )}
             {/* 모달 */}
             <ResultModal show={showModal} closeResultModal={closeResultModal} msg={modalMsg} />
         </div>

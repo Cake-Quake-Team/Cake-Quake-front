@@ -1,6 +1,6 @@
 import LoadingSpinner from "../../common/loadingSpinner";
 
-const SellerProfileModifyComponent = ({
+const SellerProfileDetailsModifyComponent = ({
     sellerProfile,
     form,
     buttonLoading,
@@ -93,4 +93,4 @@ const SellerProfileModifyComponent = ({
 
 }
 
-export default SellerProfileModifyComponent;
+export default SellerProfileDetailsModifyComponent;
