@@ -23,7 +23,7 @@ export const getpendingSellerList = async(page, size, type, keyword) => {
             params,
         })
 
-        console.log(res.data)
+        console.log("API data: ",res)
         return res
     } catch (error) {
         console.log("접근 오류:")

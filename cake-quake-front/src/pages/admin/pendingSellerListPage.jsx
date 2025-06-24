@@ -25,7 +25,7 @@ const PendingSellerListPage = () => {
                     // 데이터가 없을 경우 빈 객체 반환
                     return { content: [], hasNext: false, totalCount: 0 }
                 }
-                return res// 정상적으로 데이터를 반환
+                return res.data// 정상적으로 데이터를 반환
             } catch (error) {
                 console.error("API 호출 오류:", error)
                 // 오류 발생 시 빈 객체 반환
