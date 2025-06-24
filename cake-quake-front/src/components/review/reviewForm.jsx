@@ -11,7 +11,7 @@ const Star = ({ filled = false }) => (
     </svg>
 );
 
-export default function ReviewForm({ product, points, temperature, values, onChange, submitting, onSubmit, submitLabel }) {
+export default function ReviewForm({ product, points,  temperatureIncrement, values, onChange, submitting, onSubmit, submitLabel }) {
     const handleFile = e => onChange('reviewPictureUrl', e.target.files?.[0] || null);
     const handleRating = i => onChange('rating', i);
     const handleContent = e => onChange('content', e.target.value);
@@ -57,10 +57,14 @@ export default function ReviewForm({ product, points, temperature, values, onCha
                     </div>
                 </div>
 
-                {/* 포인트, 온도 */}
+                {/* 포인트 & 온도 증가량 */}
                 <div className="flex justify-between items-center text-sm border-t border-b border-gray-200 py-3">
-                    <span>적립 예상 포인트 <strong className="text-orange-500">{points}P</strong></span>
-                    <span>상승 예상 온도 <strong className="text-orange-500">{temperature}℃</strong></span>
+        <span>
+          적립 예상 포인트 <strong className="text-orange-500">{points}P</strong>
+        </span>
+                    <span>
+          상승 예상 온도 <strong className="text-orange-500">+{temperatureIncrement}℃</strong>
+        </span>
                 </div>
 
                 {/* 사진 첨부 */}
