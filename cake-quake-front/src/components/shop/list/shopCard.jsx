@@ -6,9 +6,13 @@ const DEFAULT_IMAGE='/shop_default_image.jpeg';
 
 const ShopCard = ({ shop }) => {
 
-    const imgSrc = `http://localhost${shop.thumbnailUrl}`;
+    const {shopName, address,thumbnailUrl,rating} =shop;
+    console.log("받아온 thumbnailImageUrl:", thumbnailUrl);
 
-    const numericRating = parseFloat(shop.rating);
+
+    const imgSrc = thumbnailUrl ? thumbnailUrl : DEFAULT_IMAGE;
+
+    const numericRating = parseFloat(rating);
 
     // 별을 렌더링하는 함수
     const renderStars = (rating) => {
@@ -40,8 +44,8 @@ const ShopCard = ({ shop }) => {
         <div className="border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full bg-white">
             <div className="relative w-full h-48 overflow-hidden">
                 <img
-                    src={imgSrc}
-                    alt={shop.shopName}
+                    src={`http://localhost/${imgSrc}`}
+                    alt={shopName}
                     className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
                     onError={(e) => {
                         e.target.onerror = null;
@@ -53,10 +57,10 @@ const ShopCard = ({ shop }) => {
             <div className="p-4 flex flex-col justify-between flex-grow">
                 <div>
                     <h3 className="text-xl font-semibold text-gray-800 mb-1 leading-tight">
-                        {shop.shopName}
+                        {shopName}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-2 truncate" title={shop.address}>
-                        {shop.address}
+                    <p className="text-sm text-gray-600 mb-2 truncate" title={address}>
+                        {address}
                     </p>
                 </div>
 

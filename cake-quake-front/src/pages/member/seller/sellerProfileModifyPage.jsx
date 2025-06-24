@@ -20,14 +20,14 @@ const SellerProfileModifyPage = () => {
     const navigate = useNavigate()
     const { user } = useAuth() // 로그인한 유저 정보
     const { uid } = useParams()
-    const { sellerProfile, setSellerProfile, clearSellerProfile } = useMemberStore()
+    const { profile, setProfile, clearProfile } = useMemberStore()
 
     const [form, setForm] = useState({
         uname: "",
         phoneNumber: "",
     })
 
-    // sellerProfile이 없을 경우 API 호출
+    // profile이 없을 경우 API 호출
     const { data: sellerData, isLoading, isError, error } = useQuery({
         queryKey: ['sellerProfile'],
         queryFn: async () => {
@@ -35,7 +35,7 @@ const SellerProfileModifyPage = () => {
             const res = await getSellerProfile()
             return res.data
         },
-        enabled: !sellerProfile && !!user && !!user.userId,
+        enabled: !profile && !!user && !!user.userId,
         staleTime: 10 * 60 * 1000,
         retry: false
     })
@@ -43,13 +43,13 @@ const SellerProfileModifyPage = () => {
     // sellerData가 있을 때 상태 업데이트
     useEffect(() => {
         if (sellerData) {
-            setSellerProfile(sellerData)
+            setProfile(sellerData)
             setForm({
                 uname: sellerData.uname,
                 phoneNumber: sellerData.phoneNumber
             })
         }
-    }, [sellerData, setSellerProfile])
+    }, [sellerData, setProfile])
 
     const [showModal, setShowModal] = useState(false)
     const [modalMsg, setModalMsg] = useState("")
@@ -158,7 +158,7 @@ const SellerProfileModifyPage = () => {
 
     const closeResultModal = () => {
         setShowModal(false)
-        clearSellerProfile() // store 상태 초기화
+        clearProfile() // store 상태 초기화
         navigate("/seller/profile")
     }
     
@@ -169,12 +169,10 @@ const SellerProfileModifyPage = () => {
             {isError && <div className="text-red-500">오류 발생: {error.message}</div>} {/* 오류 메시지 */}
             {!isLoading && !isError && sellerData && (
                 <SellerProfileModifyComponent
-                    sellerProfile= {sellerProfile}
+                    sellerProfile={profile}
                     form={form}
                     buttonLoading={buttonLoading}
                     errorMessage={errorMessage}
-                    isLoading={isLoading}
-                    isError={isError}
                     handleChange={handleChange}
                     handlePhoneNumberChange={handlePhoneNumberChange}
                     handleModify={handleModify}

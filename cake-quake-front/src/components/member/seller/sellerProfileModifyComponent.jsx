@@ -10,7 +10,7 @@ const SellerProfileModifyComponent = ({
     handleModify,
     openVerifyModal,
     isVerified,
-    inputRefs
+    inputRefs,
 }) => {
 
     
@@ -83,7 +83,7 @@ const SellerProfileModifyComponent = ({
                             type="submit"
                             className="w-full px-4 py-2 bg-violet-400 text-white font-bold rounded hover:bg-violet-600"
                         >
-                            다음 단계로
+                            완료
                         </button>
                     )}
                 </form>

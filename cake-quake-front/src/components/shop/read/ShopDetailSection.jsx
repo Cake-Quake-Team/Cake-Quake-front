@@ -1,6 +1,7 @@
-import React from 'react';
-import { MapPin, Clock, Phone, Star, Heart, Share2 ,ArrowLeft} from 'lucide-react';
+import React, {useState} from 'react';
+import { MapPin, Clock, Phone, Star, Heart, Share2 ,ArrowLeft,Pencil} from 'lucide-react';
 import {Navigate, useNavigate} from "react-router";
+import MapModal from "./mapModal.jsx";
 
 
 //평점 별 채우기
@@ -25,24 +26,17 @@ const renderStars=(rating)=> {
 
 const ShopDetailSection=({shop})=>{
     const numericRating =parseFloat(shop.rating);
+
     const navigate =useNavigate();
+    const [showMap, setShowMap] = useState(false);
+
     return(
 
         <div className="relative text-center mb-8 p-6 bg-white rounded-xl shadow-lg border border-gray-100">
-            {/* 목록으로 돌아가기 */}
-            <div className="absolute top-4 left-4">
-                <span
-                    onClick={() => navigate('/cakes')}
-                    className="flex items-center text-gray-500 hover:text-blue-600 cursor-pointer text-sm transition-colors"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    목록으로 돌아가기
-                </span>
-            </div>
             {/* 프로필 이미지 (원형) */}
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden mx-auto mb-5 border-4 border-blue-200 shadow-xl">
                 <img
-                    src={shop.thumbnailUrl || '/shop_default_image.jpeg'}
+                    src={shop.thumbnailUrl ? `http://localhost/${shop.thumbnailUrl}` : '/shop_default_image.jpeg'}
                     alt={shop.shopName}
                     className="w-full h-full object-cover"
                 />
@@ -59,10 +53,21 @@ const ShopDetailSection=({shop})=>{
                 {/*<span className="ml-2 text-gray-600 text-base">리뷰 {shop.reviewCount}개</span>*/}
             </div>
             {/*기본 정보*/}
-            <p className="text-lg text-gray-700 mb-1 flex items-center justify-center">
+            <p
+                className="text-lg text-gray-700 mb-1 flex items-center justify-center cursor-pointer hover:text-blue-500"
+                onClick={() =>{
+                    setShowMap(true);} }
+            >
                 <MapPin className="mr-2 text-gray-500 w-5 h-5" />
                 <span>{shop.address}</span>
             </p>
+
+            {showMap && (
+                <MapModal
+                    address={shop.address}
+                    onClose={() => setShowMap(false)}
+                />
+            )}
             <p className="text-lg text-gray-700 mb-1 flex items-center justify-center">
                 <Clock className="mr-2 text-gray-500 w-5 h-5" />
                 <span>{shop.openTime} ~ {shop.closeTime} {shop.closeDays ? `(${shop.closeDays} 휴무)` : '(연중무휴)'}</span>

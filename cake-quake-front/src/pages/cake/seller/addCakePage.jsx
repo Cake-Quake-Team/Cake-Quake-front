@@ -131,7 +131,7 @@ function CakeAddPage() {
             console.error("상품 등록 실패", error);
             alert("등록 중 오류 발생");
         }
-        navigate(`/seller/shop/${shopId}/cakes/list`);
+        navigate(`/shops/${shopId}`);
     };
 
     return (
@@ -148,7 +148,7 @@ function CakeAddPage() {
                 <CakeBasicInfoForm formData={addCakeDTO} onChange={handleChange}/>
                 <CakeOptionForm optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>
                 <Link
-                    to={"/cakes/list"}
+                    to={`shops/${shopId}`}
                     className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                 >
                     취소

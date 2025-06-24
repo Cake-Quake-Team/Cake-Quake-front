@@ -10,7 +10,8 @@ const ShopFilterBar = ({ filter, setFilter, sort, setSort, keyword, setKeyword }
             <select value={filter} onChange={e => setFilter(e.target.value)} style={{ marginRight: '8px' }}>
                 <option value="">전체</option>
                 <option value="ACTIVE">영업 중</option>
-                <option value="INACTIVE">휴점</option>
+                <option value="INACTIVE">영업 종료</option>
+                <option value="CLOSED">휴점</option>
             </select>
             <select value={sort} onChange={e => setSort(e.target.value)}>
                 <option value="shopId">최신순</option>

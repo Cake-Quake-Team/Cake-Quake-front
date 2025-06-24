@@ -1,8 +1,9 @@
 import {Link, useParams} from "react-router";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getAllCakeList, getOptionItems, getOptionTypes} from "../../api/cakeApi.jsx";
 import CakeCard from "../../components/cake/itemComponents/cakeCard.jsx";
 import CakeOptionList from "../../components/cake/optionComponents/optionListComponent.jsx";
+import SellerShopDetail from "../../components/shop/sellerShopDetail.jsx";
 
 // 메인 분류 목록
 const shopCategories = [
@@ -15,7 +16,7 @@ export default function ShopManagement() {
 
     const [cakes, setCakes] = useState([]);
     const [page] = useState(1);
-    const [selectedShopCategory, setSelectedShopCategory] = useState("RECOMMENDED_PRODUCTS");
+    const [selectedShopCategory, setSelectedShopCategory] = useState("SHOP_MANAGEMENT");
 
     {/*상품 관리 목록 가져오기*/}
     useEffect(() => {
@@ -68,7 +69,7 @@ export default function ShopManagement() {
                 <div className="flex items-center justify-center relative mb-3">
                     <h2 className="text-2xl font-semibold">매장 관리</h2>
                     <Link
-                        to={`/seller/shop/${shopId}/cakes/add`}
+                        to={`cakes/add`}
                         className="absolute right-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                     >
                         ➕ 새 상품 등록
@@ -99,18 +100,14 @@ export default function ShopManagement() {
                 <ul>
                     {/*카테고리가 매장관리일 경우*/}
                     {selectedShopCategory === "SHOP_MANAGEMENT" && (
-                        <>
-                            <div className="text-center text-gray-500 text-lg mt-10">
-                                선택하신 분류에 해당하는 매장 정보가 없습니다. 🍰
-                            </div>
-                        </>
+                        <SellerShopDetail className="mt-8" />
                     )}
                     {/*카테고리가 상품관리일 경우*/}
                     {selectedShopCategory === "CAKE_MANAGEMENT" && (
                         cakes.length > 0 ? (
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                                 {cakes.map(cake => (
-                                    <Link to={`/seller/shop/${shopId}/cakes/read/${cake.cakeId}`}>
+                                    <Link to={`cakes/read/${cake.cakeId}`}>
                                         <CakeCard key={cake.cakeId} cake={cake}/>
                                     </Link>
                                 ))}
@@ -120,17 +117,33 @@ export default function ShopManagement() {
                                 선택하신 분류에 해당하는 케이크가 없습니다. 🍰
                             </div>
                         ))}
-                    {/*카테고리가 옵션관리일 경우*/}
                     {selectedShopCategory === "OPTION_MANAGEMENT" && (
-                            optionTypes.length > 0 ? (
-                                <>
-                            <CakeOptionList optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>
-                                </>
-                            ) : (
-                                    <div className="text-center text-gray-500 text-lg mt-10">
-                                        선택하신 분류에 해당하는 옵션이 없습니다. 🍰
-                                    </div>
-                            ))}
+                        optionTypes.length > 0 ? (
+                            <CakeOptionList
+                                optionTypes={optionTypes}
+                                selectedOptions={selectedOptions}
+                                setSelectedOptions={setSelectedOptions}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-center text-gray-600 mt-20">
+                                <p className="text-2xl font-semibold mb-2">옵션이 없어요 😢</p>
+                                <p className="text-base text-gray-500 mb-6">
+                                    아직 등록된 옵션이 없어요.<br />
+                                    옵션을 추가해서 다양한 선택지를 제공해보세요!
+                                </p>
+                                <Link to="options/add">
+                                    <button
+                                        className="px-6 py-2 bg-gray-500 text-white text-sm font-semibold rounded-lg shadow-md
+                               hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50
+                               transition-all duration-200"
+                                    >
+                                        [+] 새 옵션 추가
+                                    </button>
+                                </Link>
+                            </div>
+                        )
+                    )}
+
                 </ul>
             </div>
         </>

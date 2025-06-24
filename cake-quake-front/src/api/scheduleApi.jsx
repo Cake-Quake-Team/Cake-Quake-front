@@ -4,20 +4,22 @@ export const API_SERVER_HOST = "http://localhost:8080";
 const prefix = `${ API_SERVER_HOST }/api/v1`;
 
 // 1. 달력에서 날짜 선택 (예: 2025-06-25) 후, 특정 매장의 가능한 시간 조회
-async function getAvailableTimes(shopId, date) {
+export const getAvailableTimes = async (shopId, date) =>{
 
-    const response = jwtAxios.get(`${prefix}/schedule/available-times?shopId=${shopId}&date=${date}`);
+    const response = await jwtAxios.get(`${prefix}/schedule/available-times?shopId=${shopId}&date=${date}`);
     const times = response.data;
-    console.log('사용 가능한 시간:', times);
+    console.log(`API 응답 - 매장 ${shopId}, 날짜 ${date}의 예약 가능한 시간:`, times);
+    return times;
 
 }
 
 // 2. 날짜 (예: 2025-06-25)와 시간 (예: 14:00) 선택 후, 가능한 매장 조회 (모달에 표시)
-async function getAvailableShops(date, time) {
+export const getAvailableShops=async (date) => {
 
-    const response = jwtAxios.get(`${prefix}/schedule/available-shops?date=${date}&time=${time}`);
+    const response = await jwtAxios.get(`${prefix}/schedule/available-shops-by-date?date=${date}`);
     const shops = response.data;
     console.log('예약 가능한 매장:', shops);
+    return shops;
 
 }
 

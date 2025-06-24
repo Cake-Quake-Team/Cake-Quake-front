@@ -2,6 +2,8 @@ import { lazy, Suspense } from "react";
 import SellerLayout from "../layouts/sellerLayout.jsx";
 import BasicLayout from "../layouts/basicLayout.jsx";
 
+
+const SellerProfilePages = lazy(()=>import("../pages/seller/sellerProfilePages.jsx"))
 const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
 const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
 
@@ -19,9 +21,15 @@ const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌�
 const sellerRouter = () => {
     return {
         path: "seller",
-        //element: <BasicLayout />,
+
+        // element: <BasicLayout />,
+
         children: [
 
+            {
+                path:"mypage",
+                element:<Suspense fallback={Loading}><SellerProfilePages/></Suspense>
+            },
             {
                 path: "profile",
                 element: <Suspense fallback={Loading}><SellerProfilePage /></Suspense>
@@ -34,15 +42,15 @@ const sellerRouter = () => {
 
             //--------------------발주--------------------
             {
-                path: "read/:shopId/procurements",
+                path: ":shopId/procurements",
                 element: <Suspense fallback={Loading}><ProcurementListPage/></Suspense>
             },
             {
-                path: "read/:shopId/procurements/new",
+                path: ":shopId/procurements/create",
                 element:<Suspense fallback={Loading}><ProcurementCreatePage/></Suspense>
             },
             {
-                path: "read/:shopId/procurements/:pid",
+                path: ":shopId/procurements/:procurementId",
                 element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
             },
             //--------------------------판매자 주문 관련 라우트--------------------//

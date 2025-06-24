@@ -2,10 +2,11 @@ import SellerProfileComponent from "../../../components/member/seller/sellerProf
 import { getSellerProfile } from "../../../api/memberApi";
 import { useAuth } from "../../../store/AuthContext";
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import useMemberStore from "../../../store/useMemberStore";
 import LoadingSpinner from "../../../components/common/loadingSpinner";
+import WithdrawConfirmModal from "../../../components/member/modal/withdrawConfirmModal";
 
 
 const SellerProfilePage = () => {
@@ -17,7 +18,7 @@ const SellerProfilePage = () => {
 
     const { user } = useAuth() // 로그인한 유저 정보
     const navigate = useNavigate()
-    const { setSellerProfile } = useMemberStore()
+    const { setProfile } = useMemberStore()
 
     const {data: sellerData, isLoading, isError, error} = useQuery({
         queryKey: ['sellerProfile'],
@@ -36,13 +37,26 @@ const SellerProfilePage = () => {
 
     useEffect(() => {
         if (sellerData) {
-            setSellerProfile(sellerData) // zustand로 저장
+            setProfile(sellerData) // zustand로 저장
             console.log("zustand에 sellerData 저장")
         }
     }, [sellerData])
 
+    // 회원 탈퇴 모달용
+    const [isWithdrawConfirmModalOpen, setWithdrawConfirmModalOpen] = useState(false)
+
+    // 정보 수정
     const handleModifyProfile = () => {
         navigate(`/seller/profile/modify/${sellerData.uid}`)
+    }
+
+    // 비밀번호 확인 후 탈퇴 처리 모달 불러오기
+    const handleWithdraw = () => {
+        setWithdrawConfirmModalOpen(true)
+    }
+
+    const closeWithdrawConfirmModal = () => {
+        setWithdrawConfirmModalOpen(false)
     }
 
     return (
@@ -55,6 +69,13 @@ const SellerProfilePage = () => {
                     errorMessage={isError ? "판매자 정보를 불러오는 데 실패했습니다." : ''}
                     sellerData={sellerData}
                     handleModifyProfile={handleModifyProfile}
+                    handleWithdraw={handleWithdraw}
+                />
+            )}
+            {isWithdrawConfirmModalOpen  && (
+                <WithdrawConfirmModal
+                    isOpen={isWithdrawConfirmModalOpen}
+                    onClose={closeWithdrawConfirmModal}
                 />
             )}
         </div>

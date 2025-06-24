@@ -37,6 +37,9 @@ function SellerCakeReadPage() {
                         acc[typeId] = {
                             optionTypeId: typeId,
                             optionType: typeName,
+                            isRequired: currentOption.isRequired,
+                            minSelection: currentOption.minSelection,
+                            maxSelection: currentOption.maxSelection,
                             optionItems: []
                         };
                     }
@@ -107,7 +110,7 @@ function SellerCakeReadPage() {
             try {
                 await deleteCake(cakeId);
                 alert("상품이 삭제되었습니다.");
-                navigate(`/seller/shop/${shopId}/cakes/list`);
+                navigate(`/shops/${shopId}`);
             } catch (err) {
                 console.error("상품 삭제 실패:", err);
                 alert("상품 삭제에 실패했습니다.");
@@ -121,7 +124,7 @@ function SellerCakeReadPage() {
                 <div className="flex items-center justify-center relative mb-3">
                     {shopId && (
                         <Link
-                            to={`/seller/shop/${shopId}/cakes/list`}
+                            to={`/shops/${shopId}`}
                             className="absolute left-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                             title="목록으로"
                         >
@@ -151,7 +154,7 @@ function SellerCakeReadPage() {
                     </button>
                     {shopId && (
                         <Link
-                            to={`/seller/shop/${shopId}/cakes/update/${cakeId}`}
+                            to={`/shops/${shopId}/cakes/update/${cakeId}`}
                             className="ml-5 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
                         >
                             수정

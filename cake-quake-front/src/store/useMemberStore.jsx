@@ -1,9 +1,9 @@
 import { create } from 'zustand'
 
 const useMemberStore = create((set) => ({
-    sellerProfile: null,
-    setSellerProfile: (profile) => set({ sellerProfile: profile }),
-    clearSellerProfile: () => set({ sellerProfile: null }),
+    profile: null,
+    setProfile: (profile) => set({ profile }),
+    clearProfile: () => set({ profile: null }),
 }))
 
 export default useMemberStore

@@ -3,7 +3,7 @@ import {Link} from "react-router";
 
 function CakeOptionList({ optionTypes = [] }) {
     return (
-        <div className="my-6 px-4 md:px-0 max-w-xl mx-auto space-y-4">
+        <div className="my-6 px-4 md:px-0 max-w-6xl mx-auto space-y-4">
             {optionTypes.length === 0 ? (
                 <p className="text-gray-500 italic p-2 bg-gray-50 rounded-md">
                     옵션 정보가 없습니다. 관리자에게 문의하세요. 🥲
@@ -19,9 +19,6 @@ function CakeOptionList({ optionTypes = [] }) {
                                 <summary className="flex justify-between items-center py-3 px-4 cursor-pointer text-gray-700 font-medium bg-gray-50 border-b border-gray-200">
                   <span className="flex items-center text-lg">
                     {optionType.optionType}
-                      {optionType.isRequired && (
-                          <span className="text-gray-500 text-xs ml-2">*필수선택</span>
-                      )}
                       <Link
                           to={`options/read/${optionType.optionTypeId}`}
                           className="text-orange-300 text-sm ml-4 hover:underline"

@@ -3,7 +3,6 @@ import {lazy, Suspense} from "react";
 import BasicLayout from "../layouts/basicLayout.jsx";
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
-const ShopDetail=lazy(()=>import("../pages/shop/shopDetailPage.jsx"))
 const ShopNotice=lazy(()=>import("../pages/shop/shopNoticeListPage.jsx"))
 const ShopNoticeDetail=lazy(()=>import("../pages/shop/shopNoticeDetailPage.jsx"))
 const ShopNoticeCreate=lazy(()=>import("../pages/shop/shopNoticeCreatePage.jsx"))
@@ -16,7 +15,6 @@ const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
 const CakeUpdate = lazy(() => import("../pages/cake/seller/updateCakePage.jsx"));
 const SellerCakeRead = lazy(() => import("../pages/cake/seller/sellerReadPage.jsx"));
 const OptionAdd = lazy(() => import("../pages/cake/seller/addOptionPage.jsx"));
-const OptionUpdate = lazy(() => import("../pages/cake/seller/updateOptionPage.jsx"));
 const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"));
 
 //리뷰
@@ -29,10 +27,6 @@ const shopRouter = () => {
         path: "shops",
         element: <SellerLayout/>,
         children: [
-            {
-                path: "read/:cid",
-                element: <Suspense fallback={Loading}><ShopDetail /></Suspense>
-            },
             {
                 path: "read/:cid/notices",
                 element: <Suspense fallback={Loading}><ShopNotice /></Suspense>
@@ -58,7 +52,6 @@ const shopRouter = () => {
                 path:"update/:cid",
                 element: <Suspense fallback={Loading}><ShopUpdate/></Suspense>
             },
-
             //---------------------------------------현지
             {
                 path: ":shopId",
@@ -80,10 +73,6 @@ const shopRouter = () => {
             {
                 path: ":shopId/options/add",
                 element: <Suspense fallback={Loading}><OptionAdd/></Suspense>
-            },
-            {
-                path: ":shopId/options/update/:optionId",
-                element: <Suspense fallback={Loading}><OptionUpdate/></Suspense>
             },
             {
                 path: ":shopId/options/read/:optionId",

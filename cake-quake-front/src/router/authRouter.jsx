@@ -5,6 +5,7 @@ const SigninPage = lazy(() => import("../pages/member/auth/signinPage"))
 const SignupPage = lazy(() => import("../pages/member/auth/signupPage"))
 const SignupBuyerPage = lazy(() => import("../pages/member/auth/signupBuyerPage"))
 const SignupSellersStep1Page = lazy(() => import("../pages/member/auth/signupSellerStep1Page"))
+const ChangePasswordPage = lazy(() => import("../pages/member/auth/changePasswordPage"))
 
 const Loading = <div>Loading...</div>
 
@@ -31,6 +32,10 @@ const authRouter = () => {
             {
                 path: "signup/seller-step2",
                 element: <Suspense fallback={Loading}><SignupSellersStep2Page /></Suspense>
+            },
+            {
+                path: "password",
+                element: <Suspense fallback={Loading}><ChangePasswordPage /></Suspense>
             },
         ]
     };

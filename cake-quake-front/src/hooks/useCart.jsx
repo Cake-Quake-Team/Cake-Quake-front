@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+ import { useState, useEffect } from 'react';
 import {
     getCartItems,
     updateCartItem, // cartApi.js의 updateCartItem이 payload만 받도록 수정되었을 것임
