@@ -3,7 +3,7 @@ import SellerLayout from "../layouts/sellerLayout.jsx";
 import BasicLayout from "../layouts/basicLayout.jsx";
 
 
-
+const SellerProfilePages = lazy(()=>import("../pages/seller/sellerProfilePages.jsx"))
 const SellerProfilePage = lazy(() => import("../pages/member/seller/sellerProfilePage.jsx"))
 const SellerProfileModifyPage = lazy(() => import("../pages/member/seller/sellerProfileModifyPage.jsx"))
 
@@ -21,6 +21,10 @@ const sellerRouter = () => {
         // element: <BasicLayout />,
         children: [
 
+            {
+                path:"mypage",
+                element:<Suspense fallback={Loading}><SellerProfilePages/></Suspense>
+            },
             {
                 path: "profile",
                 element: <Suspense fallback={Loading}><SellerProfilePage /></Suspense>
