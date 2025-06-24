@@ -2,7 +2,7 @@ import React from 'react';
 
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
 
-function CakeCard({ cake }) {
+function CakeCard({ cake,onClick }) {
 
     const { cname, price, thumbnailImageUrl, isOnsale } = cake;
     const imgSrc = thumbnailImageUrl ? thumbnailImageUrl : DEFAULT_IMAGE;
@@ -10,7 +10,9 @@ function CakeCard({ cake }) {
     if (!cake) return null;
 
     return (
-        <div className="border rounded-xl shadow hover:shadow-lg transition duration-300 overflow-hidden relative">
+        <div
+            onClick={onClick}
+            className="border rounded-xl shadow hover:shadow-lg transition duration-300 overflow-hidden relative">
             <img
                 src={imgSrc}
                 alt={cname || '케이크 이미지'}
