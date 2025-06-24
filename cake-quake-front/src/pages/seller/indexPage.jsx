@@ -1,5 +1,5 @@
 import {Link, useParams} from "react-router";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {getAllCakeList, getOptionItems, getOptionTypes} from "../../api/cakeApi.jsx";
 import CakeCard from "../../components/cake/itemComponents/cakeCard.jsx";
 import CakeOptionList from "../../components/cake/optionComponents/optionListComponent.jsx";
@@ -117,17 +117,33 @@ export default function ShopManagement() {
                                 선택하신 분류에 해당하는 케이크가 없습니다. 🍰
                             </div>
                         ))}
-                    {/*카테고리가 옵션관리일 경우*/}
                     {selectedShopCategory === "OPTION_MANAGEMENT" && (
-                            optionTypes.length > 0 ? (
-                                <>
-                            <CakeOptionList optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>
-                                </>
-                            ) : (
-                                    <div className="text-center text-gray-500 text-lg mt-10">
-                                        선택하신 분류에 해당하는 옵션이 없습니다. 🍰
-                                    </div>
-                            ))}
+                        optionTypes.length > 0 ? (
+                            <CakeOptionList
+                                optionTypes={optionTypes}
+                                selectedOptions={selectedOptions}
+                                setSelectedOptions={setSelectedOptions}
+                            />
+                        ) : (
+                            <div className="flex flex-col items-center justify-center text-center text-gray-600 mt-20">
+                                <p className="text-2xl font-semibold mb-2">옵션이 없어요 😢</p>
+                                <p className="text-base text-gray-500 mb-6">
+                                    아직 등록된 옵션이 없어요.<br />
+                                    옵션을 추가해서 다양한 선택지를 제공해보세요!
+                                </p>
+                                <Link to="options/add">
+                                    <button
+                                        className="px-6 py-2 bg-gray-500 text-white text-sm font-semibold rounded-lg shadow-md
+                               hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50
+                               transition-all duration-200"
+                                    >
+                                        [+] 새 옵션 추가
+                                    </button>
+                                </Link>
+                            </div>
+                        )
+                    )}
+
                 </ul>
             </div>
         </>
