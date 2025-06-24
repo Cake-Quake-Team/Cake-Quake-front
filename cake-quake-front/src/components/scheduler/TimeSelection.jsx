@@ -17,11 +17,20 @@ const TimeSelection = ({ shopId, date, onSelectTime }) => {
 
             setIsLoading(true);
             setError(null);
-            const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD 형식으로 변환
+            // Date 객체를 YYYY-MM-DD 형식의 문자열로 변환 (로컬 타임존 기준)
+            const dateString = date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
             try {
                 const times = await getAvailableTimes(shopId, dateString);
-                setAvailableTimes(times);
+                // 백엔드에서 HH:MM:SS 또는 HH:MM 형태로 올 수 있으므로,
+                // 항상 HH:MM:SS 형태로 맞춰주는 것이 안정적입니다.
+                const formattedTimes = times.map(t => {
+                    if (t.length === 5) { // HH:MM 형태라면
+                        return t + ':00'; // HH:MM:00 으로 만듦
+                    }
+                    return t; // HH:MM:SS 형태라면 그대로
+                });
+                setAvailableTimes(formattedTimes); // 포맷팅된 시간 배열 저장
             } catch (err) {
                 console.error('예약 가능한 시간 조회 실패:', err);
                 setError('예약 가능한 시간을 불러오는 데 실패했습니다.');
@@ -50,10 +59,13 @@ const TimeSelection = ({ shopId, date, onSelectTime }) => {
         return <div style={{ textAlign: 'center', padding: '20px', color: 'red' }}>오류: {error}</div>;
     }
 
-    // 현재 시간보다 이전 시간은 비활성화
+    // 현재 시간을 로컬 타임존 기준으로 가져옴
     const now = new Date();
-    // 현재 날짜를 YYYY-MM-DD 형식으로 가져옴 (UTC 기준이 아닌 로컬 시간 기준으로)
-    const today = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    // 선택된 날짜를 YYYY-MM-DD 형식의 문자열로 가져옴 (로컬 타임존 기준)
+    const selectedDateString = date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    // 오늘 날짜를 YYYY-MM-DD 형식의 문자열로 가져옴 (로컬 타임존 기준)
+    const todayString = now.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
 
     return (
         <div style={{ marginTop: '30px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
@@ -61,11 +73,13 @@ const TimeSelection = ({ shopId, date, onSelectTime }) => {
             {availableTimes.length > 0 ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', padding: '10px', border: '1px solid #ddd', borderRadius: '8px' }}>
                     {availableTimes.map((time) => {
-                        // 'YYYY-MM-DDTHH:mm:ss' 형식으로 조합하여 Date 객체 생성
-                        const fullDateTime = new Date(`${date.toISOString().split('T')[0]}T${time}`);
+                        // 날짜와 시간을 합쳐 Date 객체 생성 (로컬 타임존 기준)
+                        // 'YYYY-MM-DD HH:MM:SS' 형식으로 조립
+                        const dateTimeString = `${selectedDateString} ${time}`;
+                        const fullDateTime = new Date(dateTimeString);
 
-                        // 날짜가 오늘이고, 시간이 현재 시간보다 이전이면 비활성화
-                        const isDisabled = date.toISOString().split('T')[0] === today && fullDateTime < now;
+                        // 날짜가 오늘이고, 현재 시간이 픽업 시간보다 이후이면 비활성화
+                        const isDisabled = selectedDateString === todayString && fullDateTime < now;
 
                         return (
                             <button
@@ -98,3 +112,5 @@ const TimeSelection = ({ shopId, date, onSelectTime }) => {
         </div>
     );
 };
+
+export default TimeSelection;

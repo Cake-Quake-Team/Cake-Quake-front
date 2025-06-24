@@ -58,7 +58,12 @@ function BuyerHeader() {
                     <NotificationBell />
 
                     <Search className="w-5 h-5 cursor-pointer" />
-                    <ShoppingCart className="w-5 h-5 cursor-pointer" />
+
+                    <ShoppingCart
+                        className="w-5 h-5 cursor-pointer"
+                        onClick={() => navigate('/buyer/cart')}
+                    />
+
 
                     {user ? (
                         <>

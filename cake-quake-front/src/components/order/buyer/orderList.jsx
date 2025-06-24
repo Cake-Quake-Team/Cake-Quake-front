@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 export default function OrderList({ orders, isLoading, error }) {
     const formatPickup = (date, time) => {
@@ -28,11 +28,11 @@ export default function OrderList({ orders, isLoading, error }) {
         <table className="w-full table-auto border-collapse">
             <thead>
             <tr className="bg-gray-100">
-                <th className="p-2 border">주문일시</th>
-                <th className="p-2 border">상태</th>
-                <th className="p-2 border">픽업일시</th>
-                <th className="p-2 border">총금액</th>
-                <th className="p-2 border">액션</th>
+                <th className="p-2 border">주문 일시</th>
+                <th className="p-2 border">주문 상태</th>
+                <th className="p-2 border">픽업 시간</th>
+                <th className="p-2 border">총 금액</th>
+                <th className="p-2 border">상세 보기</th>
             </tr>
             </thead>
             <tbody>
@@ -47,7 +47,7 @@ export default function OrderList({ orders, isLoading, error }) {
                             to={`/buyer/orders/${order.orderId}`}
                             className="text-blue-500 hover:underline"
                         >
-                            상세
+                            주문 상세
                         </Link>
                     </td>
                 </tr>

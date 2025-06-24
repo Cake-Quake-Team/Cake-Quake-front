@@ -13,6 +13,10 @@ export const getStoreRequests = async (shopId,{page =1 , size = 10, sortField = 
     return res.data
 }
 
+//마이페이지용 상위 3개만 보여주는 헬퍼
+export const getTopStoreRequests = (shopId) => getStoreRequests(shopId,{page:1,size:3});
+
+
 //상태별 발주 목록 조회
 export const getRequestByStatus = async (status,{page = 1, size =10,sortField="procurementId"} = {}) =>{
     const res = await jwtAxios.get(`${prefix}/procurements/status/${status}`,{

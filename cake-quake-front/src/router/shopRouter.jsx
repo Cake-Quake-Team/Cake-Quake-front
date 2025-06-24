@@ -3,13 +3,12 @@ import {lazy, Suspense} from "react";
 import BasicLayout from "../layouts/basicLayout.jsx";
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
-const ShopDetail=lazy(()=>import("../pages/shop/shopDetailPage.jsx"))
 const ShopNotice=lazy(()=>import("../pages/shop/shopNoticeListPage.jsx"))
 const ShopNoticeDetail=lazy(()=>import("../pages/shop/shopNoticeDetailPage.jsx"))
 const ShopNoticeCreate=lazy(()=>import("../pages/shop/shopNoticeCreatePage.jsx"))
 const ShopNoticeUpdate=lazy(()=>import("../pages/shop/shopNoticeUpdatePage.jsx"))
 const ShopUpdate=lazy(()=>import("../pages/shop/shopUpdatePage.jsx"))
-const ShopList=lazy(()=>import("../pages/shop/shopListPage.jsx"))
+
 
 const SellerIndex = lazy(() => import("../pages/seller/indexPage"));
 const CakeAdd = lazy(() => import("../pages/cake/seller/addCakePage.jsx"));
@@ -28,10 +27,6 @@ const shopRouter = () => {
         path: "shops",
         element: <SellerLayout/>,
         children: [
-            {
-                path: "read/:cid",
-                element: <Suspense fallback={Loading}><ShopDetail /></Suspense>
-            },
             {
                 path: "read/:cid/notices",
                 element: <Suspense fallback={Loading}><ShopNotice /></Suspense>
@@ -56,11 +51,6 @@ const shopRouter = () => {
                 //shops/update/5
                 path:"update/:cid",
                 element: <Suspense fallback={Loading}><ShopUpdate/></Suspense>
-            },
-            {
-                //shops/update/5
-                path:"shoplist",
-                element: <Suspense fallback={Loading}><ShopList/></Suspense>
             },
             //---------------------------------------현지
             {

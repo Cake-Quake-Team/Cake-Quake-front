@@ -10,7 +10,7 @@ const CakeListSection = ({ cakes }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {cakes.map((cake) => (
-                <CakeCard key={cake.cakeId} cake={cake}/>
+                <CakeCard key={cake.shopId} cake={cake}/>
             ))}
         </div>
     );

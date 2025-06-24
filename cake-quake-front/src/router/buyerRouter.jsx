@@ -3,14 +3,16 @@ import { lazy, Suspense } from 'react';
 import CartLayout from '../layouts/CartLayout.jsx';
 import AdminLayout from "../layouts/adminLayout.jsx";
 import BasicLayout from "../layouts/basicLayout.jsx";
+import OrderDetailPage from "../pages/order/buyer/orderDetailPage.jsx";
 import AiRecommendPage from "../pages/ai/aiRecommendPage.jsx";
+
 
 
 const CakeIndex = lazy(() => import("../pages/cake/buyer/indexPage.jsx"));
 const BuyerCakeRead = lazy(() => import("../pages/cake/buyer/buyerReadPage.jsx"));
 const CartPage = lazy(() => import('../pages/cart/CartPage.jsx'));
 const OrderListPage = lazy(() => import('../pages/order/buyer/orderListPage.jsx'));
-const OrderDetailPage = lazy(() => import('../pages/order/buyer/orderDetailPage.jsx'));
+//const OrderDetailPage = lazy(() => import('../pages/order/buyer/orderDetailPage.jsx'));
 const CreateOrderPage = lazy(() => import('../pages/order/buyer/createOrderPage.jsx'));
 
 //-----------------리뷰------------------
@@ -35,6 +37,10 @@ const BuyerProfileDetailsModifyAlarmPage = lazy(() => import("../pages/member/bu
 //---------------------AI
 const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
 
+//-------------------buyer/shops
+const BuyerNoticeListPage=lazy(()=>import("../pages/buyer/shop/buyerNoticeListPage.jsx"));
+const BuyerNoticeDetailPage = lazy(()=>import("../pages/buyer/shop/buyerNoticeDetailPage.jsx"));
+const BuyerShopDetailPage=lazy(()=>import("../pages/buyer/shop/buyerShopDetailPage.jsx"));
 
 const Loading = <div>Loading...</div>;
 
@@ -48,6 +54,24 @@ const buyerRouter = () => ({
                 element: <Suspense fallback={Loading}><CakeIndex/></Suspense>
 
         },
+        //---------------------------매장 상세 보기------------------------------------
+        {
+            path: "shops/:shopId",
+            element: <Suspense fallback={Loading}><BuyerShopDetailPage /></Suspense>
+        },
+
+        //---------------------------공지사항 목록 보기------------------------------------
+        {
+            path: "shops/:shopId/notices",
+            element: <Suspense fallback={Loading}><BuyerNoticeListPage /></Suspense>
+        },
+
+        { //공지사항 상세보기
+            path: "shops/:shopId/notices/:noticeId",
+            element: <Suspense fallback={Loading}><BuyerNoticeDetailPage/></Suspense>
+        },
+
+
 
         //---------------------------상품 상세 보기------------------------------------
         {

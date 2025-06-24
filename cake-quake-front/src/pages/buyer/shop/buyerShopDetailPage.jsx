@@ -1,13 +1,15 @@
-import ShopDetailSection from "../../components/shop/read/ShopDetailSection.jsx";
+
 import {useNavigate, useParams} from "react-router";
 import {useEffect, useState} from "react";
-import {getShopDetail} from "../../api/shopApi.jsx";
-import ShopNoticeSection from "../../components/shop/read/ShopNoticeSection.jsx";
-import ShopImageGallery from "../../components/shop/read/ShopImageGallery.jsx";
-import CakeListSection from "../../components/shop/read/CakeListSection.jsx";
+import {getShopDetail} from "../../../api/shopApi.jsx";
+import ShopDetailSection from "../../../components/shop/read/ShopDetailSection.jsx";
+import ShopImageGallery from "../../../components/shop/read/ShopImageGallery.jsx";
+import ShopNoticeSection from "../../../components/shop/read/ShopNoticeSection.jsx";
+import CakeListSection from "../../../components/shop/read/CakeListSection.jsx";
 
-const ShopDetailPage = () => {
-    const { cid:shopId} = useParams();
+
+const BuyerShopDetailPage = () => {
+    const { shopId} = useParams();
     const [shopDetail, setShopDetail] = useState(null);
     const navigate=useNavigate();
 
@@ -23,6 +25,11 @@ const ShopDetailPage = () => {
         }
     }, [shopId]); // shopId가 변경될 때마다 useEffect 재실행
 
+    const handleViewAllNotices = () => {
+        // shopId를 사용하여 동적으로 경로를 생성합니다.
+        navigate(`/buyer/shops/${shopId}/notices`);
+    };
+
 
 
     if (!shopDetail) {
@@ -35,11 +42,6 @@ const ShopDetailPage = () => {
             </main>
         );
     }
-
-    const handleViewAllNotices = () => {
-        // shopId를 사용하여 동적으로 경로를 생성합니다.
-        navigate(`/shops/read/${shopId}/notices`);
-    };
 
     return (
         <main className="flex-grow max-w-3xl w-full mx-auto px-4 py-8 md:px-0">
@@ -65,4 +67,4 @@ const ShopDetailPage = () => {
     );
 };
 
-export default ShopDetailPage;
+export default BuyerShopDetailPage;

@@ -13,22 +13,10 @@ export function ProcurementListComponent({
                                              hasNext,
                                              onLoadMore,
                                              onClickItem,
-                                             onCreate,        // 추가
+                                             //onCreate,        // 추가
                                          }) {
     return (
         <div>
-            {/* 새 발주 버튼 */}
-            <div className="flex justify-end mb-4">
-                <button
-                    type="button"
-                    onClick={onCreate}
-                    className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                >
-                    <PlusIcon className="h-5 w-5 mr-2" />
-                    새 발주
-                </button>
-            </div>
-
             <div className="space-y-4">
                 {requests.map(req => {
                     const createdDate = req.regDate
