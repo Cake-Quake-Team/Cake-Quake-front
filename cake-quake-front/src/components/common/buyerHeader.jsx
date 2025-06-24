@@ -134,7 +134,7 @@ function BuyerHeader() {
                     {user ? (
                         <>
                             <Link
-                                to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile/details"}
+                                to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
                                 onClick={() => setSidebarOpen(false)}
                                 className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
                             >

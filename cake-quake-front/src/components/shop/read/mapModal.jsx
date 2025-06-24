@@ -13,7 +13,7 @@ function MapModal({ address, onClose }) {
             const script = document.createElement("script");
             script.id = "kakao-map-script";
             script.src =
-                "https://dapi.kakao.com/v2/maps/sdk.js?appkey=ce53977cec71e784179bc9105edf27ff&libraries=services";
+                "https://dapi.kakao.com/v2/maps/sdk.js?appkey=a4d2b3bcd88f8fc61e890952c9a87fbc&libraries=services";
             script.async = true;
 
             script.onload = () => {
