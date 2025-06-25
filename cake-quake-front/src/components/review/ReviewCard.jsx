@@ -21,12 +21,13 @@ export default function ReviewCard({ review, onClick }) {
         if (!isNaN(d)) dateText = format(d, 'yyyy.MM.dd');
     }
 
-    // 이미지 URL (절대경로/상대경로 모두 대응)
+    // 이미지 URL (절대경로/상대경로 모두 대응), 없으면 public/cakeImage/default-cake.png 사용
     const imgSrc = reviewPictureUrl
         ? (reviewPictureUrl.startsWith('http')
             ? reviewPictureUrl
             : `http://localhost${reviewPictureUrl}`)
-        : null;
+        : '/cakeImage/default-cake.png';  // public/cakeImage/default-cake.png
+
 
     return (
         <div
