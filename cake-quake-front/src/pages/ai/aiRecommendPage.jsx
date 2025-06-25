@@ -21,25 +21,32 @@ function AiRecommendPage() {
             return;
         }
 
+        const userQuestion = question; // 현재 질문을 변수에 저장
+        setQuestion("");
+
+        setChatHistory(prev => [...prev, { question: userQuestion, answer: null }]);
+        setIsLoading(true);
+
         setIsLoading(true);
         try {
             let response;
             if (selectedType === "lettering") {
-                response = await recommendCakeLettering({ question });
+                response = await recommendCakeLettering({ question: userQuestion });
             } else if (selectedType === "options") {
-                response = await recommendCakeOptions({ question });
+                response = await recommendCakeOptions({ question: userQuestion });
             } else if (selectedType === "image") {
-                response = await recommendCakeImage({ question });
-                setChatHistory(prev => [...prev, { question, answer: `<img src="${response.imageUrl}" alt="AI 이미지" style="max-width:100%;" />` }]);
-                setIsLoading(false);
-                setQuestion('');
+                response = await recommendCakeImage({ question: userQuestion });
                 return;
             } else {
                 response = await generateAnswer({ question });
             }
-
-            setChatHistory(prev => [...prev, { question, answer: response }]);
-            setQuestion('');
+            setChatHistory(prev =>
+                prev.map((item, index) =>
+                    index === prev.length - 1 // 마지막 질문 (방금 보낸 질문)
+                        ? { ...item, answer: response }
+                        : item
+                )
+            );
         } catch (error) {
             console.error("AI 추천 실패", error);
             setChatHistory(prev => [...prev, { question, answer: "추천에 실패했습니다. 다시 시도해주세요." }]);
