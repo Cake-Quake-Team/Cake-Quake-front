@@ -107,3 +107,11 @@ export const rejectDeletionRequest = async (requestId) => {
     );
     return true;
 };
+
+// ---------------------케이크 상품 리뷰 확인--------------------------
+export const getCakeReviews = async (cakeId,{page =1, size =5} = {})=>{
+    const res = await jwtAxios.get(`${prefix}/cakes/${cakeId}/reviews`,{
+        params: {page,size}
+    });
+    return res.data;
+}
