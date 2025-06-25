@@ -4,7 +4,7 @@ import OptionAdd from '../../../components/cake/optionComponents/addOptionCompon
 import { addOptionType, addOptionItem, getOptionTypes } from '../../../api/cakeApi';
 
 function OptionAddPage() {
-    const { shopId, optionId } = useParams();
+    const { shopId } = useParams();
     const navigate = useNavigate();
     const [existingOptionTypes, setExistingOptionTypes] = useState([]);
     const [selectedOptionTypeId, setSelectedOptionTypeId] = useState('');
@@ -96,7 +96,7 @@ function OptionAddPage() {
                 };
 
                 await addOptionItem(shopId, body);
-                navigate(`/shops/${shopId}/options/read/${optionId}`);
+                navigate(`/shops/${shopId}`);
             }
 
             alert('옵션이 성공적으로 등록되었습니다.');

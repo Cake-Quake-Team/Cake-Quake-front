@@ -21,7 +21,7 @@ const SellerProfilePage = () => {
             <div className="max-w-4xl w-full mx-auto p-4 md:p-8">
 
                 <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">내 매장 정보</h2>
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">내 정보</h2>
                     <SellerProfileSummary className="!p-0 !py-0 !px-0 !max-w-full !mx-0" />
                 </div>
 
