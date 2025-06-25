@@ -115,7 +115,7 @@ function BuyerProfile( ) {
                         {/* temperature가 숫자일 때만 toFixed 호출합니다.*/}
                         {typeof temperature === 'number' && (
                             <p className="text-sm text-gray-500">
-                                <Link to="/buyer/temperature" className="font-semibold text-orange-300 hover:underline">
+                                <Link to="/buyer/profile/temperature" className="font-semibold text-orange-300 hover:underline">
                                     온도 지수: {temperature.toFixed(1)}°C
                                 </Link>
                             </p>

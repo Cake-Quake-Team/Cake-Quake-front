@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {getTemperature, getTemperatureHistory} from "../../../api/temperatureApi.jsx";
 import FilterTabs from "../../../components/temperature/filterTabs.jsx";
 import HistoryList from "../../../components/temperature/temperatureHistory.jsx";
+import {getBuyerProfile} from "../../../api/memberApi.js";
 
 
 export default function TemperaturePage() {
@@ -14,60 +15,76 @@ export default function TemperaturePage() {
     const [hasNext, setHasNext] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [currentUserUid, setCurrentUserUid] = useState(null); //
 
-    const currentUserUid = 5;
 
-    const load = async () => {
-        if (!currentUserUid) {
-            setError("사용자 정보를 찾을 수 없습니다. 로그인 상태를 확인해주세요.");
-            setLoading(false);
-            return;
-        }
-
+    const loadAllTemperatureData = async() =>{
         setLoading(true);
-        try {
-            //온도
-            // currentUserUid를 getTemperature 함수에 전달
-            const tem = await getTemperature(currentUserUid);
-            setTemperature(tem.temperature);
+        setError("");
 
-            //이력
-            // currentUserUid를 getTemperatureHistory 함수에 전달
-            const {items, hasNext} = await getTemperatureHistory({
-                uid: currentUserUid, // <-- uid 추가
-                page: 1,
-                size: PAGE_SIZE,
-            });
-            setHistory(items);
-            setHasNext(hasNext);
-            setPage(1);
+        try {
+            // 1. 사용자 프로필을 먼저 가져와 UID를 추출합니다.
+            const profileApiResponse = await getBuyerProfile();
+            console.log("getBuyerProfile 응답 (TemperaturePage):", profileApiResponse);
+
+            if (profileApiResponse.success && profileApiResponse.data && profileApiResponse.data.uid) {
+                const fetchedUid = profileApiResponse.data.uid;
+                setCurrentUserUid(fetchedUid); // UID 상태 업데이트
+
+                // 2. 추출된 UID를 사용하여 온도 정보를 가져옵니다.
+                const tempApiResponse = await getTemperature(fetchedUid);
+                console.log("getTemperature 응답 (TemperaturePage):", tempApiResponse);
+                if (typeof tempApiResponse?.temperature === 'number') {
+                    setTemperature(tempApiResponse.temperature);
+                } else {
+                    console.warn("API에서 유효하지 않은 온도 값이 반환되었습니다 (TemperaturePage):", tempApiResponse);
+                    setTemperature(null);
+                    setError("현재 온도 정보를 불러왔으나 유효한 값이 아닙니다.");
+                }
+
+                // 3. 추출된 UID를 사용하여 온도 이력 정보를 가져옵니다.
+                const {items, hasNext} = await getTemperatureHistory({
+                    uid: fetchedUid,
+                    page: 1,
+                    size: PAGE_SIZE,
+                });
+                setHistory(items);
+                setHasNext(hasNext);
+                setPage(1);
+
+            } else {
+                setError(profileApiResponse.message || "사용자 프로필(UID)을 불러오는데 실패했습니다. 로그인 상태를 확인해주세요.");
+                setCurrentUserUid(null);
+                setTemperature(null);
+                setHistory([]);
+            }
         } catch (e) {
-            console.error("TemperaturePage.loadAll 오류", e); // 로그 메시지 수정 (PointPage -> TemperaturePage)
-            setError(e.response?.data?.message || e.message);
+            console.error("TemperaturePage 데이터 페칭 오류:", e);
+            setError("온도 및 이력 정보를 불러오는 데 실패했습니다.");
+            setTemperature(null);
+            setHistory([]);
         } finally {
             setLoading(false);
         }
     };
 
     const loadMore = async () => {
-        if (!hasNext || loading) return; // 로딩 중 중복 호출 방지
-
-        if (!currentUserUid) {
-            setError("사용자 정보를 찾을 수 없습니다. 로그인 상태를 확인해주세요.");
-            return;
-        }
+        if (!hasNext || loading || !currentUserUid) return;
 
         setLoading(true);
         try {
             const next = page + 1;
             const { items, hasNext: more } = await getTemperatureHistory({
-                uid: currentUserUid, // <-- uid 추가
+                uid: currentUserUid,
                 page: next,
                 size: PAGE_SIZE,
             });
             setHistory(prev => [...prev, ...items]);
             setHasNext(more);
             setPage(next);
+        } catch (e) {
+            console.error("TemperaturePage.loadMore 오류", e);
+            setError(e.response?.data?.message || e.message);
         } finally {
             setLoading(false);
         }
@@ -75,15 +92,14 @@ export default function TemperaturePage() {
 
     const filtered = history.filter(item => {
         if (filter === "all") return true;
-        return item.reason?.toUpperCase() === filter;
+        // reason이 존재하고 대소문자 구분 없이 필터링
+        return item.reason && item.reason.toUpperCase() === filter.toUpperCase();
     });
 
     useEffect(() => {
-        // currentUserUid가 유효할 때만 load 함수를 호출하도록 의존성 추가
-        if (currentUserUid) {
-            load();
-        }
-    }, [currentUserUid]); // currentUserUid가 변경될 때마다 다시 로드
+        // 컴포넌트 마운트 시 초기 데이터 로드
+        loadAllTemperatureData();
+    }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 한 번만 실행
 
     return (
         <div className="max-w-xl mx-auto p-4 space-y-6">
@@ -98,7 +114,7 @@ export default function TemperaturePage() {
                         현재 온도
                     </h2>
                     <p className="text-7xl font-extrabold tracking-tight text-indigo-600">
-                        {temperature}°C
+                        {temperature.toFixed(1)}°C
                     </p>
                     <p className="text-sm mt-3 opacity-80 text-gray-600">실시간으로 측정된 온도입니다.</p>
                 </div>
@@ -109,7 +125,11 @@ export default function TemperaturePage() {
                 onChange={setFilter}
             />
 
-            {loading && <p className="text-center">로딩 중…</p>}
+            {loading && history.length === 0 && <p className="text-center">이력 정보를 불러오는 중…</p>}
+
+            {!loading && filtered.length === 0 && !error && (
+                <p className="text-center text-gray-500">조회된 이력 정보가 없습니다.</p>
+            )}
 
             <HistoryList
                 items={filtered}
