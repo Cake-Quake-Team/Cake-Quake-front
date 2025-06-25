@@ -27,9 +27,9 @@ function BuyerHeader() {
                     </Link>
                     )}
                     {user?.role === "SELLER" && (
-                         // <Link to={`shops/${shopId}`}>
+                        <Link to={`shops/${user.shopId}`}>
                             <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
-                        //</Link>
+                        </Link>
                     )}
                     {user?.role === "BUYER" && (
                         <Link to="/buyer">
@@ -37,9 +37,9 @@ function BuyerHeader() {
                         </Link>
                     )}
                     {user?.role === "SELLER" && (
-                        // <Link to={`shops/${shopId}`}>
+                         <Link to={`shops/${user.shopId}`}>
                         <h1 className="text-2xl font-bold">Cake Quake</h1>
-                        //</Link>
+                        </Link>
                     )}
 
 
