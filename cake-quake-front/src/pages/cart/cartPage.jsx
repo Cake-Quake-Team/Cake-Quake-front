@@ -33,16 +33,6 @@ export default function CartPage() {
     // modal 상태에 'success' 타입을 추가
     const [modal, setModal] = useState({ type: null, id: null, message: '' });
 
-    // useCart 훅이 이미 fetchCart를 호출하고 있으므로, 이 useEffect는 제거
-    // useEffect(() => {
-    //     getCartItems()
-    //         .then(res => {
-    //             console.log("✅ 장바구니 응답:", res);
-    //         })
-    //         .catch(err => {
-    //             console.error("❌ 장바구니 에러:", err);
-    //         });
-    // }, []);
 
     const cartItems = Array.isArray(items) ? items : [];
 
@@ -160,7 +150,7 @@ export default function CartPage() {
                     }
                     openModal('all');
                 }}
-                onContinueShopping={() => navigate('/buyer/products')}
+                onContinueShopping={() => navigate('/buyer')}
                 onOrderSelected={handleOrderSelected}
                 onOrderAll={handleOrderAll}
             />

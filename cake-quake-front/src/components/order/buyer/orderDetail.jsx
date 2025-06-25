@@ -4,47 +4,35 @@ import { useNavigate } from 'react-router';
 export default function OrderDetail({
                                         order,
                                         onCancel, // 이 props는 주문 취소 로직을 상위 컴포넌트에서 처리할 때 사용
-                                        onBack
+                                        onBack,
+                                        onPay,    // ⭐ 추가: 결제하기 버튼 클릭 핸들러 ⭐
+                                        isPaying  // ⭐ 추가: 결제 진행 중 상태 ⭐
                                     }) {
     const [isCancelling, setIsCancelling] = useState(false);
     const navigate = useNavigate();
 
-    const handleCancel = async () => { // async 추가 (onCancel이 비동기일 수 있으므로)
+    const handleCancel = async () => {
         const confirmed = window.confirm('정말로 이 주문을 취소하시겠습니까?');
         if (!confirmed) return;
 
-        setIsCancelling(true); // 취소 요청 시작 시 버튼 비활성화
+        setIsCancelling(true);
         try {
-            await onCancel(order.orderId); // 상위 컴포넌트의 onCancel 함수 호출
-            // 취소 성공 후 필요한 추가 로직 (예: 상태 업데이트, 메시지)은 onCancel 내부에서 처리되거나
-            // 이 컴포넌트에서 직접 주문 상태를 업데이트할 수도 있습니다.
-            // 여기서는 onCancel이 이미 상위에서 처리해줄 것으로 가정합니다.
+            await onCancel(order.orderId);
         } catch (err) {
             console.error('❌ 주문 취소 실패:', err);
             alert('주문 취소 중 오류가 발생했습니다.');
         } finally {
-            setIsCancelling(false); // 취소 요청 완료 시 버튼 활성화
+            setIsCancelling(false);
         }
     };
 
-
-
-    // ⭐ 리뷰 쓰기 버튼 클릭 핸들러 수정 ⭐
     const handleWriteReview = () => {
         const firstCakeId = order.items && order.items.length > 0 && order.items[0].cakeItem ? order.items[0].cakeItem.cakeId : null;
 
         navigate(`/buyer/reviews/create/${order.orderId}`, {
-            state: { cakeId: firstCakeId } // firstCakeId를 state로 전달
+            state: { cakeId: firstCakeId }
         });
     };
-
-    // // 리뷰 쓰기 버튼 클릭 핸들러 (나중에 페이지 이동 로직 추가)
-    // const handleWriteReview = () => {
-    //     // 나중에 여기에 리뷰 작성 페이지로 이동하는 로직을 추가합니다.
-    //     // 예: navigate(`/review/write/${order.orderId}`);
-    //     alert('리뷰 쓰기 페이지로 이동 예정');
-    //     console.log(`리뷰 작성: 주문 ID ${order.orderId}`);
-    // };
 
     const formatReservedAt = (reservedAtString) => {
         if (!reservedAtString) return '정보 없음';
@@ -70,19 +58,25 @@ export default function OrderDetail({
 
     if (!order) return <div className="p-4 text-center">로딩 중…</div>;
 
-    // 주문 취소 불가능한 상태 정의 (백엔드 주문 상태 값과 정확히 일치해야 함)
+    // 주문 취소 불가능한 상태 정의
     const nonCancellableStatuses = [
-        'NO_SHOW',             // 노쇼
-        'RESERVATION_CANCELLED', // 주문 취소
-        'READY_FOR_PICKUP', // 픽업 확정
-        'PICKUP_COMPLETED'  // 만약 'PICKUP_COMPLETED'가 확정 완료를 의미한다면 여기에 추가
+        'RESERVATION_CONFIRMED', // 예약 확정 (결제 후)
+        'PREPARING',             // 준비 중
+        'READY_FOR_PICKUP',      // 픽업 준비 완료
+        'PICKUP_COMPLETED',      // 픽업 완료
+        'RESERVATION_CANCELLED', // 이미 취소됨
+        'NO_SHOW'                // 노쇼
     ];
 
     // 주문 취소 버튼 활성화 여부
     const isCancelButtonDisabled = nonCancellableStatuses.includes(order.status) || isCancelling;
 
+    // ⭐ 결제하기 버튼 활성화 여부 ⭐
+    // 'RESERVATION_PENDING' (예약 확인 중) 상태일 때만 결제 가능
+    const isPayButtonActive = order.status === "RESERVATION_PENDING";
+
     // 리뷰 쓰기 버튼 활성화 여부 (일반적으로 픽업 완료 후 가능)
-    const isReviewButtonVisible = order.status === 'PICKUP_COMPLETED' || order.status === 'PICKUP_CONFIRMED'; // 픽업이 완료되었을 때만 리뷰 가능하다고 가정
+    const isReviewButtonVisible = order.status === 'PICKUP_COMPLETED'; // 'PICKUP_CONFIRMED'는 결제 후 상태이므로, 픽업 완료 시에만 리뷰를 쓰는 것이 일반적.
 
     return (
         <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded">
@@ -105,7 +99,7 @@ export default function OrderDetail({
                                         src={item.thumbnailImageUrl}
                                         alt={item.cname || "케이크 이미지"}
                                         className="w-full h-full object-cover rounded-md"
-                                        onError={(e) => { e.target.onerror = null; e.target.src="/default-cake-image.jpg"; }} // 기본 이미지 경로 확인 및 설정 필요
+                                        onError={(e) => { e.target.onerror = null; e.target.src="/default-cake-image.jpg"; }}
                                     />
                                 </div>
                             )}
@@ -115,7 +109,7 @@ export default function OrderDetail({
                                     <span className="text-gray-600 sm:ml-auto">{item.productCnt}개</span>
                                 </div>
                                 <div className="text-right mt-1">
-                                    <span className="text-lg font-bold">{(item.price ?? 0) * (item.productCnt ?? 0).toLocaleString()}원</span>
+                                    <span className="text-lg font-bold">₩{(item.price ?? 0) * (item.productCnt ?? 0).toLocaleString()}원</span>
                                 </div>
                             </div>
                         </div>
@@ -126,10 +120,23 @@ export default function OrderDetail({
             </div>
 
             <div className="mt-6 text-right font-bold text-lg">
-                총 결제 금액: {(order.totalPrice ?? 0).toLocaleString()}원
+                총 결제 금액: ₩{(order.totalPrice ?? 0).toLocaleString()}원
             </div>
 
-            <div className="mt-6 flex justify-end gap-4"> {/* 버튼들을 오른쪽으로 정렬 */}
+            <div className="mt-6 flex justify-end gap-4">
+                {/* ⭐ 결제하기 버튼 ⭐ */}
+                <button
+                    onClick={onPay} // 상위 컴포넌트에서 전달받은 onPay 핸들러 연결
+                    disabled={!isPayButtonActive || isPaying} // 활성화 조건 및 결제 로딩 상태 연결
+                    className={`px-4 py-2 rounded-md text-white font-semibold transition-colors
+                        ${isPayButtonActive && !isPaying
+                        ? 'bg-blue-600 hover:bg-blue-700' // 활성화 시 파란색
+                        : 'bg-gray-400 text-gray-700 cursor-not-allowed' // 비활성화 시 회색
+                    }`}
+                >
+                    {isPaying ? '결제 진행 중...' : '결제하기'}
+                </button>
+
                 {/* 주문 취소 버튼 */}
                 <button
                     onClick={handleCancel}
@@ -143,7 +150,7 @@ export default function OrderDetail({
                 {isReviewButtonVisible && (
                     <button
                         onClick={handleWriteReview}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                     >
                         리뷰 쓰기
                     </button>

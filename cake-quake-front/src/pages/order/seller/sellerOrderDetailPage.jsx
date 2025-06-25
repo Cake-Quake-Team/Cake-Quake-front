@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getSellerOrderDetail, updateSellerOrderStatus } from "../../../api/sellerOrderApi";
-import SellerOrderDetail from "../../../components/order/seller/SellerOrderDetail";
+import { getSellerOrderDetail, updateSellerOrderStatus } from "../../../api/sellerOrderApi.jsx";
+import SellerOrderDetail from "../../../components/order/seller/sellerOrderDetail.jsx";
 
 const SellerOrderDetailPage = () => {
     // ✅ shopId와 orderId를 모두 useParams로 가져옴

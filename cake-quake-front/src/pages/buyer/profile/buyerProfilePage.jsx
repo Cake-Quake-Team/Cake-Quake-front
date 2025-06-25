@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 import BuyerProfile from '../../../components/member/buyer/buyerProfile.jsx';
 import {getMyReviewList} from "../../../api/reviewApi.jsx";
 import {useNavigate} from "react-router";
 import {getPointBalance} from "../../../api/pointApi.jsx"; // 새로 만든 컴포넌트 임포트
+
 
 
 function MyPage() {
@@ -16,6 +18,7 @@ function MyPage() {
     const [reviewCount, setReviewCount] = useState(0);
     const [orderCount, setOrderCount] = useState(0);
     const [pointBalance, setPointBalance] = useState(0);
+
 
     // (1) 쿠폰·주문 개수 더미 초기화
     useEffect(() => {
@@ -37,6 +40,7 @@ function MyPage() {
         fetchReviewCount();
     }, []);
 
+
     // 포인트 잔액 조회
     useEffect(() => {
         async function fetchPoint() {
@@ -49,6 +53,7 @@ function MyPage() {
         }
         fetchPoint();
     }, []);
+
     return (
         <div className="container mx-auto p-4 sm:px-6 lg:px-8 max-w-4xl min-h-screen">
 
@@ -70,8 +75,10 @@ function MyPage() {
                         <p className="text-gray-400">{reviewCount}</p>
                     </div>
                     <div className="flex-1 px-4">
-                        <p className="text-lg font-semibold text-gray-700">전체 주문 내역</p>
-                        <p className="text-gray-400">{orderCount}</p>
+                        <Link to="/buyer/orders" className="block">
+                            <p className="text-lg font-semibold text-gray-700">전체 주문 내역</p>
+                            <p className="text-gray-400">{orderCount}</p>
+                        </Link>
                     </div>
                 </div>
             </section>
