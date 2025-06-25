@@ -7,7 +7,9 @@ const ResultModal = ({ show, closeResultModal, msg }) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
              style={{ backgroundColor: 'rgba(169, 169, 169, 0.7)' }}>
             <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent mb-4">Result</h2>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-500 bg-clip-text text-transparent mb-4">
+                    결과
+                </h2>
                 <p className="text-xl text-gray-600 mb-6">{msg}</p>
                 <button
                     onClick={closeResultModal}

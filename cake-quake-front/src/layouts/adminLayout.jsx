@@ -42,19 +42,7 @@ export default function AdminLayout() {
                     </div>
                 </div>
 
-                {/* 우측: 필터 버튼들 */}
-                <div className="flex items-center space-x-2">
-                    <button className="bg-black text-white px-3 py-1 rounded-full text-sm flex items-center space-x-1 shadow-sm hover:bg-gray-300 transition-colors duration-200">
-                        <span>✔</span>
-                        <span>New</span>
-                    </button>
-                    <button className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm shadow-sm hover:bg-gray-300 transition-colors duration-200">
-                        보류
-                    </button>
-                    <button className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm shadow-sm hover:bg-gray-300 transition-colors duration-200">
-                        거절
-                    </button>
-                </div>
+                {/* 로그아웃이 보이게 교체 예정 */}
             </header>
 
             {/* 본문: 사이드바 + 메인 컨텐츠 */}
@@ -74,7 +62,7 @@ export default function AdminLayout() {
                                     isActive("/admin/sellers/pending") ? "bg-blue-50 text-blue-700 font-medium" : ""
                                 }`}
                             >
-                                <span>문서 관리</span>
+                                <span>승인 관리</span>
                                 {isActive("/admin/sellers/pending")}
                             </Link>
                             <Link

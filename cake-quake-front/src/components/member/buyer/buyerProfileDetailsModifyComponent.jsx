@@ -16,7 +16,7 @@ const BuyerProfileDetailsModifyComponent = ({
     const { userId } = buyerProfile || {}
     const {uname, phoneNumber } = form || {}
 
-    // 아이디랑 휴대폰 번호만 수정 가능. (테두리 색을 다르게 강조)
+    // 아이디랑 휴대폰 번호만 수정 가능.
     // 휴대폰 인증 요청 버튼
     return (
         <div className="min-h-screen flex items-center justify-center bg-white">
@@ -70,6 +70,7 @@ const BuyerProfileDetailsModifyComponent = ({
                     >
                         {isVerified ? "전화번호 인증 완료" : "전화번호 인증"}
                     </button>
+                    <p class="text-sm text-gray-500">전화번호 변경 시에만 새로 인증이 필요합니다.</p>
                     {errorMessage && (
                         <div className="text-red-500 text-sm text-center">{errorMessage}</div>
                     )}
@@ -81,7 +82,7 @@ const BuyerProfileDetailsModifyComponent = ({
                             type="submit"
                             className="w-full px-4 py-2 bg-violet-400 text-white font-bold rounded hover:bg-violet-600"
                         >
-                            다음 단계로
+                            완료
                         </button>
                     )}
                 </form>

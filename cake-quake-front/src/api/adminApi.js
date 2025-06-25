@@ -29,4 +29,16 @@ export const getpendingSellerList = async(page, size, type, keyword) => {
         console.log("접근 오류:")
         throw error
     }
-}
+};
+
+// 판매자 승인
+export const approvePendingSeller = async (tempSellerId) => {
+    try {
+        const res = await jwtAxios.post(`${baseUrl}/admin/sellers/${tempSellerId}/approve`)
+        console.log("판매자 승인 응답:", res.data)
+        return res.data
+    } catch (error) {
+        console.error("판매자 승인 중 오류:", error)
+        throw error
+    }
+};
