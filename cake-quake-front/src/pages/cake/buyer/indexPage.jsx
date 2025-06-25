@@ -156,7 +156,7 @@ function CakeAllList() {
                 {selectedMainCategory !== "STORE_BY_CATEGORY" && (
                     <>
                         {Array.isArray(cakes) && cakes.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1">
                                 {cakes.map(cake => (
                                     <Link
                                         key={cake.cakeId}

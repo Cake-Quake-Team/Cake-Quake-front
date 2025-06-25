@@ -53,7 +53,7 @@ function CakeOptionList({ optionTypes = [] }) {
                                             {optionType.optionItems.map((optionItem) => (
                                                 <label
                                                     key={`${optionType.optionTypeId}_${optionItem.optionItemId}`}
-                                                    className="flex justify-between items-center py-2 px-4 cursor-pointer hover:bg-gray-50 transition-colors duration-150"
+                                                    className="flex justify-between items-center py-2 px-4 transition-colors duration-150"
                                                 >
                           <span className="text-gray-700 font-light flex-grow">
                             {optionItem.optionName}
