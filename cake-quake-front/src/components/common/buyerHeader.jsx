@@ -1,5 +1,5 @@
-import {Link, useNavigate, useParams} from "react-router";
-import {Search, ShoppingCart, Menu, X, Bot} from "lucide-react";
+import {Link, useNavigate} from "react-router";
+import {MessageCircle  , ShoppingCart, Menu, X, Bot} from "lucide-react";
 import { useAuth } from "../../store/AuthContext";
 import { useState } from "react";
 import NotificationBell from "./notificationBell.jsx";
@@ -57,12 +57,16 @@ function BuyerHeader() {
                     {/* 🔔 알림 종 아이콘 추가 */}
                     <NotificationBell />
 
-                    <Search className="w-5 h-5 cursor-pointer" />
 
+                    <MessageCircle   className="w-5 h-5 cursor-pointer" />
+
+                    {/* 장바구니 - BUYER만 보임*/}
+                    {user?.role === "BUYER" && (
                     <ShoppingCart
                         className="w-5 h-5 cursor-pointer"
                         onClick={() => navigate('/buyer/cart')}
                     />
+                    )}
 
 
                     {user ? (
