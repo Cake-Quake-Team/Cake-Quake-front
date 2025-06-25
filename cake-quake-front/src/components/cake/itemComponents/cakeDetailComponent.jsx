@@ -1,10 +1,14 @@
 import React from 'react';
 import {Link} from "react-router";
 import {Store} from "lucide-react";
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
 
 function CakeDetailComponent({ cake, optionTypes, selectedOptions, setSelectedOptions, OptionComponent }) {
+
+    const {user} = useAuth()
+
     if (!cake || !cake.cakeDetailDTO) {
         return <div className="text-center py-8 text-gray-500">상품 정보가 없습니다.</div>;
     }
@@ -42,11 +46,13 @@ function CakeDetailComponent({ cake, optionTypes, selectedOptions, setSelectedOp
                 {/* 오른쪽: 상품 정보 및 옵션 영역 */}
                 <div className="md:w-1/2 flex flex-col justify-between">
                     <div>
+                        {user?.role === 'BUYER' && (
                         <Link className="text-sm font-bold flex items-centertext-gray-900 mb-2 underline hover:text-gray-400"
                               to={`/buyer/shops/${shopId}`
                               }>
                             <Store className="mt-0.5 w-4 h-4 cursor-pointer mr-2" />{shopName}
                         </Link>
+                        )}
                         <h2 className="mt-3 text-2xl font-bold text-gray-900 mb-2">{cname}</h2>
                         <p className="text-2xl text-gray-900 mb-6">{price.toLocaleString()}원</p>
 

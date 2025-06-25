@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnailSelect }) {
+function CakeImageUploadForm({ images, onImageChange, onImageRemove }) {
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
 
@@ -40,7 +40,6 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnail
                                     type="radio"
                                     name="thumbnail"
                                     checked={img.isThumbnail}
-                                    onChange={() => onThumbnailSelect(index)}
                                 />
                             </div>
                             <button

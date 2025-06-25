@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router';
+import {  useNavigate } from 'react-router';
 import OptionAdd from '../../../components/cake/optionComponents/addOptionComponent';
 import { addOptionType, addOptionItem, getOptionTypes } from '../../../api/cakeApi';
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 function OptionAddPage() {
-    const { shopId } = useParams();
+    const {user} = useAuth()
     const navigate = useNavigate();
     const [existingOptionTypes, setExistingOptionTypes] = useState([]);
     const [selectedOptionTypeId, setSelectedOptionTypeId] = useState('');
@@ -16,7 +17,7 @@ function OptionAddPage() {
     useEffect(() => {
         const fetchOptionTypes = async () => {
             try {
-                const types = await getOptionTypes(shopId); // [{optionTypeId, optionType}]
+                const types = await getOptionTypes(user.shopId); // [{optionTypeId, optionType}]
                 setExistingOptionTypes(types);
             } catch (error) {
                 console.error('옵션 타입 목록 조회 실패:', error);
@@ -24,7 +25,7 @@ function OptionAddPage() {
             }
         };
         fetchOptionTypes();
-    }, [shopId]);
+    }, [user.shopId]);
 
     // 옵션 값 항목 추가 (비어있음)
     const handleAddOptionItem = () => {
@@ -95,8 +96,8 @@ function OptionAddPage() {
                     price: Number(item.price)
                 };
 
-                await addOptionItem(shopId, body);
-                navigate(`/shops/${shopId}`);
+                await addOptionItem(user.shopId, body);
+                navigate(`/shops/${user.shopId}`);
             }
 
             alert('옵션이 성공적으로 등록되었습니다.');
@@ -113,7 +114,7 @@ function OptionAddPage() {
 
     // 취소 버튼 클릭 핸들러
     const handleToList = () => {
-        navigate(`/shops/${shopId}`);
+        navigate(`/shops/${user.shopId}`);
     };
 
     return (
