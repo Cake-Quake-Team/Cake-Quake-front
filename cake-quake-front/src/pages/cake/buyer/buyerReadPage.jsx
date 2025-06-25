@@ -4,7 +4,9 @@ import { List } from "lucide-react";
 import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import {Link, useParams, useNavigate} from "react-router"; // Link, useParams, useNavigate를 'react-router'에서 가져옴
 import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
-import { addCartItem } from "../../../api/cartApi.jsx"; // 장바구니 추가 API 함수 import (가정)
+import { addCartItem } from "../../../api/cartApi.jsx";
+import {getCakeReviews} from "../../../api/reviewApi.jsx";
+import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx"; // 장바구니 추가 API 함수 import (가정)
 
 // ⭐ 새로운 모달 컴포넌트 추가 ⭐
 const AddToCartSuccessModal = ({ message, onConfirm }) => {
@@ -35,6 +37,11 @@ function BuyerCakeReadPage() {
     // ⭐ 모달 상태 추가 ⭐
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+
+
+    // 리뷰
+    const [reviews, setReviews] = useState([]);
+    const [reviewPage, setReviewPage] = useState(1);
 
 
     // 케이크 상세 정보를 가져오는 useEffect (옵션 정보 포함)
@@ -90,6 +97,21 @@ function BuyerCakeReadPage() {
 
         fetchCakeDetail();
     }, [cakeId, shopId]);
+
+    // 2) 리뷰 가져오기 (첫 페이지만 미리 불러옴, 더보기 버튼 클릭 시 page++)
+    useEffect(() => {
+        if (!cakeId) return;
+        (async () => {
+            try {
+                const data = await getCakeReviews(cakeId, { page: reviewPage, size: 5 });
+                const list = data.content ?? data;
+                setReviews(prev => reviewPage === 1 ? list : [...prev, ...list]);
+            } catch (e) {
+                console.error(e);
+            }
+        })();
+    }, [cakeId, reviewPage]);
+
 
     // ⭐ 장바구니 담기 핸들러 수정 ⭐
     const handleAddToCart = async () => {
@@ -225,6 +247,23 @@ function BuyerCakeReadPage() {
                     </button>
                 </div>
             </div>
+            <section className="max-w-6xl mx-auto py-12">
+                <h2 className="text-3xl font-bold text-center">BEST REVIEWS</h2>
+                <p className="text-center text-gray-500 mb-8">
+                    고객님들께서 남겨주신 소중한 후기입니다
+                </p>
+
+                {reviews.length > 0 ? (
+                    <BestReviewsCarousel
+                        reviews={reviews}
+                        onCardClick={id =>
+                            navigate(`/shops/${shopId}/cakes/${cakeId}/reviews/${id}`)
+                        }
+                    />
+                ) : (
+                    <p className="text-center text-gray-500">등록된 리뷰가 없습니다.</p>
+                )}
+            </section>
 
             {/* ⭐ 장바구니 추가 성공 모달 ⭐ */}
             {showSuccessModal && (
