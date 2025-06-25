@@ -1,44 +1,70 @@
 import React, { useEffect, useState } from 'react';
 import { getTemperature } from '../../../api/temperatureApi.jsx';
 import {Link} from "react-router";
+import {getBuyerProfile} from "../../../api/memberApi.js";
 
-function BuyerProfile({ currentUserUid }) {
-    const [temperature, setTemperature] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+function BuyerProfile( ) {
+    const [temperature, setTemperature] = useState(null); // 온도 데이터 저장
+    const [loading, setLoading] = useState(true); //전체 로딩 상태
+    const [error, setError] = useState(""); //오류 메시지 저장
+    const [buyerProfile,setBuyerProfile] = useState(null); //사용자 프로필 데이터 저장(uname,uid)
 
-    useEffect(() => {
-        const fetchTemperature = async () => {
-            if (!currentUserUid) {
-                setError("사용자 정보를 찾을 수 없습니다.");
-                // currentUserUid가 없으면 온도를 null로 설정하여 UI가 올바르게 처리되도록 합니다.
-                setTemperature(null);
-                return;
-            }
+
+    useEffect(()=>{
+        const fetchAllProfileData = async ()=>{
             setLoading(true);
-            setError(""); // 이전 오류 초기화
-            try {
-                const tem = await getTemperature(currentUserUid);
-                // API 응답의 temperature가 유효한 숫자인지 확인하고 설정합니다.
-                if (typeof tem?.temperature === 'number') {
-                    setTemperature(tem.temperature);
+            setError("");
+
+            try{
+                // 사용자 프로필 가지고 옴
+                const profileApiResponse =await getBuyerProfile();
+                console.log("getBuyerProfile 응답 : ", profileApiResponse);
+
+                if (profileApiResponse.success && profileApiResponse.data) {
+                    const fetchedProfileData = profileApiResponse.data;
+                    setBuyerProfile(fetchedProfileData); // 가져온 프로필 데이터를 상태에 저장
+
+                    // profileData에서 uid를 추출하여 온도 정보를 가져오는 데 사용합니다.
+                    const userUid = fetchedProfileData.uid;
+                    console.log("프로필에서 추출된 UID:", userUid);
+
+                    // 2. 추출된 UID를 사용하여 온도 정보를 가져옵니다.
+                    if (userUid) {
+                        const tempApiResponse = await getTemperature(userUid); // 추출된 UID 사용
+                        console.log("getTemperature 응답:", tempApiResponse);
+
+                        // API 응답의 temperature가 유효한 숫자인지 확인하고 설정합니다.
+                        if (typeof tempApiResponse?.temperature === 'number') {
+                            setTemperature(tempApiResponse.temperature);
+                        } else {
+                            console.warn("API에서 유효하지 않은 온도 값이 반환되었습니다:", tempApiResponse);
+                            setTemperature(null);
+                            setError("온도 정보를 불러왔으나 유효한 값이 아닙니다.");
+                        }
+                    } else {
+                        setError("사용자 UID를 찾을 수 없어 온도 정보를 불러올 수 없습니다.");
+                        setTemperature(null);
+                    }
                 } else {
-                    console.warn("API에서 유효하지 않은 온도 값이 반환되었습니다:", tem);
-                    setTemperature(null); // 유효하지 않은 값이면 null로 설정
-                    setError("온도 정보를 불러왔으나 유효한 값이 아닙니다.");
+                    // 프로필 조회 실패 시 에러 처리
+                    setError(profileApiResponse.message || "사용자 프로필을 불러오는데 실패했습니다.");
+                    setBuyerProfile(null);
+                    setTemperature(null);
                 }
             } catch (e) {
-                console.error("TemperatureDisplay.fetchTemperature 오류:", e);
-                setError("온도 정보를 불러오는 데 실패했습니다.");
-                setTemperature(null); // 오류 시 온도 초기화
+                console.error("BuyerProfile 데이터 페칭 오류:", e);
+                setError("프로필 및 온도 정보를 불러오는 데 실패했습니다.");
+                setBuyerProfile(null);
+                setTemperature(null);
             } finally {
-                setLoading(false);
+                setLoading(false); // 모든 데이터 페칭 완료 (성공/실패 무관)
             }
+
         };
+        fetchAllProfileData();
+    },[])
 
-        fetchTemperature();
-    }, [currentUserUid]);
-
+    // 온도 바 너비 계산 함수
     const calculateTemperatureBarWidth = (tempValue) => {
         const minTemp = 0;
         const maxTemp = 100;
@@ -48,6 +74,24 @@ function BuyerProfile({ currentUserUid }) {
 
     // temperature가 숫자인 경우에만 width를 계산합니다.
     const temperatureBarWidth = typeof temperature === 'number' ? calculateTemperatureBarWidth(temperature) : 0;
+
+    // 로딩 중일 때 표시
+    if (loading) {
+        return (
+            <div className="bg-white rounded-lg p-6 text-center text-gray-500">
+                <p>프로필 및 온도 정보를 불러오는 중...</p>
+            </div>
+        );
+    }
+
+    // 에러가 발생했거나, 로딩 후 프로필 데이터가 없을 때 표시
+    if (error || !buyerProfile) {
+        return (
+            <div className="bg-white rounded-lg p-6 text-center text-red-500">
+                <p>{error || "사용자 프로필을 불러올 수 없습니다."}</p>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white rounded-lg p-6">
@@ -62,15 +106,18 @@ function BuyerProfile({ currentUserUid }) {
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-gray-800">
-                            <span id="user-id-display">사용자 아이디 불러와야댐</span>
+                            <span id="user-id-display">{buyerProfile.uname || '사용자'}</span>
                         </h2>
+
                         {loading && <p className="text-sm text-gray-500">온도 불러오는 중...</p>}
                         {error && <p className="text-sm text-red-500">{error}</p>}
 
                         {/* temperature가 숫자일 때만 toFixed 호출합니다.*/}
                         {typeof temperature === 'number' && (
                             <p className="text-sm text-gray-500">
-                                <span className="font-semibold text-orange-300">온도 지수: {temperature.toFixed(1)}°C</span>
+                                <Link to="/buyer/temperature" className="font-semibold text-orange-300 hover:underline">
+                                    온도 지수: {temperature.toFixed(1)}°C
+                                </Link>
                             </p>
                         )}
                         {/* temperature가 아직 null이거나 오류 등으로 숫자가 아닌 경우 대체 텍스트를 표시합니다. */}
