@@ -4,7 +4,7 @@ import BuyerProfile from '../../../components/member/buyer/buyerProfile.jsx';
 import {getMyReviewList} from "../../../api/reviewApi.jsx";
 import {useNavigate} from "react-router";
 import {getPointBalance} from "../../../api/pointApi.jsx"; // 새로 만든 컴포넌트 임포트
-
+import {getOrderList} from "../../../api/buyerOrderApi.jsx";
 
 
 function MyPage() {
@@ -52,6 +52,23 @@ function MyPage() {
             }
         }
         fetchPoint();
+    }, []);
+
+    //주문 내역 조회
+    useEffect(() => {
+        async function fetchOrderCount() {
+            try {
+                // getOrderList API를 호출하여 totalElements만 가져옵니다.
+                // size를 1로 보내면 실제로 1개만 가져오지만, PageInfo에는 전체 개수가 담겨 옵니다.
+                // page는 0부터 시작
+                const response = await getOrderList({ page: 0, size: 1 });
+                // response.pageInfo.totalElements가 백엔드에서 넘어오는 전체 주문 개수입니다.
+                setOrderCount(response.pageInfo.totalElements ?? 0);
+            } catch (e) {
+                console.error('주문 수 조회 실패', e);
+            }
+        }
+        fetchOrderCount();
     }, []);
 
     return (

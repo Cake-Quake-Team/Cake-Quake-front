@@ -89,7 +89,7 @@ const SellerOrderItem = ({ order }) => {
 
                 <div className="text-right mt-2">
                     <Link
-                        to={`/seller/shops/${shopId}/orders/${order.orderId}`}
+                        to={`/shops/${shopId}/orders/${order.orderId}`}
                         className="text-blue-600 hover:text-blue-900 text-sm"
                     >
                         주문 상세 보기

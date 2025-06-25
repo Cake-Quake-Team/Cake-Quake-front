@@ -30,8 +30,8 @@ const CreateOrder = () => {
         e.preventDefault();
 
         // 유효성 검사 (이제 `orderItemsFromSource`를 사용)
-        if (!orderItemsFromSource.length) { // ⭐ `items.length` 대신 `orderItemsFromSource.length` 사용 ⭐
-            alert("주문할 상품이 없습니다."); // ⭐ 메시지 수정 ⭐
+        if (!orderItemsFromSource.length) { // `items.length` 대신 `orderItemsFromSource.length` 사용 ⭐
+            alert("주문할 상품이 없습니다."); // 메시지 수정
             return;
         }
         if (!pickupDate || !pickupTime) {

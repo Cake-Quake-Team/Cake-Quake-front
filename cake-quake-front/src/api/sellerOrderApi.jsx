@@ -25,7 +25,7 @@ export const getSellerOrderDetail = async (shopId, orderId) => {
 // 판매자 주문 상태 업데이트
 export const updateSellerOrderStatus = async (shopId, orderId, status) => { // ✅ 함수명 변경
     await jwtAxios.patch(
-        `${prefix}/shops/${shopId}/orders/${orderId}/status`, // ✅ prefix 사용
+        `${prefix}/shops/${shopId}/orders/${orderId}`, // ✅ prefix 사용
         { status: status } // ✅ 명확하게 status 필드에 값을 할당
     );
 };
