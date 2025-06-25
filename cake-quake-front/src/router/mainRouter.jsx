@@ -26,12 +26,23 @@ const mainRouter = createBrowserRouter([
             },
 
             sellerRouter(),
-            adminRouter(),
             buyerRouter(),
             authRouter(),
             memberRouter(),
             shopRouter(),
             scheduleRouter()
+
+        ]
+    },
+    {
+        path: "/",
+        children: [
+            {
+                index: true, // 부모 경로와 동일한 경로 (/)를 의미
+                element: <Suspense fallback={Loading}><MainPage /></Suspense>
+            },
+
+            adminRouter()
 
         ]
     }
