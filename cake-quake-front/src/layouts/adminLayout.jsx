@@ -1,13 +1,23 @@
-import { Outlet, Link, useLocation } from "react-router"; // Changed from "react-router" to "react-router-dom" for Link and useLocation
+import { Outlet, Link, useLocation, useNavigate } from "react-router"; // Changed from "react-router" to "react-router-dom" for Link and useLocation
 import { useState } from "react";
 import { Search } from "lucide-react";
+import { useAuth } from "../store/AuthContext";
 
 export default function AdminLayout() {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true); // 사이드바 상태
 
-    const [page, setPage] = useState(1);
-    const [size, setSize] = useState(10);
+    const navigate = useNavigate()
+    const {user, signOut} = useAuth()
+
+    const [page, setPage] = useState(1)
+    const [size, setSize] = useState(10)
+
+    // 로그아웃
+    const handleSignOut = async () => {
+        await signOut() // 쿠키 제거
+        navigate('/auth/signin')
+    }
 
     // 현재 경로를 보고 체크 표시를 줄 함수 (예: /admin/shops 일 때 체크 표시)
     const isActive = (path) => location.pathname === path;
@@ -180,6 +190,21 @@ export default function AdminLayout() {
                                 <span>포인트 관리</span>
                                 {isActive("/admin/points")}
                             </Link>
+
+                            {/* 로그아웃 버튼 */}
+                            {user && (
+                                <div className="text-sm font-semibold text-gray-500 mt-4 mb-2 hover:bg-gray-100">
+                                    <button
+                                        onClick={() => {
+                                            setSidebarOpen(false)
+                                            handleSignOut()
+                                        }}
+                                        
+                                        >
+                                        로그아웃({user.userId})
+                                    </button>
+                                </div>
+                            )}
                         </nav>
                     )}
                 </aside>
