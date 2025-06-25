@@ -2,8 +2,6 @@ import BasicLayout from "../layouts/BasicLayout";
 import MainPage from "../pages/mainPage";
 import {createBrowserRouter} from "react-router";
 import {Suspense} from "react";
-
-
 import buyerRouter from "./buyerRouter.jsx";
 import sellerRouter from "./sellerRouter.jsx";
 import adminRouter from "./adminRouter.jsx";

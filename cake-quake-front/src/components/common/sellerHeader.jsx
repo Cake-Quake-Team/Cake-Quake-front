@@ -37,8 +37,8 @@ export default function SellerHeader() {
                     <div className="relative after:content-[''] after:absolute after:left-1/2 after:top-0 after:h-full after:w-px after:bg-gray-400" />
 
                     {/* 거래 내역 */}
-                    <Link to={`/shops/${shopId}/transactions`}>
-                        <li className={`${currentPath === `/shops/${shopId}/transactions` ? 'text-black font-semibold' : 'hover:text-black'} cursor-pointer`}>
+                    <Link to={`/shops/${shopId}/orders`}> {/* 이제 /shops/{shopId}/orders로 이동 */}
+                        <li className={`${currentPath === `/shops/${shopId}/orders` ? 'text-black font-semibold' : 'hover:text-black'} cursor-pointer`}>
                             거래 내역<br /><span className="text-xs text-gray-400">Subheading</span>
                         </li>
                     </Link>

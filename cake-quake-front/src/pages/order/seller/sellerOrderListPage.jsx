@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
-import SellerOrderList from "../../../components/order/seller/SellerOrderList";
-import { getSellerOrderList } from "../../../api/sellerOrderApi";
+import SellerOrderList from "../../../components/order/seller/sellerOrderList.jsx";
+import { getSellerOrderList } from "../../../api/sellerOrderApi.jsx";
 
 const ListLoading = () => (
     <div className="text-center p-8 text-blue-600 font-semibold">

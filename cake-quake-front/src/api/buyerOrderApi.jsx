@@ -3,7 +3,7 @@ import jwtAxios from '../utils/jwtUtil.js';
 const API_SERVER_HOST = "http://localhost:8080";
 const prefix = `${API_SERVER_HOST}/api/v1/buyer`;
 
-// ✅ 주문 생성 (userId는 서버에서 SecurityContext로 처리하는 경우 불필요할 수 있음)
+// ✅ 주문 생성
 export const createOrder = (payload) => {
     return jwtAxios.post(`${prefix}/orders/create`, payload);
 };

@@ -21,6 +21,10 @@ const OptionRead = lazy(() => import("../pages/cake/seller/readOptionPage.jsx"))
 const SellerReviewPage = lazy(()=>import("../pages/shop/review/sellerReviewPage.jsx"));
 const SellerReviewDetailPage = lazy(()=>import("../pages/shop/review/sellerReviewDetailPage.jsx"))
 
+//주문
+const SellerOrderListPage = lazy(()=>import("../pages/order/seller/sellerOrderListPage.jsx"));
+const SellerOrderDetailPage = lazy(()=>import("../pages/order/seller/sellerOrderDetailPage.jsx"))
+
 
 const shopRouter = () => {
     return {
@@ -96,6 +100,15 @@ const shopRouter = () => {
                         <SellerReviewDetailPage/>
                     </Suspense>
                 )
+            },
+            //--------------------------판매자 주문 관련 라우트--------------------//
+            {
+                path: ":shopId/orders",
+                element: <Suspense fallback={Loading}><SellerOrderListPage/></Suspense>
+            },
+            {
+                path: ":shopId/orders/:orderId",
+                element: <Suspense fallback={Loading}><SellerOrderDetailPage/></Suspense>
             }
         ]
     };

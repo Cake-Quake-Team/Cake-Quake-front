@@ -23,7 +23,7 @@ export default function CreateOrderPage() {
 
 
     const handleSuccess = () => {
-        navigate('/buyer/orders/list'); // 주문 완료 후 주문 리스트로 이동
+        navigate('/buyer/orders'); // 주문 완료 후 주문 리스트로 이동
     };
 
     // 필수 정보 (shopId)가 넘어오지 않았을 경우의 처리 (선택 사항, 유효성 검사)
