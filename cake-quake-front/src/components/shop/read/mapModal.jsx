@@ -115,12 +115,12 @@ function MapModal({ address, onClose }) {
     }, [scriptReady, address]);
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-4 w-[90%] max-w-md">
+        <div className="fixed top-30 right-8 z-50 w-[95%] max-w-lg">
+            <div className="bg-white rounded-2xl shadow-2xl p-6">
                 <div
                     id="map"
                     style={{ width: "100%", height: "300px" }}
-                    className="mb-4 rounded-md overflow-hidden"
+                    className="mb-6 rounded-lg overflow-hidden border border-gray-200"
                 >
                     {!scriptReady && (
                         <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
@@ -128,8 +128,9 @@ function MapModal({ address, onClose }) {
                         </div>
                     )}
                 </div>
+                {/* 닫기 버튼 */}
                 <button
-                    className="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition-colors"
+                    className="mt-6 w-full bg-blue-600 text-white font-bold py-3 rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-200"
                     onClick={onClose}
                 >
                     닫기
