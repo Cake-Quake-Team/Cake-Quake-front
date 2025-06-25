@@ -257,7 +257,7 @@ function BuyerCakeReadPage() {
                     <BestReviewsCarousel
                         reviews={reviews}
                         onCardClick={id =>
-                            navigate(`/shops/${shopId}/cakes/${cakeId}/reviews/${id}`)
+                            navigate(`/buyer/reviews/${id}`)
                         }
                     />
                 ) : (

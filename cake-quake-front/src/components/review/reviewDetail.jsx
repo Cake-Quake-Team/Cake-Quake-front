@@ -33,15 +33,21 @@ export default function ReviewDetail({
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-            {/* 1. 원본 이미지 */}
-            {review.reviewPictureUrl && (
-                <img
-                    src={`http://localhost${review.reviewPictureUrl}`}
-                    alt={`리뷰 이미지 ${review.reviewId}`}
-                    className="w-full h-auto object-contain rounded mb-6"
-                    loading="lazy"
-                />
-            )}
+                 {review.reviewPictureUrl && (
+                     <div className="w-full flex justify-center mb-6">
+                        <img
+                           src={`http://localhost${review.reviewPictureUrl}`}
+                           alt={`리뷰 이미지 ${review.reviewId}`}
+                           loading="lazy"
+                           className="
+                             rounded
+                             object-contain
+                             max-w-full        /* 가로로 가능한 만큼 꽉 채우되 */
+                             max-h-96          /* 세로 최대 24rem(384px)로 제한 */
+                           "
+                         />
+                       </div>
+                 )}
 
             {/* 2. 별점 */}
             <div className="flex items-center text-yellow-500 mb-4">
