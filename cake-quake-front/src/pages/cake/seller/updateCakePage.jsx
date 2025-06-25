@@ -2,9 +2,11 @@ import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router";
 import UpdateCake from "../../../components/cake/itemComponents/updateCakeComponent.jsx";
 import {getCakeDetail, updateCake, getOptionTypes, getOptionItems} from "../../../api/cakeApi.jsx";
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 function CakeUpdatePage() {
-    const {shopId, cakeId} = useParams();
+    const {user} = useAuth()
+    const { cakeId} = useParams();
     const navigate = useNavigate();
 
     // 케이크 기본 정보
@@ -27,7 +29,7 @@ function CakeUpdatePage() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const cake = await getCakeDetail(shopId, cakeId);
+                const cake = await getCakeDetail(user.shopId, cakeId);
 
                 const {
                     cname,
@@ -56,8 +58,8 @@ function CakeUpdatePage() {
                 console.log("초기 선택된 옵션 (setSelectedOptions 직전):", cake.options);
 
                 // 3. 모든 옵션 타입과 모든 옵션 아이템 가져와서 매핑
-                const fetchedOptionTypes = await getOptionTypes(shopId);
-                const fetchedOptionItems = await getOptionItems(shopId);
+                const fetchedOptionTypes = await getOptionTypes(user.shopId);
+                const fetchedOptionItems = await getOptionItems(user.shopId);
                 console.log("모든 옵션 타입 API 응답 (getOptionTypes):", fetchedOptionTypes);
 
                 const mergedOptionTypes = fetchedOptionTypes.map(type => {
@@ -84,7 +86,7 @@ function CakeUpdatePage() {
         };
 
         fetchData();
-    }, [shopId, cakeId]);
+    }, [user.shopId, cakeId]);
 
     // 기본 정보 입력 핸들러
     const handleChange = (e) => {
@@ -169,10 +171,10 @@ function CakeUpdatePage() {
                 }
             });
 
-            await updateCake(shopId, cakeId, formData);
+            await updateCake(user.shopId, cakeId, formData);
 
             alert("케이크 수정 완료!");
-            navigate(`/shops/${shopId}/cakes/read/${cakeId}`);
+            navigate(`/shops/${user.shopId}/cakes/read/${cakeId}`);
 
         } catch (error) {
             console.error("케이크 수정 실패:", error);
@@ -199,7 +201,7 @@ function CakeUpdatePage() {
                 />
                 <div className="flex justify-center mt-6">
                 <Link
-                    to={`/shops/${shopId}/cakes/read/${cakeId}`}
+                    to={`/shops/${user.shopId}/cakes/read/${cakeId}`}
                     className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                 >
                     취소

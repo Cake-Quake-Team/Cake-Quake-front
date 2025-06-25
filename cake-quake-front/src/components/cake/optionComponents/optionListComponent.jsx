@@ -1,7 +1,11 @@
 import React from "react";
 import {Link} from "react-router";
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 function CakeOptionList({ optionTypes = [] }) {
+
+    const {user} = useAuth()
+
     return (
         <div className="my-6 px-4 md:px-0 max-w-6xl mx-auto space-y-4">
             {optionTypes.length === 0 ? (
@@ -20,7 +24,7 @@ function CakeOptionList({ optionTypes = [] }) {
                   <span className="flex items-center text-lg">
                     {optionType.optionType}
                       <Link
-                          to={`shops/${optionType.shopId}/options/read/${optionType.optionTypeId}`}
+                          to={`/shops/${user.shopId}/options/read/${optionType.optionTypeId}`}
                           className="text-orange-300 text-sm ml-4 hover:underline"
                       >
                       상세보기&gt;
@@ -70,7 +74,7 @@ function CakeOptionList({ optionTypes = [] }) {
                                 {/* 옵션 추가 버튼 */}
                                 <div className="border-t border-gray-200 bg-white">
                                     <Link
-                                        to={`shops/${optionType.shopId}/options/add`}
+                                        to={`/shops/${optionType.shopId}/options/add`}
                                         className="text-sm text-gray-400 py-2 px-4 flex items-center hover:underline">
                                         <span className="mr-1">[+]</span> 옵션 추가
                                     </Link>

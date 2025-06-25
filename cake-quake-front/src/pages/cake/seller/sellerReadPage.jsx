@@ -4,9 +4,11 @@ import {List} from "lucide-react";
 import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import {Link, useNavigate, useParams} from "react-router";
 import CakeOptionList from "../../../components/cake/optionComponents/optionListComponent.jsx";
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 function SellerCakeReadPage() {
-    const { shopId, cakeId } = useParams();
+    const {user} = useAuth()
+    const {  cakeId } = useParams();
     const navigate = useNavigate();
     const [cake, setCake] = useState(null); // 케이크 상세 정보
     const [optionTypes, setOptionTypes] = useState([]); // 병합된 최종 옵션 타입 데이터 (CakeDetailComponent로 전달)
@@ -24,7 +26,7 @@ function SellerCakeReadPage() {
             setLoading(true);
             setError(null);
 
-            const data = await getCakeDetail(shopId, cakeId); // 백엔드에서 cakeDetailDTO와 options를 모두 받아옴
+            const data = await getCakeDetail(user.shopId, cakeId); // 백엔드에서 cakeDetailDTO와 options를 모두 받아옴
             setCake(data);
 
             // 백엔드에서 받은 options 데이터를 기반으로 optionTypes를 직접 구성
@@ -110,7 +112,7 @@ function SellerCakeReadPage() {
             try {
                 await deleteCake(cakeId);
                 alert("상품이 삭제되었습니다.");
-                navigate(`/shops/${shopId}`);
+                navigate(`/shops/${user.shopId}`);
             } catch (err) {
                 console.error("상품 삭제 실패:", err);
                 alert("상품 삭제에 실패했습니다.");
@@ -122,9 +124,9 @@ function SellerCakeReadPage() {
         <div>
             <div className="container mx-auto px-6 py-10">
                 <div className="flex items-center justify-center relative mb-3">
-                    {shopId && (
+                    {user.shopId && (
                         <Link
-                            to={`/shops/${shopId}`}
+                            to={`/shops/${user.shopId}`}
                             className="absolute left-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                             title="목록으로"
                         >
@@ -152,9 +154,9 @@ function SellerCakeReadPage() {
                     >
                         삭제
                     </button>
-                    {shopId && (
+                    {user.shopId && (
                         <Link
-                            to={`/shops/${shopId}/cakes/update/${cakeId}`}
+                            to={`/shops/${user.shopId}/cakes/update/${cakeId}`}
                             className="ml-5 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
                         >
                             수정

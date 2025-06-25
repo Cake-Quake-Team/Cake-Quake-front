@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import CakeCard from "../../../components/cake/itemComponents/cakeCard.jsx";
 import { getAllCakeList } from "../../../api/cakeApi.jsx";
 import CakeCategorySelector from "../../../components/cake/itemComponents/categorySelectComponent.jsx";
@@ -15,12 +15,13 @@ const mainCategories = [
 ];
 
 function CakeAllList() {
+    // 상품 목록 관련 상태
     const [cakes, setCakes] = useState([]);
     const [page, setPage] = useState(1);
     const [hasNext, setHasNext] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+    // 카테고리 선택 상태
     const [selectedMainCategory, setSelectedMainCategory] = useState("RECOMMENDED_PRODUCTS");
     const [selectedDetailKeyword, setSelectedDetailKeyword] = useState("LETTERING");
 
@@ -29,57 +30,39 @@ function CakeAllList() {
     const [sort, setSort] = useState("shopId");
     const [keyword, setKeyword] = useState("");
 
-    // ✅ 카테고리 변경 시 초기화 및 즉시 첫 페이지 요청
+    // API 호출을 위한 단일 useEffect
+    // mainCategory, detailKeyword, page가 변경될 때마다 실행
     useEffect(() => {
-        if (selectedMainCategory === "STORE_BY_CATEGORY") return;
+        // '매장별 분류' 카테고리는 케이크 목록을 불러오지 않으므로 실행 중단
+        if (selectedMainCategory === "STORE_BY_CATEGORY") {
+            return;
+        }
 
-        setCakes([]);
-        setPage(1);
-        setHasNext(true);
-        setIsInitialLoad(true);
-        setIsLoading(true); // ✅ 바로 첫 요청 보내기 위해 로딩 시작
+        // 더 이상 불러올 데이터가 없거나, 이미 로딩 중이면 실행 중단
+        // 첫 페이지 로딩(page === 1)은 항상 허용
+        if (!hasNext && page > 1) {
+            return;
+        }
+        if (isLoading) {
+            return;
+        }
 
-        let fetchKeyword =
+        setIsLoading(true);
+
+        const fetchKeyword =
             selectedMainCategory === "CAKE_BY_CATEGORY"
                 ? selectedDetailKeyword
                 : undefined;
 
-        getAllCakeList({ page: 1, keyword: fetchKeyword })
-            .then(data => {
-                setCakes(data.content);
-                setHasNext(data.hasNext);
-                setIsInitialLoad(false);
-            })
-            .catch(err => {
-                console.error("카테고리 변경 시 케이크 로딩 실패", err);
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
-    }, [selectedMainCategory, selectedDetailKeyword]);
-
-
-    // ✅ 케이크 목록 불러오기
-    useEffect(() => {
-        if (selectedMainCategory === "STORE_BY_CATEGORY") return;
-        if (!hasNext || isLoading) return;
-
         const fetchCakes = async () => {
-            setIsLoading(true);
-
-            let fetchKeyword =
-                selectedMainCategory === "CAKE_BY_CATEGORY"
-                    ? selectedDetailKeyword
-                    : undefined;
-
             try {
                 const data = await getAllCakeList({ page, keyword: fetchKeyword });
 
-                setCakes(prev =>
-                    isInitialLoad ? data.content : [...prev, ...data.content]
-                );
+                // 페이지가 1이면(새로운 카테고리/키워드 선택 시) 목록을 초기화
+                // 페이지가 1보다 크면(무한 스크롤) 기존 목록에 추가
+                setCakes(prevCakes => page === 1 ? data.content : [...prevCakes, ...data.content]);
                 setHasNext(data.hasNext);
-                setIsInitialLoad(false);
+
             } catch (err) {
                 console.error("케이크 목록 불러오기 실패", err);
             } finally {
@@ -88,51 +71,49 @@ function CakeAllList() {
         };
 
         fetchCakes();
+
     }, [page, selectedMainCategory, selectedDetailKeyword]);
 
-    // 무한스크롤 로직 (page 바뀔 때마다 다음 페이지 호출)
+
+    // 카테고리 변경 시 상태 초기화
+    // 이 useEffect는 카테고리/키워드 변경 시 page를 1로 재설정하는 역할만 수행
     useEffect(() => {
+        // '매장별 분류'로 전환되면 케이크 목록 상태를 초기화하지 않음
         if (selectedMainCategory === "STORE_BY_CATEGORY") return;
-        if (page === 1 || !hasNext || isLoading || isInitialLoad) return;
 
-        const fetchCakes = async () => {
-            setIsLoading(true);
+        // 카테고리나 키워드가 변경되면 페이지와 목록을 초기화
+        // 이렇게 하면 위 fetch useEffect가 page=1로 다시 실행됨
+        setPage(1);
+        setCakes([]);
+        setHasNext(true);
 
-            let fetchKeyword =
-                selectedMainCategory === "CAKE_BY_CATEGORY"
-                    ? selectedDetailKeyword
-                    : undefined;
-
-            try {
-                const data = await getAllCakeList({ page, keyword: fetchKeyword });
-                setCakes(prev => [...prev, ...data.content]);
-                setHasNext(data.hasNext);
-            } catch (err) {
-                console.error("무한스크롤 케이크 로딩 실패", err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchCakes();
-    }, [page]);
+    }, [selectedMainCategory, selectedDetailKeyword]);
 
 
-    // ✅ 스크롤 감지
+    // 스크롤 이벤트 핸들러 (무한 스크롤 트리거)
     useEffect(() => {
+        // '매장별 분류'에서는 스크롤 이벤트를 감지하지 않음
+        if (selectedMainCategory === "STORE_BY_CATEGORY") return;
+
         const handleScroll = () => {
             const scrollTop = window.scrollY;
             const windowHeight = window.innerHeight;
-            const docHeight = document.body.scrollHeight;
+            const docHeight = document.documentElement.scrollHeight;
 
+            // 스크롤이 바닥에서 300px 이내로 남았고, 더 불러올 데이터가 있으며, 현재 로딩 중이 아닐 때
             if (scrollTop + windowHeight >= docHeight - 300 && hasNext && !isLoading) {
-                setPage(prev => prev + 1);
+                // 다음 페이지를 요청
+                setPage(prevPage => prevPage + 1);
             }
         };
 
         window.addEventListener("scroll", handleScroll);
+
+        // 컴포넌트 언마운트 시 이벤트 리스너 제거
         return () => window.removeEventListener("scroll", handleScroll);
-    }, [hasNext, isLoading]);
+
+    }, [hasNext, isLoading, selectedMainCategory]);
+
 
     return (
         <div className="flex flex-col min-h-screen">
@@ -194,6 +175,11 @@ function CakeAllList() {
                         )}
                         {isLoading && (
                             <div className="text-center text-gray-400 mt-4">불러오는 중입니다...</div>
+                        )}
+                        {!hasNext && cakes.length > 0 && (
+                            <div className="text-center text-gray-400 text-sm mt-8">
+                                모든 상품을 불러왔습니다.
+                            </div>
                         )}
                     </>
                 )}
