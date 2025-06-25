@@ -45,6 +45,7 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnail
                             </div>
                             <button
                                 onClick={() => onImageRemove(index)}
+                                type="button"
                                 className="absolute top-1 right-1 bg-black bg-opacity-50 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-opacity-80"
                                 title="삭제"
                             >

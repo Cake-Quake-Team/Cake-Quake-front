@@ -140,81 +140,42 @@ function CakeUpdatePage() {
         );
     };
 
-    async function uploadImage(file) {
-        const formData = new FormData();
-        formData.append("file", file);
-
-        const response = await fetch("/api/images/upload", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error("이미지 업로드 실패");
-        }
-
-        return await response.json();
-    }
-
-
     // 제출 핸들러
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            // 1. 새 이미지 파일만 업로드
-            const uploadedImages = [];
-            for (const img of images) {
-                if (img.file) {
-                    const result = await uploadImage(img.file); // 업로드
-                    uploadedImages.push({
-                        id: result.id,
-                        src: result.url,
-                        isThumbnail: img.isThumbnail,
-                    });
-                }
-            }
-
-            // 2. 기존 이미지 + 새로 업로드한 이미지 통합
-            const allImages = [
-                ...images.filter((img) => img.id !== null), // 기존 이미지
-                ...uploadedImages,
-            ];
-
-            // 3. 썸네일 ID 찾기
-            const thumbnailImage = allImages.find((img) => img.isThumbnail);
-            const thumbnailImageId = thumbnailImage?.id || null;
-
-            // 4. 최종 이미지 ID 목록
-            const imageIds = allImages.map((img) => img.id);
-
-            // 5. DTO 구성
-            const updateDTOBlob = new Blob(
-                [
-                    JSON.stringify({
-                        cname: updateDTO.cname,
-                        category: updateDTO.category,
-                        price: updateDTO.price,
-                        description: updateDTO.description,
-                        isOnsale: updateDTO.isOnsale,
-                        imageIds: imageIds,
-                        thumbnailImageId: thumbnailImageId,
-                        optionItemIds: selectedOptions.map((opt) => opt.optionItemId),
-                    }),
-                ],
-                { type: "application/json" }
-            );
-
-            // 6. FormData 구성
             const formData = new FormData();
+
+            // updateCakeDTO JSON Blob으로 추가
+            const updateCakeDTO = {
+                cname: updateDTO.cname,
+                category: updateDTO.category,
+                price: updateDTO.price,
+                description: updateDTO.description,
+                isOnsale: updateDTO.isOnsale,
+                imageIds: images.filter(img => img.id !== null).map(img => img.id),
+                thumbnailImageId: images.find(img => img.isThumbnail)?.id || null,
+                optionItemIds: selectedOptions.map(opt => opt.optionItemId),
+            };
+
+            const updateDTOBlob = new Blob([JSON.stringify(updateCakeDTO)], { type: "application/json" });
             formData.append("updateCakeDTO", updateDTOBlob);
 
-            // 7. 최종 요청
+            // 새 이미지 파일들은 newCakeImages로 폼데이터에 추가
+            images.forEach(img => {
+                if (img.file) {
+                    formData.append("newCakeImages", img.file);
+                }
+            });
+
             await updateCake(shopId, cakeId, formData);
+
             alert("케이크 수정 완료!");
             navigate(`/shops/${shopId}/cakes/read/${cakeId}`);
-        } catch (err) {
-            console.error("수정 실패", err);
+
+        } catch (error) {
+            console.error("케이크 수정 실패:", error);
             alert("케이크 수정 중 오류가 발생했습니다.");
         }
     };
