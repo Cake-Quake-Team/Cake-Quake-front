@@ -53,7 +53,7 @@ function OptionAddPage() {
         }
         try {
             const body = { optionType: newOptionTypeName };
-            const result = await addOptionType(shopId, body); // { optionTypeId, optionType }
+            const result = await addOptionType(user.shopId, body); // { optionTypeId, optionType }
             alert('새 옵션 타입이 성공적으로 등록되었습니다.');
             setExistingOptionTypes(prev => [...prev, result]);
             setSelectedOptionType(result.optionType);
