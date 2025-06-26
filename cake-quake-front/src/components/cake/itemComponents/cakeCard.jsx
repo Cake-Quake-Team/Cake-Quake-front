@@ -30,8 +30,8 @@ function CakeCard({ cake,onClick }) {
 
             <div className="text-center p-2">
                 <h3 className="text-sm mb-1">{cname}</h3>
-                <hr className="text-gray-300 mt-2" />
-                <p className="text-gray-700 text-sm mt-2">{price.toLocaleString()}원</p>
+                <hr className="text-gray-200 mt-1" />
+                <p className="text-sm mt-1">{price.toLocaleString()}원</p>
                 {/* 여기에 조회수 or 주문수 or 리뷰수 가 나올 예정*/}
             </div>
         </div>
