@@ -20,6 +20,20 @@ export const getShopDetail=async (shopId)=>{
     return response.data;
 }
 
+//매장별 상품 조회
+export const getShopCakes = async (shopId, category, pageRequestDTO = { page: 1, size: 10 }) => {
+    if (!shopId) throw new Error("shopId가 필요합니다.");
+    const response = await jwtAxios.get(`${prefix}/shops/${shopId}/cakes`, {
+        params: {
+            page: pageRequestDTO.page,
+            size: pageRequestDTO.size,
+            category: category,
+        }
+    });
+
+    return response.data; // content, hasNext 포함된 InfiniteScrollResponseDTO 형태
+};
+
 //공지사항 목록 가져오기
 export const getShopNotices = async (shopId, pageRequest = { page: 1, size: 10 }) => {
     const response = await jwtAxios.get(`${prefix}/shops/${shopId}/notices`, {
