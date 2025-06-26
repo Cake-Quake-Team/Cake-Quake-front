@@ -7,8 +7,8 @@ import { useParams } from "react-router";
 const ORDER_STATUS_OPTIONS = [
     { value: "RESERVATION_PENDING", label: "예약 확인 중" },
     { value: "RESERVATION_CONFIRMED", label: "예약 확정" },
-    { value: "PREPARING", label: "준비 중" }, // DTO에 있다면 추가
-    { value: "READY_FOR_PICKUP", label: "픽업 준비 완료" }, // DTO에 있다면 추가
+    { value: "PREPARING", label: "준비 중" },
+    { value: "READY_FOR_PICKUP", label: "픽업 준비 완료" },
     { value: "PICKUP_COMPLETED", label: "픽업 완료" },
     { value: "RESERVATION_CANCELLED", label: "주문 취소" },
     { value: "NO_SHOW", label: "노쇼" },

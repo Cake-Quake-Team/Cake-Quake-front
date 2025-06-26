@@ -5,11 +5,22 @@ export default function OrderDetail({
                                         order,
                                         onCancel, // 이 props는 주문 취소 로직을 상위 컴포넌트에서 처리할 때 사용
                                         onBack,
-                                        onPay,    // ⭐ 추가: 결제하기 버튼 클릭 핸들러 ⭐
-                                        isPaying  // ⭐ 추가: 결제 진행 중 상태 ⭐
+                                        onPay,    // 추가: 결제하기 버튼 클릭 핸들러
+                                        isPaying  // 추가: 결제 진행 중 상태
                                     }) {
     const [isCancelling, setIsCancelling] = useState(false);
     const navigate = useNavigate();
+
+    // 주문 상태 한글화 함수
+    const orderStatusMap = {
+        RESERVATION_PENDING: '예약 확인 중',
+        RESERVATION_CONFIRMED: '예약 확정',
+        PREPARING: '준비 중',
+        READY_FOR_PICKUP: '픽업 준비 완료',
+        PICKUP_COMPLETED: '픽업 완료',
+        RESERVATION_CANCELLED: '예약 취소',
+        NO_SHOW: '노쇼',
+    };
 
     const handleCancel = async () => {
         const confirmed = window.confirm('정말로 이 주문을 취소하시겠습니까?');
@@ -60,8 +71,6 @@ export default function OrderDetail({
 
     // 주문 취소 불가능한 상태 정의
     const nonCancellableStatuses = [
-        'RESERVATION_CONFIRMED', // 예약 확정 (결제 후)
-        'PREPARING',             // 준비 중
         'READY_FOR_PICKUP',      // 픽업 준비 완료
         'PICKUP_COMPLETED',      // 픽업 완료
         'RESERVATION_CANCELLED', // 이미 취소됨
@@ -78,14 +87,17 @@ export default function OrderDetail({
     // 리뷰 쓰기 버튼 활성화 여부 (일반적으로 픽업 완료 후 가능)
     const isReviewButtonVisible = order.status === 'PICKUP_COMPLETED'; // 'PICKUP_CONFIRMED'는 결제 후 상태이므로, 픽업 완료 시에만 리뷰를 쓰는 것이 일반적.
 
+    // 주문 상태를 한국어로 표시하기 위한 변수
+    const displayStatus = orderStatusMap[order.status] || order.status;
+
     return (
         <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded">
             <h2 className="text-2xl font-bold mb-4">주문 상세 #{order.orderNumber ?? order.orderId}</h2>
 
             <div className="mb-6 space-y-1 text-gray-800">
-                <p><strong>주문 상태:</strong> {order.status}</p>
+                <p><strong>주문 상태:</strong> {displayStatus}</p>
                 <p><strong>픽업 일시:</strong> {formatReservedAt(order.reservedAt)}</p>
-                <p><strong>요청사항:</strong> {order.orderNote || '없음'}</p>
+                <p><strong>요청 사항:</strong> {order.orderNote || '없음'}</p>
             </div>
 
             <div className="border-t pt-4">
