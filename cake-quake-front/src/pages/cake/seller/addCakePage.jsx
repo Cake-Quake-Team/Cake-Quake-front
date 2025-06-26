@@ -3,11 +3,12 @@ import CakeBasicInfoForm from "../../../components/cake/itemComponents/cakeBasic
 import CakeImageUploadForm from "../../../components/cake/itemComponents/cakeImageForm.jsx";
 import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
 import {getOptionTypes, getOptionItems, addCake} from "../../../api/cakeApi.jsx";
-import {Link, useNavigate, useParams} from "react-router";
+import {Link, useNavigate} from "react-router";
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 function CakeAddPage() {
 
-    const {shopId} = useParams();
+    const {user} = useAuth()
     const navigate = useNavigate();
 
     const [addCakeDTO, setAddCakeDTO] = useState({
@@ -27,31 +28,42 @@ function CakeAddPage() {
 
     const handleImageChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
-
-        const newFiles = selectedFiles.map(file => ({
+        const newFiles = selectedFiles.map((file) => ({
             file,
             isThumbnail: false,
         }));
 
-        setCakeImage((prev) => [...prev, ...newFiles]);
+        setCakeImage(prev => {
+            const updated = [...prev, ...newFiles];
 
-        e.target.value = null;
+            // 썸네일 지정이 없다면 첫 번째 이미지 자동 지정
+            const hasThumbnail = updated.some(img => img.isThumbnail);
+            if (!hasThumbnail && updated.length > 0) {
+                updated[0].isThumbnail = true;
+            }
+
+            return updated;
+        });
+
+        e.target.value = null; // input 초기화
     };
 
-    // 썸네일 지정 함수
-    const handleThumbnailSelect = (index) => {
-        setCakeImage(prev =>
-            prev.map((img, i) => ({
-                ...img,
-                isThumbnail: i === index,
-            }))
-        );
-    };
 
     // 이미지 삭제
     const handleImageRemove = (indexToRemove) => {
-        setCakeImage(prev => prev.filter((_, idx) => idx !== indexToRemove));
+        setCakeImage(prev => {
+            const updated = prev.filter((_, idx) => idx !== indexToRemove);
+
+            // 삭제 후 썸네일이 하나도 없다면 첫 번째 걸 썸네일로 지정
+            const hasThumbnail = updated.some(img => img.isThumbnail);
+            if (!hasThumbnail && updated.length > 0) {
+                updated[0].isThumbnail = true;
+            }
+
+            return updated;
+        });
     };
+
 
     // 옵션 상태 및 API 호출
     const [optionTypes, setOptionTypes] = useState([]);
@@ -61,9 +73,9 @@ function CakeAddPage() {
         const fetchOptions = async () => {
             try {
                 // 모든 옵션 타입 가져오기
-                const fetchedOptionTypes = await getOptionTypes(shopId); // 변수명 충돌 피하기 위해 변경
+                const fetchedOptionTypes = await getOptionTypes(user.shopId); // 변수명 충돌 피하기 위해 변경
                 // 모든 옵션 값 가져오기
-                const fetchedOptionItems = await getOptionItems(shopId);
+                const fetchedOptionItems = await getOptionItems(user.shopId);
 
                 // 타입과 아이템 매핑
                 const mergedOptionTypes = fetchedOptionTypes.map(type => {
@@ -88,7 +100,7 @@ function CakeAddPage() {
         };
 
         fetchOptions();
-    }, [shopId]);
+    }, [user.shopId]);
 
     const handleSubmit = async () => {
         try {
@@ -111,7 +123,7 @@ function CakeAddPage() {
             );
 
             if (cakeImage.length > 0) {
-                cakeImage.forEach(img => {
+                cakeImage.forEach((img) => {
                     if (img.file instanceof File) {
                         formData.append("cakeImages", img.file);
                         console.log(`[프론트] FormData에 파일 추가: ${img.file.name}, 크기: ${img.file.size} bytes`);
@@ -131,7 +143,7 @@ function CakeAddPage() {
             console.error("상품 등록 실패", error);
             alert("등록 중 오류 발생");
         }
-        navigate(`/shops/${shopId}`);
+        navigate(`/shops/${user.shopId}`);
     };
 
     return (
@@ -143,12 +155,12 @@ function CakeAddPage() {
                     images={cakeImage}
                     onImageChange={handleImageChange}
                     onImageRemove={handleImageRemove}
-                    onThumbnailSelect={handleThumbnailSelect}
                 />
                 <CakeBasicInfoForm formData={addCakeDTO} onChange={handleChange}/>
                 <CakeOptionForm optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>
+                <div className="mt-6 flex justify-center">
                 <Link
-                    to={`shops/${shopId}`}
+                    to={`/shops/${user.shopId}`}
                     className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
                 >
                     취소
@@ -159,6 +171,7 @@ function CakeAddPage() {
                 >
                     등록
                 </button>
+                </div>
             </div>
         </div>
     );

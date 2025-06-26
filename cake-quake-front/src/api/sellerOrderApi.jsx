@@ -6,10 +6,16 @@ const API_VERSION = "/api/v1"; // ✅ v1을 상수로 분리하여 관리
 const prefix = `${API_SERVER_HOST}${API_VERSION}`; // ✅ prefix에 API_VERSION 포함
 
 // 판매자 주문 목록 조회 (함수명 변경)
-export const getSellerOrderList = async (shopId, params) => { // ✅ 함수명 변경, params 객체 그대로 전달
+export const getSellerOrderList = async (shopId, params) => {
+    // ⭐⭐ 이 부분을 수정합니다: params.status가 "ALL"일 경우 undefined로 설정 ⭐⭐
+    const modifiedParams = { ...params }; // params 객체 복사
+    if (modifiedParams.status === "ALL") {
+        modifiedParams.status = undefined; // 백엔드 @Nullable에 맞춰 undefined로 보냄
+    }
+
     const response = await jwtAxios.get(
-        `${prefix}/shops/${shopId}/orders`, // ✅ prefix 사용
-        { params: params } // ✅ params 객체 그대로 전달 (page, size, status, type 포함)
+        `${prefix}/shops/${shopId}/orders`,
+        { params: modifiedParams } // 수정된 params 객체 전달
     );
     return response.data;
 };

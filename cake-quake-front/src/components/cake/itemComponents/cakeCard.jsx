@@ -12,11 +12,11 @@ function CakeCard({ cake,onClick }) {
     return (
         <div
             onClick={onClick}
-            className="border rounded-xl shadow hover:shadow-lg transition duration-300 overflow-hidden relative">
+            className="hover:shadow-lg transition duration-300 overflow-hidden relative">
             <img
                 src={imgSrc}
                 alt={cname || '케이크 이미지'}
-                className="w-full h-48 object-cover"
+                className="w-full h-64 object-cover"
                 onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = DEFAULT_IMAGE;
@@ -28,9 +28,11 @@ function CakeCard({ cake,onClick }) {
                 </div>
             )}
 
-            <div className="p-4">
-                <h3 className="text-lg font-semibold mb-1">{cname}</h3>
-                <p className="text-gray-700 font-medium">{price.toLocaleString()}원</p>
+            <div className="text-center p-2">
+                <h3 className="text-sm mb-1">{cname}</h3>
+                <hr className="text-gray-200 mt-1" />
+                <p className="text-sm mt-1">{price.toLocaleString()}원</p>
+                {/* 여기에 조회수 or 주문수 or 리뷰수 가 나올 예정*/}
             </div>
         </div>
     );

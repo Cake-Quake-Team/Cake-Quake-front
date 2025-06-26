@@ -1,10 +1,12 @@
 import {Link, useParams} from "react-router";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useRef, useCallback} from "react";
 import {getAllCakeList, getOptionItems, getOptionTypes} from "../../api/cakeApi.jsx";
 import CakeCard from "../../components/cake/itemComponents/cakeCard.jsx";
 import CakeOptionList from "../../components/cake/optionComponents/optionListComponent.jsx";
 import SellerShopDetail from "../../components/shop/sellerShopDetail.jsx";
 import {getShopDetail} from "../../api/shopApi.jsx";
+import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+
 
 // 메인 분류 목록
 const shopCategories = [
@@ -14,9 +16,10 @@ const shopCategories = [
 ];
 
 export default function ShopManagement() {
-
     const [cakes, setCakes] = useState([]);
-    const [page] = useState(1);
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true); // 더 불러올 데이터가 있는지 여부
+    const [loading, setLoading] = useState(false); // 로딩 상태
     const [selectedShopCategory, setSelectedShopCategory] = useState("SHOP_MANAGEMENT");
     const [shopDetail, setShopDetail] = useState(null);
     const {shopId} = useParams();
@@ -48,19 +51,53 @@ export default function ShopManagement() {
         loadShopAndCakes();
     }, [shopId])
 
+    // 무한 스크롤을 위한 Ref
+    const observer = useRef();
+    const lastCakeElementRef = useCallback(node => {
+        if (loading || !hasMore) return; // 이미 로딩 중이거나 더 이상 데이터가 없으면 return
+
+        if (observer.current) observer.current.disconnect();
+
+        observer.current = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && hasMore) {
+                // 맨 아래 요소가 뷰포트에 들어오면 페이지 번호 증가
+                setPage(prevPage => prevPage + 1);
+            }
+        });
+
+        if (node) observer.current.observe(node);
+    }, [loading, hasMore]); // loading과 hasMore 상태가 바뀔 때마다 콜백 함수 재생성
+
     {/*상품 관리 목록 가져오기*/}
     useEffect(() => {
-        // 지금은 레터링케이크 카테고리에 맞는 케이크만 나옴. 매장별 상품 목록으로 바꿔야 함
-        getAllCakeList({page})
-            .then(data => {setCakes(data.content);})
-            .catch(err => {console.error("케이크 목록 불러오기 실패", err);
+        // 로딩 중이거나 더 이상 데이터가 없거나, 다른 카테고리일 경우 실행하지 않음
+        if (loading || !hasMore || selectedShopCategory !== "CAKE_MANAGEMENT") {
+            return;
+        }
+
+        setLoading(true);
+
+        getAllCakeList({page}) // 백엔드 API에 페이지 정보를 전달
+            .then(data => {
+                // 기존 데이터에 새로운 데이터 추가
+                setCakes(prevCakes => [...prevCakes, ...data.content]);
+                setHasMore(data.hasNext);
+            })
+            .catch(err => {
+                console.error("케이크 목록 불러오기 실패", err);
+                setHasMore(false);
+            })
+            .finally(() => {
+                setLoading(false);
             });
-    }, [page]);
+    }, [page, selectedShopCategory, hasMore]);
 
 
 
     {/*옵션 관리 목록 가져오기*/}
     useEffect(() => {
+        if (selectedShopCategory !== "OPTION_MANAGEMENT") return;
+
         const fetchOptions = async () => {
             try {
                 const fetchedOptionTypes = await getOptionTypes(shopId);
@@ -70,7 +107,6 @@ export default function ShopManagement() {
                     const relevantItems = fetchedOptionItems.filter(item =>
                         item.optionTypeId === type.optionTypeId
                     );
-
                     return {
                         optionTypeId: type.optionTypeId,
                         optionType: type.optionType,
@@ -89,7 +125,17 @@ export default function ShopManagement() {
         };
 
         fetchOptions();
-    }, [shopId]);
+    }, [shopId, selectedShopCategory]);
+
+    // 카테고리 변경 시 데이터 초기화
+    useEffect(() => {
+        if (selectedShopCategory === "CAKE_MANAGEMENT") {
+            // 상품 관리 카테고리로 전환될 때만 초기화
+            setCakes([]);
+            setPage(1);
+            setHasMore(true);
+        }
+    }, [selectedShopCategory]);
 
 
     return (

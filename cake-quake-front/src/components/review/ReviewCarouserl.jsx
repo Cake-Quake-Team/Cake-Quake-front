@@ -1,5 +1,5 @@
 // src/components/review/BestReviewsCarousel.jsx
-import React, { useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import ReviewCard from './ReviewCard';
 
@@ -16,6 +16,15 @@ export default function BestReviewsCarousel({ reviews, onCardClick }) {
         const cardWidth = (card?.offsetWidth ?? 0) + gap;
         container.scrollBy({ left: cardWidth * VISIBLE * dir, behavior: 'smooth' });
     };
+
+
+    // 3초마다 자동으로 우측으로 한 페이지씩 스크롤
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            scroll(1);
+        }, 5000);
+        return () => clearInterval(intervalId);
+    }, []); // 빈 배열: 마운트 시 한 번 설정, 언마운트 시 해제
 
     return (
         <div className="relative">

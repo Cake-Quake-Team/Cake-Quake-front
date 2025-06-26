@@ -11,9 +11,11 @@ import {
 } from '../../../api/cakeApi';
 
 import OptionDetail from '../../../components/cake/optionComponents/optionDetailComponent';
+import {useAuth} from "../../../store/AuthContext.jsx";
 
 function OptionReadPage() {
-    const { shopId, optionId } = useParams();
+    const {user} = useAuth()
+    const { optionId } = useParams();
     const navigate = useNavigate();
     const [optionData, setOptionData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -24,7 +26,7 @@ function OptionReadPage() {
     const fetchOptionDetail = async () => {
         try {
             setLoading(true);
-            const numericShopId = Number(shopId); // shopId, optionId는 URL 파라미터이므로 숫자로 변환
+            const numericShopId = Number(user.shopId); // shopId, optionId는 URL 파라미터이므로 숫자로 변환
             const numericOptionId = Number(optionId);
 
             const fetchedOptionType = await getOptionTypeDetail(numericShopId, numericOptionId); // 단일 객체
@@ -49,13 +51,13 @@ function OptionReadPage() {
     };
 
     useEffect(() => {
-        if (!shopId || !optionId) {
+        if (!user.shopId || !optionId) {
             setError("매장 ID 또는 옵션 ID가 없습니다.");
             setLoading(false);
             return;
         }
         fetchOptionDetail(); // 컴포넌트 마운트 시 데이터 로딩
-    }, [shopId, optionId]); // shopId, optionId 변경 시 다시 로딩
+    }, [user.shopId, optionId]); // shopId, optionId 변경 시 다시 로딩
 
     // '취소' or '삭제' 버튼 클릭 핸들러
     const handleDelete = async () => {
@@ -64,9 +66,9 @@ function OptionReadPage() {
         } else {
             if (window.confirm("정말로 이 옵션을 삭제하시겠습니까?")) {
                 try {
-                    await deleteOptionType(Number(shopId), Number(optionId));
+                    await deleteOptionType(Number(user.shopId), Number(optionId));
                     alert("옵션이 삭제되었습니다.");
-                    navigate(`/shops/${shopId}/options`); // 삭제 후 옵션 목록 페이지로 이동
+                    navigate(`/shops/${user.shopId}`);
                 } catch (err) {
                     console.error("옵션 삭제 실패:", err);
                     alert("옵션 삭제에 실패했습니다.");
@@ -89,7 +91,7 @@ function OptionReadPage() {
                     minSelection: updatedDataFromChild.minSelection!== undefined ? updatedDataFromChild.minSelection : 0,
                     maxSelection: updatedDataFromChild.maxSelection !== undefined ? updatedDataFromChild.maxSelection : 1
                 };
-                await updateOptionType(Number(shopId), Number(optionId), updateTypePayload);
+                await updateOptionType(Number(user.shopId), Number(optionId), updateTypePayload);
 
                 // 2. 옵션 항목들 (optionItems) 업데이트 로직
                 const currentOptionItems = optionData?.optionItems || []; // 기존 데이터 안전하게 가져오기
@@ -98,14 +100,14 @@ function OptionReadPage() {
                 for (const item of updatedDataFromChild.optionItems) {
                     if (item.optionItemId && String(item.optionItemId).startsWith('new_')) {
                         // 새로 추가된 항목 (임시 ID가 'new_'로 시작하는 경우)
-                        await addOptionItem(Number(shopId), {
+                        await addOptionItem(Number(user.shopId), {
                             optionTypeId: Number(optionId),
                             optionName: item.optionName,
                             price: item.price
                         });
                     } else if (item.optionItemId && existingItemIds.has(String(item.optionItemId))) {
                         // 기존 항목 (수정)
-                        await updateOptionItem(Number(shopId), Number(item.optionItemId), {
+                        await updateOptionItem(Number(user.shopId), Number(item.optionItemId), {
                             optionName: item.optionName,
                             price: item.price
                         });
@@ -116,7 +118,7 @@ function OptionReadPage() {
                 // existingItemIds에 남아있는 항목들은 삭제된 항목들
                 for (const idToDelete of existingItemIds) {
                     if (!String(idToDelete).startsWith('new_')) { // 임시 ID가 아닌 실제 ID만 삭제
-                        await deleteOptionItem(Number(shopId), Number(idToDelete));
+                        await deleteOptionItem(Number(user.shopId), Number(idToDelete));
                     }
                 }
 
