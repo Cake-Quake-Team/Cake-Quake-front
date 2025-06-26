@@ -51,8 +51,19 @@ function CakeAddPage() {
 
     // 이미지 삭제
     const handleImageRemove = (indexToRemove) => {
-        setCakeImage(prev => prev.filter((_, idx) => idx !== indexToRemove));
+        setCakeImage(prev => {
+            const updated = prev.filter((_, idx) => idx !== indexToRemove);
+
+            // 삭제 후 썸네일이 하나도 없다면 첫 번째 걸 썸네일로 지정
+            const hasThumbnail = updated.some(img => img.isThumbnail);
+            if (!hasThumbnail && updated.length > 0) {
+                updated[0].isThumbnail = true;
+            }
+
+            return updated;
+        });
     };
+
 
     // 옵션 상태 및 API 호출
     const [optionTypes, setOptionTypes] = useState([]);
@@ -112,7 +123,7 @@ function CakeAddPage() {
             );
 
             if (cakeImage.length > 0) {
-                cakeImage.forEach(img => {
+                cakeImage.forEach((img) => {
                     if (img.file instanceof File) {
                         formData.append("cakeImages", img.file);
                         console.log(`[프론트] FormData에 파일 추가: ${img.file.name}, 크기: ${img.file.size} bytes`);
