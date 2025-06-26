@@ -34,7 +34,7 @@ function BuyerCakeReadPage() {
     const [error, setError] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]); // 선택된 옵션 상태
     const [isAddingToCart, setIsAddingToCart] = useState(false); // 장바구니 담기 로딩 상태
-    // ⭐ 모달 상태 추가 ⭐
+    // 모달 상태 추가
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
 
@@ -113,11 +113,11 @@ function BuyerCakeReadPage() {
     }, [cakeId, reviewPage]);
 
 
-    // ⭐ 장바구니 담기 핸들러 수정 ⭐
+    // 장바구니 담기 핸들러 수정
     const handleAddToCart = async () => {
         if (!cake || !cake.cakeDetailDTO || !cake.cakeDetailDTO.cakeId) {
             alert("상품 정보가 불완전합니다. 다시 시도해주세요.");
-            console.error("Cake object, cakeDetailDTO, or cakeId is null/undefined:", cake);
+            //console.error("Cake object, cakeDetailDTO, or cakeId is null/undefined:", cake);
             return;
         }
 
@@ -138,7 +138,7 @@ function BuyerCakeReadPage() {
 
             await addCartItem(cartItemData);
 
-            // ⭐ API 호출 성공 후 모달 띄우기 ⭐
+            // API 호출 성공 후 모달 띄우기
             setModalMessage("상품이 장바구니에 담겼습니다!");
             setShowSuccessModal(true);
 
@@ -151,13 +151,13 @@ function BuyerCakeReadPage() {
         }
     };
 
-    // ⭐ 모달의 '확인' 버튼 클릭 시 호출될 함수 ⭐
+    // 모달의 '확인' 버튼 클릭 시 호출될 함수
     const handleModalConfirm = () => {
         setShowSuccessModal(false); // 모달 닫기
         navigate('/buyer/cart'); // 장바구니 페이지로 이동
     };
 
-    // ⭐ 바로 주문하기 핸들러 추가 ⭐
+    // 바로 주문하기 핸들러 추가
     const handleDirectOrder = () => {
         if (!cake || !cake.cakeDetailDTO || !cake.cakeDetailDTO.cakeId) {
             alert("상품 정보가 불완전하여 바로 주문할 수 없습니다. 다시 시도해주세요.");
@@ -165,10 +165,11 @@ function BuyerCakeReadPage() {
             return;
         }
 
-        // 선택된 옵션 정보와 케이크 정보를 포함하여 주문 생성 페이지로 이동
-        // 주문 생성 페이지는 이 정보를 `location.state`로 받아 처리해야 합니다.
-        // 예시 DTO: { cakeItemId, quantity, options: [{optionItemId, optionCnt}] }
         const itemToOrder = {
+
+            shopId: parseInt(shopId),
+
+            cakeId: cake.cakeDetailDTO.cakeId,
             cakeItemId: cake.cakeDetailDTO.cakeId,
             cname: cake.cakeDetailDTO.cname, // 주문 생성 페이지에서 보여줄 이름
             thumbnailImageUrl: cake.cakeDetailDTO.thumbnailImageUrl, // 주문 생성 페이지에서 보여줄 이미지
@@ -182,10 +183,7 @@ function BuyerCakeReadPage() {
             }))
         };
 
-        // 주문 생성 페이지 경로로 이동. 여기서는 `/buyer/orders/create`를 가정합니다.
-        // `state` 객체에 주문할 상품 정보를 배열 형태로 전달합니다.
-        // 단일 상품이지만, 주문 생성 페이지가 여러 상품을 받을 수 있도록 배열로 보냅니다.
-        navigate('/buyer/orders/create', { state: { selectedItems: [itemToOrder] } });
+     navigate('/buyer/orders/create', { state: { selectedItems: [itemToOrder], shopId: parseInt(shopId) } });
     };
 
 

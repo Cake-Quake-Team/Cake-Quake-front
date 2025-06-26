@@ -12,9 +12,14 @@ const SellerProfilePage = () => {
         // 여기에 주문 확인 API 호출 로직 추가
     };
 
-    const handleViewOrderDetails = (orderId) => {
-        navigate(`/seller/orders/${orderId}`); // 주문 상세 페이지로 이동
+    const handleViewOrderDetails = (shopId, orderId) => { // shopId 파라미터 추가
+        if (shopId && orderId) { // 두 ID가 모두 유효할 때만 이동
+            navigate(`/shops/${shopId}/orders/${orderId}`); // shopId와 orderId 모두 경로에 포함
+        } else {
+            alert("주문 상세 정보를 찾을 수 없습니다. (ID 누락)");
+        }
     };
+
 
     return (
         <div className="min-h-screen bg-gray-50">

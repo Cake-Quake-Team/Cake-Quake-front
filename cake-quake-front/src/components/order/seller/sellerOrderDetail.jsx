@@ -30,7 +30,9 @@ const SellerOrderDetail = ({ order, onStatusChange, isUpdating }) => {
                     {/* ✅ DTO의 buyer 객체 사용 (ordererName, ordererPhone 필드 없음) */}
                     <p><strong>주문 번호:</strong> {order.orderNumber}</p> {/* ✅ orderNumber 사용 */}
                     <p><strong>주문자:</strong> {order.buyer?.uname || '정보 없음'}</p> {/* ✅ order.buyer.uname 사용 */}
-                    <p><strong>연락처:</strong> {order.buyer?.phoneNumber || '정보 없음'}</p> {/* ✅ order.buyer.phoneNumber 사용 */}
+                    <p><strong>연락처:</strong> {order.buyer?.phoneNumber || '정보 없음'}
+                    </p> {/* ✅ order.buyer.phoneNumber 사용 */}
+                    <p className="text-gray-600">요청사항: <span className="font-medium">{order.orderNote || '없음'}</span></p>
                 </div>
                 <div>
                     <h2 className="font-semibold text-lg mb-2">픽업 및 결제 정보</h2>

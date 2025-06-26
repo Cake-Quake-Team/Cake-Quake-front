@@ -24,7 +24,7 @@ export default function OrderListItem({ order }) {
     // 주문 상태 한글화 함수 (OrderDetail에서 가져오거나 공통 유틸로 빼기)
     const getStatusKorean = (status) => {
         switch (status) {
-            case 'RESERVATION_PENDING': return '예약 대기';
+            case 'RESERVATION_PENDING': return '예약 확인 중';
             case 'RESERVATION_CONFIRMED': return '예약 확정';
             case 'PREPARING': return '준비 중';
             case 'READY_FOR_PICKUP': return '픽업 준비 완료';
