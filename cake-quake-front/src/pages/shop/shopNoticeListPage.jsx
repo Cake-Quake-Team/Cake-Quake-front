@@ -133,7 +133,7 @@ const ShopNoticeListPage = () => {
             <div className="flex justify-between items-center mb-8">
                 <div className="flex justify-between items-center mb-8">
                 <span
-                    onClick={() => navigate(`/shops/read/${cid}`)}
+                    onClick={() => navigate(`/shops/${cid}`)}
                     className="flex items-center text-gray-500 hover:text-blue-600 cursor-pointer text-sm transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />

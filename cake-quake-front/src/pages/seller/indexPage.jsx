@@ -4,7 +4,9 @@ import {getAllCakeList, getOptionItems, getOptionTypes} from "../../api/cakeApi.
 import CakeCard from "../../components/cake/itemComponents/cakeCard.jsx";
 import CakeOptionList from "../../components/cake/optionComponents/optionListComponent.jsx";
 import SellerShopDetail from "../../components/shop/sellerShopDetail.jsx";
+import {getShopDetail} from "../../api/shopApi.jsx";
 import LoadingSpinner from "../../components/common/LoadingSpinner.jsx";
+
 
 // 메인 분류 목록
 const shopCategories = [
@@ -19,6 +21,35 @@ export default function ShopManagement() {
     const [hasMore, setHasMore] = useState(true); // 더 불러올 데이터가 있는지 여부
     const [loading, setLoading] = useState(false); // 로딩 상태
     const [selectedShopCategory, setSelectedShopCategory] = useState("SHOP_MANAGEMENT");
+    const [shopDetail, setShopDetail] = useState(null);
+    const {shopId} = useParams();
+    const [optionTypes, setOptionTypes] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState([]);
+
+    useEffect(() => {
+        const loadShopAndCakes = async () => {
+            if (!shopId) return; // shopId가 없으면 실행하지 않습니다.
+
+            try {
+                // shopId를 사용하여 매장 상세 정보를 불러옵니다.
+                const detailData = await getShopDetail(shopId);
+                setShopDetail(detailData);
+
+                // 매장 상세 정보 안에 케이크 목록이 있다면, cakes 상태에 설정합니다.
+                if (detailData && detailData.cakes) {
+                    setCakes(detailData.cakes);
+                } else {
+                    setCakes([]); // 케이크가 없으면 빈 배열로 설정합니다.
+                }
+            } catch (err) {
+                console.error("매장 상세 정보 또는 케이크 목록 불러오기 실패", err);
+                setCakes([]); // 에러 발생 시 케이크 목록 초기화
+                setShopDetail(null); // 에러 발생 시 매장 상세 정보 초기화
+            }
+        };
+
+        loadShopAndCakes();
+    }, [shopId])
 
     // 무한 스크롤을 위한 Ref
     const observer = useRef();
@@ -61,9 +92,7 @@ export default function ShopManagement() {
             });
     }, [page, selectedShopCategory, hasMore]);
 
-    const {shopId} = useParams();
-    const [optionTypes, setOptionTypes] = useState([]);
-    const [selectedOptions, setSelectedOptions] = useState([]);
+
 
     {/*옵션 관리 목록 가져오기*/}
     useEffect(() => {
@@ -108,6 +137,7 @@ export default function ShopManagement() {
         }
     }, [selectedShopCategory]);
 
+
     return (
         <>
             <div style={{ padding: "1rem" }} className="mt-3">
@@ -149,40 +179,26 @@ export default function ShopManagement() {
                     )}
                     {/*카테고리가 상품관리일 경우*/}
                     {selectedShopCategory === "CAKE_MANAGEMENT" && (
-                        <>
+                        <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
                             {cakes.length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                    {cakes.map((cake, index) => {
-                                        if (cakes.length === index + 1) {
-                                            return (
-                                                <Link to={`cakes/read/${cake.cakeId}`} ref={lastCakeElementRef} key={cake.cakeId}>
-                                                    <CakeCard cake={cake}/>
-                                                </Link>
-                                            );
-                                        } else {
-                                            return (
-                                                <Link to={`cakes/read/${cake.cakeId}`} key={cake.cakeId}>
-                                                    <CakeCard cake={cake}/>
-                                                </Link>
-                                            );
-                                        }
-                                    })}
+                                    {cakes.map(cake => (
+                                        <Link to={`cakes/read/${cake.cakeId}`} key={`${shopId}-${cake.cakeId}`}>
+                                            <CakeCard
+                                                cake={cake}
+                                                // Link 컴포넌트가 페이지 이동을 담당하므로 onClick은 선택 사항입니다.
+                                                // 특정 로직이 필요하다면 handleCardClick(cake.cakeId)를 사용할 수 있습니다.
+                                                // onClick={() => handleCardClick(cake.cakeId)}
+                                            />
+                                        </Link>
+                                    ))}
                                 </div>
                             ) : (
-                                // 데이터가 없고 로딩 중이 아닐 때만 표시
-                                !loading && (
-                                    <div className="text-center text-gray-500 text-lg mt-10">
-                                        선택하신 분류에 해당하는 케이크가 없습니다. 🍰
-                                    </div>
-                                )
-                            )}
-                            {/* 로딩 스피너 */}
-                            {loading && (
-                                <div className="flex justify-center mt-8">
-                                    <LoadingSpinner />
+                                <div className="text-center text-gray-500 text-lg mt-10">
+                                    선택하신 분류에 해당하는 케이크가 없습니다. 🍰
                                 </div>
                             )}
-                        </>
+                        </div>
                     )}
                     {selectedShopCategory === "OPTION_MANAGEMENT" && (
                         optionTypes.length > 0 ? (

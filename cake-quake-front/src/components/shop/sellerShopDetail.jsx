@@ -58,7 +58,7 @@ const SellerShopDetail = ({ className }) => {
 
     const handleViewAllNotices = () => {
         if (shopDetail && shopDetail.shopId) {
-            navigate(`/shops/${shopDetail.shopId}/notices`);
+            navigate(`/shops/read/${shopDetail.shopId}/notices`);
         }
     };
 
