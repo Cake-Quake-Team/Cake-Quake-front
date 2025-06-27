@@ -50,7 +50,7 @@ export default function DeletionRequestAdminPage() {
     const handleApprove = async id => {
         try {
             await approveDeletionRequest(id);
-            setRequests(prev => prev.filter(r => r.requestId !== id));
+            setRequests(prev => prev.filter(r => r.reviewId !== id));
         } catch (err) {
             console.error(err);
             if (err.response?.status === 401) {
@@ -64,7 +64,7 @@ export default function DeletionRequestAdminPage() {
     const handleReject = async id => {
         try {
             await rejectDeletionRequest(id);
-            setRequests(prev => prev.filter(r => r.requestId !== id));
+            setRequests(prev => prev.filter(r => r.reviewId !== id));
         } catch (err) {
             console.error(err);
             if (err.response?.status === 401) {
@@ -103,13 +103,13 @@ export default function DeletionRequestAdminPage() {
                         </div>
                         <div className="space-y-2">
                             <button
-                                onClick={() => handleApprove(r.requestId)}
+                                onClick={() => handleApprove(r.reviewId)}
                                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                             >
                                 승인
                             </button>
                             <button
-                                onClick={() => handleReject(r.requestId)}
+                                onClick={() => handleReject(r.reviewId)}
                                 className="px-4 py-2 border border-red-500 text-red-500 rounded hover:bg-red-50"
                             >
                                 거절
