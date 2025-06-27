@@ -157,9 +157,18 @@ const SignupSellersStep1Page = () => {
             setErrorMessage("사업자 등록번호, 대표자명, 개업일자를 모두 입력해주세요.")
             return
         }
-        if (!businessNumberRegex.test(businessNumber)) return "사업자 등록번호는 10자리 숫자여야 합니다."
-        if (!bossNameRegex.test(bossName)) return "대표자명은 한글 또는 영문만 입력 가능합니다."
-        if (!openingDateRegex.test(openingDate)) return "개업일자는 YYYYMMDD 형식의 8자리 숫자여야 합니다."
+        if (!businessNumberRegex.test(businessNumber)) {
+            setErrorMessage("사업자 등록번호는 '-', 공백 없이 10자리 숫자여야 합니다.")
+            return
+        }
+        if (!bossNameRegex.test(bossName)) {
+            setErrorMessage("대표자명은 한글 또는 영문만 입력 가능합니다.")
+            return
+        }
+        if (!openingDateRegex.test(openingDate)) {
+            setErrorMessage("개업일자는 YYYYMMDD 형식의 8자리 숫자여야 합니다.")
+            return
+        }
 
         const businessData = {
             businessNumber,
