@@ -52,7 +52,7 @@ const PendingSellerListPage = () => {
         retry: false
     })
    
-    const { isFetching, data, error } = query;
+    const { isFetching, data, error } = query
     console.log("page data: ", data)
 
     // 승인 버튼 클릭 핸들러

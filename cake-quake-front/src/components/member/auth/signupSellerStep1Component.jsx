@@ -122,7 +122,7 @@ const SignupSellerStep1Component = ({
                             name="businessNumber"
                             value={businessNumber}
                             onChange={handleChange}
-                            placeholder="사업자등록번호"
+                            placeholder="사업자등록번호(숫자10자리)"
                             className="w-full p-2 border rounded-lg"
                             ref={inputRefs.businessNumber}
                         />
