@@ -30,19 +30,35 @@ export default function AdminLayout() {
                     <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 text-2xl hover:text-gray-300 transition-colors duration-200">
                         ☰
                     </button>
-                    <div className="relative flex items-center">
+                    {/* <div className="relative flex items-center">
                         <input
                             type="text"
                             placeholder="Search"
                             className="border border-gray-300 rounded-full px-4 py-1 pl-8 w-64 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-300"
                         />
                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 ">
-                        <Search className="w-5 h-5 cursor-pointer" />
-                    </span>
-                    </div>
+                            <Search className="w-5 h-5 cursor-pointer" />
+                        </span>
+                    </div> */}
+                    <Link to="/buyer">
+                        <h1 className="text-2xl font-bold">Cake Quake</h1>
+                    </Link>
                 </div>
 
-                {/* 로그아웃이 보이게 교체 예정 */}
+                {/* 로그아웃 버튼 */}
+                {user && (
+                    <div className="text-sm font-semibold bg-gray-200 text-gray-700 px-3 py-1 rounded-full flex justify-end mt-4 mb-2 hover:bg-gray-400">
+                        <button
+                            onClick={() => {
+                                setSidebarOpen(false)
+                                handleSignOut()
+                            }}
+                            
+                            >
+                            로그아웃({user.userId})
+                        </button>
+                    </div>
+                )}
             </header>
 
             {/* 본문: 사이드바 + 메인 컨텐츠 */}

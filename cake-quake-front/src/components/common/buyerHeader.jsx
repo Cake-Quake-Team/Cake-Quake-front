@@ -22,9 +22,9 @@ function BuyerHeader() {
                 {/* Logo */}
                 <div className="flex items-center gap-2">
                     {user?.role === "BUYER" && (
-                    <Link to="/buyer">
-                    <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
-                    </Link>
+                        <Link to="/buyer">
+                            <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
+                        </Link>
                     )}
                     {user?.role === "SELLER" && (
                         <Link to={`shops/${user.shopId}`}>
@@ -38,11 +38,9 @@ function BuyerHeader() {
                     )}
                     {user?.role === "SELLER" && (
                          <Link to={`shops/${user.shopId}`}>
-                        <h1 className="text-2xl font-bold">Cake Quake</h1>
+                            <h1 className="text-2xl font-bold">Cake Quake</h1>
                         </Link>
                     )}
-
-
                 </div>
 
                 <div className="flex items-center space-x-4">
@@ -62,10 +60,10 @@ function BuyerHeader() {
 
                     {/* 장바구니 - BUYER만 보임*/}
                     {user?.role === "BUYER" && (
-                    <ShoppingCart
-                        className="w-5 h-5 cursor-pointer"
-                        onClick={() => navigate('/buyer/cart')}
-                    />
+                        <ShoppingCart
+                            className="w-5 h-5 cursor-pointer"
+                            onClick={() => navigate('/buyer/cart')}
+                        />
                     )}
 
 
@@ -142,13 +140,23 @@ function BuyerHeader() {
                 <nav className="flex flex-col p-4 space-y-4">
                     {user ? (
                         <>
-                            <Link
-                                to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
-                                onClick={() => setSidebarOpen(false)}
-                                className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
-                            >
-                                마이페이지
-                            </Link>
+                            {user.role !== "ADMIN" && (
+                                <Link
+                                    to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
+                                    onClick={() => setSidebarOpen(false)}
+                                    className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                                >
+                                    마이페이지
+                                </Link>
+                            )}
+                            {user.role === "ADMIN" && (
+                                <Link
+                                    to="/admin"
+                                    className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                                >
+                                    관리자 페이지
+                                </Link>
+                            )}
                             <button
                                 onClick={() => {
                                     setSidebarOpen(false);
