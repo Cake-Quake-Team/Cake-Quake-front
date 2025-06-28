@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/admin/procurement/AdminProcurementListPage.jsx
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router';
-import {
-    getAllRequests,
-    getRequestByStatus
-} from '../../api/procurementApi.jsx';
-import { AdminProcurementList } from '../../components/procurement/adminProcurementList.jsx';
+
+import { getAllRequests, getRequestByStatus } from '../../api/procurementApi.jsx';
+import {AdminProcurementList} from "../../components/procurement/adminProcurementList.jsx";
 
 const STATUS_OPTIONS = [
-    { value: '', label: '전체' },
     { value: 'REQUESTED', label: '요청됨' },
     { value: 'SCHEDULED', label: '일정지정' },
-    { value: 'SHIPPED', label: '발송됨' },
+    { value: 'SHIPPED',   label: '발송됨' },
     { value: 'DELIVERED', label: '도착완료' },
     { value: 'CANCELLED', label: '취소됨' },
 ];
@@ -18,67 +16,160 @@ const STATUS_OPTIONS = [
 export default function AdminProcurementListPage() {
     const navigate = useNavigate();
 
-    const [status, setStatus]   = useState('');
+    // 필터/그룹화 상태
+    const [selectedStatuses, setSelectedStatuses] = useState([]);
+    const [groupBy,          setGroupBy]          = useState('date');    // 'date' | 'shop'
+    const [selectedDate,     setSelectedDate]     = useState('');        // yyyy-MM-dd
+
+    // API 데이터
     const [requests, setRequests] = useState([]);
-    const [page, setPage]       = useState(1);
-    const [hasNext, setHasNext] = useState(false);
+    const [page,     setPage]     = useState(1);
+    const [hasMore,  setHasMore]  = useState(false);
+    const [loading,  setLoading]  = useState(false);
 
-    // 1) 상태 변경 시 목록 초기화
-    useEffect(() => {
-        setRequests([]);
+    // 무한스크롤 옵저버
+    const observer = useRef();
+    const lastRef = useCallback(node => {
+        if (loading) return;
+        observer.current?.disconnect();
+        observer.current = new IntersectionObserver(([entry]) => {
+            if (entry.isIntersecting && hasMore) setPage(p => p + 1);
+        });
+        if (node) observer.current.observe(node);
+    }, [loading, hasMore]);
+
+    // 상태 토글
+    const toggleStatus = value => {
         setPage(1);
-        loadPage(1, true);
-    }, [status]);
-
-    // 2) 페이지 로드 함수 (append 여부 자동 판단)
-    const loadPage = async (pageToLoad = page, reset = false) => {
-        try {
-            const params = { page: pageToLoad, size: 10 };
-            const res = status
-                ? await getRequestByStatus(status, params)
-                : await getAllRequests(params);
-
-            setRequests(prev =>
-                reset
-                    ? res.content
-                    : [...prev, ...res.content]
-            );
-            setHasNext(res.hasNext);
-            setPage(pageToLoad + 1);
-        } catch (err) {
-            console.error('관리자 발주 목록 로딩 실패', err);
-        }
+        setRequests([]);
+        setSelectedStatuses(prev =>
+            prev.includes(value)
+                ? prev.filter(v => v !== value)
+                : [...prev, value]
+        );
     };
 
-    const handleClickItem = id => {
+    // 페이지나 필터(상태/날짜) 변경 시 재로딩
+    useEffect(() => {
+        setLoading(true);
+
+        const params = { page, size: 10 };
+        const fetcher = selectedStatuses.length === 1
+            ? () => getRequestByStatus(selectedStatuses[0], params)
+            : () => getAllRequests(params);
+
+        fetcher()
+            .then(res => {
+                let data = res.content;
+
+                // 다중 상태 필터링
+                if (selectedStatuses.length > 1) {
+                    data = data.filter(r => selectedStatuses.includes(r.status));
+                }
+
+                // 요청일 필터링 (groupBy==='date' 모드에서만)
+                if (groupBy === 'date' && selectedDate) {
+                    data = data.filter(r =>
+                        r.regDate.slice(0,10) === selectedDate
+                    );
+                }
+
+                setRequests(prev =>
+                    page === 1 ? data : [...prev, ...data]
+                );
+                setHasMore(res.hasNext);
+            })
+            .catch(err => console.error('관리자 발주 목록 로딩 실패', err))
+            .finally(() => setLoading(false));
+    }, [page, selectedStatuses, groupBy, selectedDate]);
+
+    // 발주 상세 이동
+    const handleClickItem = id =>
         navigate(`/admin/procurements/${id}/confirm`);
-    };
 
     return (
-        <div className="container mx-auto p-4 space-y-4">
-            <h1 className="text-3xl">전체 발주 목록 (Admin)</h1>
 
-            <div>
-                <label className="mr-2 font-medium">상태 필터:</label>
-                <select
-                    value={status}
-                    onChange={e => setStatus(e.target.value)}
-                    className="border rounded px-2 py-1"
-                >
-                    {STATUS_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                        </option>
-                    ))}
-                </select>
+            <div className="container mx-auto p-4 space-y-6">
+                <h1 className="text-3xl font-bold">전체 발주 목록 (Admin)</h1>
+
+                {/** ── 필터·그룹화 박스 ── **/}
+                <div className="bg-white border border-gray-200 shadow rounded-lg p-4 space-y-4">
+                    {/* 상태 체크박스 */}
+                    <div className="flex flex-wrap gap-4">
+                        {STATUS_OPTIONS.map(opt => (
+                            <label key={opt.value} className="inline-flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedStatuses.includes(opt.value)}
+                                    onChange={() => toggleStatus(opt.value)}
+                                    className="form-checkbox h-4 w-4 text-indigo-600"
+                                />
+                                <span className="text-sm text-gray-700">{opt.label}</span>
+                            </label>
+                        ))}
+                    </div>
+
+                    {/* 그룹화 라디오 + 날짜 선택(날짜별 모드일 때만) */}
+                    <div className="flex flex-wrap items-center gap-6">
+                        <label className="inline-flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                name="groupBy"
+                                value="date"
+                                checked={groupBy === 'date'}
+                                onChange={() => setGroupBy('date')}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                            />
+                            <span className="text-sm text-gray-700">요청일별 묶기</span>
+                        </label>
+                        <label className="inline-flex items-center space-x-2">
+                            <input
+                                type="radio"
+                                name="groupBy"
+                                value="shop"
+                                checked={groupBy === 'shop'}
+                                onChange={() => {
+                                    setGroupBy('shop');
+                                    setSelectedDate('');  // 날짜 필터 초기화
+                                }}
+                                className="form-radio h-4 w-4 text-indigo-600"
+                            />
+                            <span className="text-sm text-gray-700">매장별 묶기</span>
+                        </label>
+
+                        {groupBy === 'date' && (
+                            <div className="inline-flex items-center space-x-2">
+                                <label className="text-sm text-gray-700">날짜 선택:</label>
+                                <input
+                                    type="date"
+                                    value={selectedDate}
+                                    onChange={e => {
+                                        setPage(1);
+                                        setSelectedDate(e.target.value);
+                                    }}
+                                    className="border rounded px-2 py-1 text-sm"
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/** ── 리스트 & 무한스크롤 ── **/}
+                <AdminProcurementList
+                    requests={requests}
+                    hasNext={hasMore}
+                    onLoadMore={() => setPage(p => p + 1)}
+                    onClickItem={handleClickItem}
+                    groupBy={groupBy}
+                />
+                <div ref={lastRef}></div>
+
+                {/** ── 로딩/끝 안내 ── **/}
+                <div className="text-center text-gray-500">
+                    {loading && <p>불러오는 중…</p>}
+                    {!hasMore && !loading && <p>모든 발주를 불러왔습니다.</p>}
+                </div>
             </div>
 
-            <AdminProcurementList
-                requests={requests}
-                hasNext={hasNext}
-                onLoadMore={() => loadPage()}
-                onClickItem={handleClickItem}
-            />
-        </div>
     );
 }
