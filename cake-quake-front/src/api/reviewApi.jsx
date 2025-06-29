@@ -1,6 +1,5 @@
 
 import jwtAxios from "../utils/jwtUtil.js";
-import axios from "axios";
 
 
 export const API_SERVER_HOST = "http://localhost:8080";
