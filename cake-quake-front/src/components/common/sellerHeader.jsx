@@ -31,7 +31,7 @@ export default function SellerHeader() {
                     {/* 가게 리뷰 수 */}
                     <Link to={`/shops/${shopId}/reviews`}>
                         <li className={`${currentPath === `/shops/${shopId}/reviews` ? 'text-black font-semibold' : 'hover:text-black'} cursor-pointer`}>
-                            가게 리뷰 수<br /><span className="text-xs text-gray-400">Subheading</span>
+                            가게 리뷰<br /><span className="text-xs text-gray-400">Subheading</span>
                         </li>
                     </Link>
                     <div className="relative after:content-[''] after:absolute after:left-1/2 after:top-0 after:h-full after:w-px after:bg-gray-400" />
