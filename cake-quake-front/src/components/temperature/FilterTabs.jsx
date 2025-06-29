@@ -1,6 +1,7 @@
 const tab=[
     {key :"all",label: "--" },
     {key :"REVIEW_WRITTEN",label: "리뷰 작성" },
+    {key :"PICKUP_COMPLETED",label: "픽업 완료" },
     {key :"RESERVATION_CANCELLED",label: "예약 취소" },
     {key :"NO_SHOW",label: "노쇼" },
     {key :"ADMIN_ADJUSTMENT",label: "관리자" },
