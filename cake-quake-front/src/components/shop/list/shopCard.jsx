@@ -41,8 +41,8 @@ const ShopCard = ({ shop }) => {
     };
 
     return (
-        <div className="border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full bg-white">
-            <div className="relative w-full h-48 overflow-hidden">
+        <div className="bg-white p-6 rounded-3xl interactive-card">
+        <div className="relative w-full h-48 overflow-hidden">
                 <img
                     src={`http://localhost/${imgSrc}`}
                     alt={shopName}

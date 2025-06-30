@@ -134,16 +134,14 @@ const ShopList = ({ filter, sort, keyword }) => { // props로 filter, sort, keyw
                             boxSizing: 'border-box',
                             textDecoration: 'none',
                             color: 'inherit',
-                            transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                            transition: 'transform 0.2s ease-in-out,0.2s ease-in-out',
                             cursor: 'pointer'
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-5px)';
-                            e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.2)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = 'none';
                         }}
                     >
                         <ShopCard shop={shop} />
