@@ -7,10 +7,10 @@ export default function SellerHeader() {
     const currentPath = location.pathname;
 
     const menus = [
-        { label: '매장 관리', path: `/shops/${shopId}` },
-        { label: '총 판매량', path: `/shops/${shopId}/sales` },
-        { label: '가게 리뷰 수', path: `/shops/${shopId}/reviews` },
-        { label: '거래 내역', path: `/shops/${shopId}/orders` },
+        { label: '매장 관리', path: `/shops/${shopId}`, sub: 'Store Management' },
+        { label: '총 판매량', path: `/shops/${shopId}/sales`, sub: 'Total Sales'},
+        { label: '가게 리뷰 수', path: `/shops/${shopId}/reviews`, sub: 'Store Reviews' },
+        { label: '거래 내역', path: `/shops/${shopId}/orders` , sub: 'Order History' },
     ];
 
     const containerRef = useRef(null);
@@ -42,7 +42,7 @@ export default function SellerHeader() {
                 >
                     {/* 밑줄 */}
                     <span
-                        className="absolute bottom-2 h-[2px] bg-black transition-all duration-300 ease-in-out"
+                        className="absolute bottom-2 h-[1.5px] bg-black transition-all duration-300 ease-in-out"
                         style={{ left: underlineStyle.left, width: underlineStyle.width }}
                     />
 
@@ -58,7 +58,7 @@ export default function SellerHeader() {
                         >
                             <Link to={menu.path}>
                                 <div>{menu.label}</div>
-                                <div className="text-xs text-gray-400">Subheading</div>
+                                <div className="text-xs text-gray-400">{menu.sub}</div>
                             </Link>
 
                             {/* 세로선: 마지막은 제외 */}

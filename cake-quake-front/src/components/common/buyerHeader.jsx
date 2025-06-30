@@ -23,12 +23,12 @@ function BuyerHeader() {
                 <div className="flex items-center gap-2">
                     {user?.role === "BUYER" && (
                         <Link to="/buyer">
-                            <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
+                            <img src="/logo.png" alt="Cake Quake Logo" className="w-15 h-15" />
                         </Link>
                     )}
                     {user?.role === "SELLER" && (
                         <Link to={`shops/${user.shopId}`}>
-                            <img src="/logo.png" alt="Cake Quake Logo" className="w-10 h-10" />
+                            <img src="/logo.png" alt="Cake Quake Logo" className="w-15 h-15" />
                         </Link>
                     )}
                     {user?.role === "BUYER" && (
