@@ -28,9 +28,11 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
 
     // 상태 배지 클래스
     const statusClasses = {
-        REQUESTED:  'bg-yellow-100 text-yellow-800',
-        SCHEDULED:  'bg-green-100  text-green-800',
-        CANCELLED:  'bg-red-100    text-red-800'
+        REQUESTED: 'bg-yellow-100 text-yellow-800',
+        COMPLETED: 'bg-green-100 text-green-800',
+        SHIPPED:   'bg-blue-100 text-blue-800',
+        DELIVERED: 'bg-indigo-100 text-indigo-800',
+        CANCELLED: 'bg-red-100 text-red-800',
     };
     const statusClass = statusClasses[status] || 'bg-gray-100 text-gray-800';
 
@@ -93,21 +95,19 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
                         </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
-                        {items.map(({ itemId, ingredientName, unit, quantity, pricePerUnit }) => {
-                            const unitPrice = pricePerUnit ?? 0;          // ▶ undefined 방어
-                            const qty       = quantity ?? 0;
-                            const subTotal  = unitPrice * qty;             // ▶ 단가×수량
+                        {items.map(({ itemId, ingredientName, unit, quantity, unitPrice }) => {
+                            const price   = unitPrice ?? 0;
+                            const qty     = quantity ?? 0;
+                            const subTotal = price * qty;
                             return (
                                 <tr key={itemId} className="hover:bg-gray-50">
                                     <td className="px-4 py-3">{ingredientName}</td>
                                     <td className="px-4 py-3 text-right">{qty}</td>
                                     <td className="px-4 py-3">{unit}</td>
                                     <td className="px-4 py-3 text-right">
-                                        {/* ▶ unitPrice 기본 0 처리 후 포맷 */}
-                                        {unitPrice.toLocaleString()}원
+                                        {price.toLocaleString()}원
                                     </td>
                                     <td className="px-4 py-3 text-right font-medium">
-                                        {/* ▶ subTotal 기본 0 처리 후 포맷 */}
                                         {subTotal.toLocaleString()}원
                                     </td>
                                 </tr>
@@ -120,8 +120,7 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
                                 총 발주 금액
                             </td>
                             <td className="px-4 py-2 text-right font-bold text-indigo-600">
-                                {/* ▶ 페이지에서 전달된 totalPrice도 0 기본값 */}
-                                { (totalPrice ?? 0).toLocaleString() }원
+                                {(totalPrice ?? 0).toLocaleString()}원
                             </td>
                         </tr>
                         </tfoot>
@@ -143,13 +142,13 @@ ProcurementDetailComponent.propTypes = {
         scheduleDate:   PropTypes.string,
         items: PropTypes.arrayOf(
             PropTypes.shape({
-                itemId:        PropTypes.number.isRequired,
-                ingredientName:PropTypes.string.isRequired,
-                unit:          PropTypes.string.isRequired,
-                quantity:      PropTypes.number.isRequired,
-                pricePerUnit:  PropTypes.number,           // ▶ optional 로 변경 가능
+                itemId:         PropTypes.number.isRequired,
+                ingredientName: PropTypes.string.isRequired,
+                unit:           PropTypes.string.isRequired,
+                quantity:       PropTypes.number.isRequired,
+                unitPrice:      PropTypes.number,  // 스냅샷으로 저장된 단가
             })
         ).isRequired,
     }).isRequired,
-    totalPrice: PropTypes.number,                     // ▶ optional 로 변경 가능
+    totalPrice: PropTypes.number,
 };

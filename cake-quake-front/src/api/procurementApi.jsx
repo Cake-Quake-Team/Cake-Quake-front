@@ -57,11 +57,11 @@ export const cancelRequestBySeller = async (shopId,procurementId, {reason}) =>{
 }
 
 // -------------------관리자 관련 발주
-//관리자 발주 확정(일정 지정)
-export const confirmRequest =async (procurementId, {scheduledDate}) =>{
-    const res =await jwtAxios.post(`${prefix}/procurements/${procurementId}/confirm`,{scheduledDate});
-    return res.data
-}
+// //관리자 발주 확정(일정 지정)
+// export const confirmRequest =async (procurementId, {scheduledDate}) =>{
+//     const res =await jwtAxios.post(`${prefix}/procurements/${procurementId}/confirm`,{scheduledDate});
+//     return res.data
+// }
 
 
 //관리자: 단건 발주 조회

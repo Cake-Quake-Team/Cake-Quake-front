@@ -27,8 +27,9 @@ export function ProcurementCreateComponent({
 
             {/* 아이템 목록 */}
             {items.map((it, idx) => {
-                const ing = ingredients.find(x => x.ingredientId === Number(it.ingredientId));
-                const unitPrice = ing?.pricePerUnit || 0;
+                const ing       = ingredients.find(x => x.ingredientId === Number(it.ingredientId));
+                const unitPrice = ing?.pricePerUnit  || 0;
+                const stock     = ing?.stockQuantity || 0;
                 const qty       = Number(it.quantity) || 0;
                 const subTotal  = unitPrice * qty;
 
@@ -60,9 +61,14 @@ export function ProcurementCreateComponent({
                             required
                         />
 
-                        {/* 단위당 가격 */}
+                        {/* 단위당 가격 + 남은 재고 */}
                         <div className="col-span-2 text-right text-gray-700">
-                            {unitPrice.toLocaleString()}원/단위
+                            <div>
+                                {unitPrice.toLocaleString()}원/단위
+                            </div>
+                            <div className="text-xs text-gray-500">
+                                재고: {stock.toLocaleString()}{ing?.unit}
+                            </div>
                         </div>
 
                         {/* 소계 */}

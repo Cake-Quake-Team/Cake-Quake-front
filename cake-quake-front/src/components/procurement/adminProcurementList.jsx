@@ -4,13 +4,17 @@ import PropTypes from 'prop-types';
 import { format } from 'date-fns';
 
 export function AdminProcurementList({
-                                         requests,
+                                         requests = [],
                                          hasNext,
                                          onLoadMore,
                                          onClickItem,
-                                         groupBy   // 'date' | 'shop'
+                                         groupBy,
                                      }) {
-    // 그룹핑
+    if (!Array.isArray(requests)) {
+        console.error('AdminProcurementList: requests는 배열이어야 합니다:', requests);
+        return null;
+    }
+
     const groups = requests.reduce((acc, req) => {
         const key = groupBy === 'shop'
             ? req.shopName
@@ -19,57 +23,45 @@ export function AdminProcurementList({
         return acc;
     }, {});
 
+    const statusClasses = {
+        REQUESTED: 'bg-yellow-100 text-yellow-800',
+        COMPLETED: 'bg-green-100 text-green-800',  // ← 새로운 상태
+        SHIPPED:   'bg-blue-100 text-blue-800',
+        DELIVERED: 'bg-indigo-100 text-indigo-800',
+        CANCELLED: 'bg-red-100 text-red-800',
+    };
+
+
+
     return (
         <div className="space-y-6">
             {Object.entries(groups).map(([groupKey, items]) => (
                 <div key={groupKey} className="bg-white shadow rounded-lg overflow-hidden">
-                    {/* 그룹 헤더 */}
                     <div className="px-6 py-2 bg-gray-100 text-sm font-medium text-gray-700">
-                        {groupBy === 'shop'
-                            ? `매장: ${groupKey}`
-                            : `요청일: ${groupKey}`}
+                        {groupBy === 'shop' ? `매장: ${groupKey}` : `요청일: ${groupKey}`}
                     </div>
-
-                    {/* 테이블: table-fixed + colgroup */}
                     <div className="px-6 overflow-x-auto">
                         <table className="min-w-full table-fixed divide-y divide-gray-200">
                             <colgroup>
-                                <col className="w-16" />      {/* ID */}
-                                <col className="w-1/3" />     {/* 매장명 */}
-                                <col className="w-1/6" />     {/* 상태 */}
-                                <col className="w-1/4" />     {/* 총금액 */}
-                                <col className="w-auto" />    {/* 액션 */}
+                                <col className="w-16" />
+                                <col className="w-1/3" />
+                                <col className="w-1/6" />
+                                <col className="w-1/4" />
+                                <col className="w-auto" />
                             </colgroup>
                             <thead className="bg-gray-50">
                             <tr>
-                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    ID
-                                </th>
-                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    매장명
-                                </th>
-                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    상태
-                                </th>
-                                <th className="py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                                    총금액
-                                </th>
-                                <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase">
-                                    {/* 액션 */}
-                                </th>
+                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase">매장명</th>
+                                <th className="py-3 text-left text-xs font-medium text-gray-500 uppercase">상태</th>
+                                <th className="py-3 text-right text-xs font-medium text-gray-500 uppercase">총금액</th>
+                                <th className="py-3 text-center text-xs font-medium text-gray-500 uppercase">액션</th>
                             </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-100">
                             {items.map(req => {
-                                const statusClasses = {
-                                    REQUESTED: 'bg-yellow-100 text-yellow-800',
-                                    SCHEDULED: 'bg-green-100 text-green-800',
-                                    SHIPPED:   'bg-blue-100 text-blue-800',
-                                    DELIVERED: 'bg-indigo-100 text-indigo-800',
-                                    CANCELLED: 'bg-red-100 text-red-800'
-                                };
-                                const statusClass = statusClasses[req.status] || 'bg-gray-100 text-gray-800';
-
+                                const cls = statusClasses[req.status] || 'bg-gray-100 text-gray-800';
+                                const total = Number(req.totalPrice) || 0;
                                 return (
                                     <tr
                                         key={req.procurementId}
@@ -83,12 +75,12 @@ export function AdminProcurementList({
                                             {req.shopName}
                                         </td>
                                         <td className="py-4 whitespace-nowrap">
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusClass}`}>
-                          {req.status}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>
+                          {req.status }
                         </span>
                                         </td>
                                         <td className="py-4 text-sm text-right text-gray-700 whitespace-nowrap">
-                                            {req.totalPrice?.toLocaleString()}원
+                                            {total.toLocaleString()}원
                                         </td>
                                         <td className="py-4 text-sm text-center text-indigo-600 whitespace-nowrap hover:underline">
                                             상세보기

@@ -14,8 +14,9 @@ const IngredientFormPage = lazy(()=> import("../pages/admin/IngredientFormPage.j
 const PendingSellerListPage = lazy(()=> import("../pages/admin/pendingSellerListPage.jsx"));
 
 //----------------------발주
-const ProcurementConfirmPage = lazy(()=> import("../pages/admin/adminProcurementConfirmPage.jsx"));
+
 const AdminProcurementListPage = lazy(() => import("../pages/admin/adminProcurementListPage.jsx"));
+const AdminProcurementDetailPage = lazy (()=>import("../pages/admin/adminProcurementDetailPage.jsx"))
 
 const Loading = <div>Loading...</div>;
 
@@ -89,10 +90,10 @@ const adminRouter = () => ({
                             ),
                         },
                         {
-                            path: ":procurementId/confirm",
+                            path: ":procurementId",
                             element: (
                                 <Suspense fallback={Loading}>
-                                    <ProcurementConfirmPage />
+                                    < AdminProcurementDetailPage/>
                                 </Suspense>
                             ),
                         },

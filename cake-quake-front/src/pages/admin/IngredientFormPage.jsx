@@ -9,20 +9,20 @@ import {
 import IngredientForm from '../../components/ingredients/ingredientForm.jsx';
 
 export default function IngredientFormPage() {
-
-    const { ingredientId }   = useParams();
+    const { ingredientId } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
 
-    // ▶ 변경: description 포함한 “단일” useState 선언
+    // description, pricePerUnit, stockQuantity 모두 포함한 단일 useState
     const [form, setForm] = useState({
-        name: '',
-        unit: '',
-        pricePerUnit: 0,
-        description: '',
+        name:          '',
+        unit:          '',
+        pricePerUnit:  null,
+        stockQuantity: null,
+        description:   '',
     });
 
-    // ▶ 수정 모드일 때, API 데이터로 form 을 “한 번만” 초기화
+    // 수정 모드: 한 번만 API 에서 가져와서 초기화
     useEffect(() => {
         if (!ingredientId) return;
         setLoading(true);
@@ -31,22 +31,23 @@ export default function IngredientFormPage() {
                 setForm({
                     name:           data.name          ?? '',
                     unit:           data.unit          ?? '',
-                    pricePerUnit:   data.pricePerUnit  ?? 0,
+                    pricePerUnit:   data.pricePerUnit  ?? null,
+                    stockQuantity:  data.stockQuantity ?? null,
                     description:    data.description   ?? '',
                 });
             })
             .finally(() => setLoading(false));
     }, [ingredientId]);
 
-    // ▶ 모든 필드에 대응: 숫자 필드는 parseInt, 나머진 raw string
+    // 모든 필드를 커버: 숫자 필드는 parseInt, 나머진 raw string
     const handleChange = field => e => {
         const raw = e.target.value;
         setForm(prev => ({
             ...prev,
             [field]:
-                field === 'pricePerUnit'
-                    ? parseInt(raw.replace(/,/g, ''), 10) || 0 /* ▶ 콤마 제거 후 파싱 */
-                    : raw,
+                field === 'pricePerUnit' || field === 'stockQuantity'
+                    ? (raw === '' ? null : parseInt(raw.replace(/,/g, ''), 10))
+                    : raw
         }));
     };
 
@@ -60,7 +61,7 @@ export default function IngredientFormPage() {
         navigate('/admin/ingredients');
     };
 
-    if (loading) return <p>로딩 중…</p>;
+    if (loading) return <p className="p-4 text-center">로딩 중…</p>;
 
     return (
         <div className="container mx-auto p-4 max-w-md">
@@ -72,6 +73,7 @@ export default function IngredientFormPage() {
                 onChangeName={handleChange('name')}
                 onChangeUnit={handleChange('unit')}
                 onChangePricePerUnit={handleChange('pricePerUnit')}
+                onChangeStockQuantity={handleChange('stockQuantity')}
                 onChangeDescription={handleChange('description')}
                 onSubmit={handleSubmit}
             />
