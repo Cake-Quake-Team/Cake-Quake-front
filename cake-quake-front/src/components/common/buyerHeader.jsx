@@ -86,7 +86,7 @@ function BuyerHeader() {
                             {/* 로그인 버튼 */}
                             <Link
                                 to="/auth/signin"
-                                className="w-[90px] text-sm text-center bg-teal-400  text-gray-700 px-3 py-2 rounded-lg hover:bg-teal-500 transition font-bold"
+                                className="w-[90px] text-sm text-center bg-teal-400 text-white px-3 py-2 rounded-lg hover:bg-teal-500 transition font-bold"
                             >
                                 로그인
                             </Link>

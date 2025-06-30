@@ -1,1 +1,180 @@
+/* 1. Pretendard 폰트 불러오기 (CDN) */
+
+/* Pretendard는 Google Fonts가 아닌 별도의 CDN을 사용합니다. */
+
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+
+
+/* 2. 그 다음 Tailwind CSS를 불러옵니다. */
+
 @import "tailwindcss";
+
+
+
+/* 3. 그 이후에 사용자 정의 스타일을 추가합니다. */
+
+@layer utilities {
+
+    /* 텍스트 한 글자씩 서서히 나타나는 애니메이션 */
+
+    .animate-char-reveal {
+
+        animation-name: charReveal;
+
+        animation-duration: 0.8s;
+
+        animation-timing-function: ease-out;
+
+        animation-fill-mode: forwards;
+
+        opacity: 0;
+
+    }
+
+
+
+    @keyframes charReveal {
+
+        0% {
+
+            opacity: 0;
+
+            transform: translateY(20px);
+
+        }
+
+        100% {
+
+            opacity: 1;
+
+            transform: translateY(0);
+
+        }
+
+    }
+
+
+
+    /* 텍스트 한 글자씩 서서히 나타나고 계속 반복되는 애니메이션 */
+
+    .animate-char-reveal-infinite {
+
+        animation-name: charReveal;
+
+        animation-duration: 0.8s;
+
+        animation-timing-function: ease-out;
+
+        animation-iteration-count: infinite; /* 무한 반복 */
+
+        animation-direction: alternate; /* 왔다갔다 반복 */
+
+        opacity: 0;
+
+    }
+
+
+
+    @keyframes zoomIn {
+
+        0% {
+
+            opacity: 0;
+
+            transform: scale(0.8);
+
+        }
+
+        100% {
+
+            opacity: 1;
+
+            transform: scale(1);
+
+        }
+
+    }
+
+
+
+    /* 버튼이 부드럽게 커지는 애니메이션 */
+
+    .animate-button-grow {
+
+        transition: transform 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+
+    }
+
+
+
+    .animate-button-grow:hover {
+
+        transform: scale(1.03) translateY(-3px); /* 원하는 만큼 키우고 올리기 */
+
+        font-size: 1.1em; /* 폰트 크기 살짝 키우기 */
+
+        color: #92bbf5; /* 마우스를 올렸을 때 색상 변경 */
+
+    }
+
+}
+
+
+
+/* 4. 마지막으로, 기본 폰트를 오버라이드합니다. */
+
+/* Pretendard를 메인 폰트로 사용 */
+
+body {
+
+    font-family: 'Pretendard', sans-serif !important; /* !important 추가 */
+
+}
+
+
+
+/* h1, h2, h3, h4, h5, h6, .font-heading에 Pretendard를 적용 */
+
+h1, h2, h3, h4, h5, h6, .font-heading {
+
+    font-family: 'Pretendard', sans-serif !important; /* !important 추가 */
+
+}
+
+
+
+/* 기존 border-b-2 border-dashed를 얇은 실선으로 변경 */
+
+.border-dashed {
+
+    border-style: solid;
+
+    border-width: 1px;
+
+    border-color: #e5e7eb;
+
+}
+
+/* 5. 반응형 스타일 (모바일 화면) 추가 */
+/* Tailwind의 'md' 브레이크포인트(768px) 미만 화면에 적용 */
+@media (max-width: 767px) {
+    /* 모바일에서 애니메이션 속도 조절 예시 */
+    /* 글자가 나타나는 속도를 더 빠르게 */
+    .animate-char-reveal {
+        animation-duration: 0.6s;
+    }
+
+    /* 모바일에서 버튼 효과 조절 예시 */
+    /* hover 효과를 더 약하게 */
+    .animate-button-grow:hover {
+        transform: scale(1.02) translateY(-1px);
+        font-size: 1em; /* 폰트 크기 변화 없애기 */
+    }
+
+    /* drop-shadow-2xl 같은 그림자 효과를 모바일에서 더 약하게 */
+    .drop-shadow-2xl {
+        /* Tailwind CSS의 drop-shadow-xl에 가까운 값으로 재정의 */
+        filter: drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08));
+    }
+}
