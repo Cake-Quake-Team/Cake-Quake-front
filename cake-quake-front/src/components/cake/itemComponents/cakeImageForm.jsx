@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 
-function CakeImageUploadForm({ images, onImageChange, onImageRemove }) {
+function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnailSelect  }) {
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
 
@@ -31,6 +31,7 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove }) {
                             <img
                                 src={src}
                                 alt={`미리보기 ${index + 1}`}
+                                onClick={() => onThumbnailSelect(index)}
                                 className={`w-full h-24 object-cover rounded-lg border-2 ${
                                     img.isThumbnail ? "border-blue-500" : "border-transparent"
                                 }`}
@@ -40,6 +41,8 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove }) {
                                     type="radio"
                                     name="thumbnail"
                                     checked={img.isThumbnail}
+                                    onChange={() => onThumbnailSelect(index)}
+                                    readOnly
                                 />
                             </div>
                             <button

@@ -40,20 +40,21 @@ function MyPage() {
         setCouponCount(5);
     }, []); // currentUserUid는 useEffect의 의존성으로 두지 않고, user를 사용
 
-    // 리뷰 개수 조회
     useEffect(() => {
-        if (!currentUserUid) return; // userId가 없으면 호출 안 함
+        if (!currentUserUid) return;
 
-        async function fetchReviewCount() {
+        (async () => {
             try {
-                const payload = await getMyReviewList(currentUserUid, { page: 0, size: 1 }); // userId 파라미터 추가
-                setReviewCount(payload.pageInfo?.totalElements ?? 0); // pageInfo에서 totalElements 가져오기
+                const payload = await getMyReviewList(currentUserUid, { page: 0, size: 1 });
+                console.log('✅ getMyReviewList payload:', payload);
+
+                // totalCount로 세팅
+                setReviewCount(payload.totalCount);
             } catch (e) {
                 console.error('리뷰 수 조회 실패', e);
             }
-        }
-        fetchReviewCount();
-    }, [currentUserUid]); // currentUserUid가 변경될 때마다 호출
+        })();
+    }, [currentUserUid]);
 
     // 포인트 잔액 조회
     useEffect(() => {
