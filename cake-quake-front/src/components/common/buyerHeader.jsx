@@ -17,7 +17,7 @@ function BuyerHeader() {
     }
 
     return (
-        <header className="w-full border-b shadow-sm bg-white">
+        <header className="w-full border-b border-gray-200 bg-white">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
