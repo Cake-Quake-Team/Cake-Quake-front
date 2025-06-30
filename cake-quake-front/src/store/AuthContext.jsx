@@ -22,20 +22,20 @@ export const AuthProvider = ({ children }) => {
 
             const payload = parseJwt(token)
 
-            if (payload?.userId && payload?.uname && payload?.role) {
+            if (payload?.uid && payload?.userId && payload?.uname && payload?.role) {
                 // shopId가 있는 경우에만 setUser 호출
                 if (payload.role === "SELLER" && payload.shopId) {
-                    setUser({ shopId: payload.shopId, userId: payload.userId, uname: payload.uname, role: payload.role })
+                    setUser({ shopId: payload.shopId, uid: payload.uid, userId: payload.userId, uname: payload.uname, role: payload.role })
                 } else if (payload.role === "ADMIN") {
-                    setUser({ userId: payload.userId, uname: payload.uname, role: payload.role })
+                    setUser({ uid: payload.uid, userId: payload.userId, uname: payload.uname, role: payload.role })
                 } else if (payload.role === "BUYER") {
-                    setUser({ userId: payload.userId, uname: payload.uname, role: payload.role })
+                    setUser({ uid: payload.uid, userId: payload.userId, uname: payload.uname, role: payload.role })
                 } else {
                     // 역할이 정의되지 않았거나 shopId가 없는 경우 처리
                     setErrorMessage('판매자 정보가 올바르지 않습니다.') // 예외 메시지
                     return
                 }
-            }
+            } // end if
         } catch (error) {
             console.error("토큰 파싱 중 오류 발생:")
             setUser(null)

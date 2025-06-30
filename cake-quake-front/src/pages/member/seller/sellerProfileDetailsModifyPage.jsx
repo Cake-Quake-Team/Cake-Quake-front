@@ -104,12 +104,12 @@ const SellerProfileDetailsModifyPage = () => {
     const validateInputs = () => {
         const { uname, phoneNumber } = form
 
-        const unameRegex = /^(?=.*[가-힣a-zA-Z])([가-힣a-zA-Z0-9]{1,19})$/
+        const unameRegex = /^(?=.*[가-힣a-zA-Z])([가-힣a-zA-Z0-9]{1,20})$/
         const phoneRegex = /^\d{3}-\d{3,4}-\d{4}$/
         
         if (!unameRegex.test(uname)) {
             inputRefs.uname.current?.focus()
-            return "이름은 한글 또는 영어 포함 1~19자여야 합니다."
+            return "이름은 한글 또는 영어 포함 20자 이내여야 합니다."
         }
         if (!phoneRegex.test(phoneNumber)) {
             inputRefs.phoneNumber.current?.focus()
