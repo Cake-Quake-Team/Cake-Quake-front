@@ -70,7 +70,7 @@ const BuyerProfileDetailsModifyComponent = ({
                     >
                         {isVerified ? "전화번호 인증 완료" : "전화번호 인증"}
                     </button>
-                    <p class="text-sm text-gray-500">전화번호 변경 시에만 새로 인증이 필요합니다.</p>
+                    <p className="text-sm text-gray-500">전화번호 변경 시에만 새로 인증이 필요합니다.</p>
                     {errorMessage && (
                         <div className="text-red-500 text-sm text-center">{errorMessage}</div>
                     )}

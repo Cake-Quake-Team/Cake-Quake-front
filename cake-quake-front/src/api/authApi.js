@@ -1,6 +1,11 @@
 import axios from 'axios';
 import jwtAxios from '../utils/jwtUtil';
 
+const rest_api_key = import.meta.env.VITE_KAKAO_LOGIN_REST_API_KEY
+const redirect_uri = import.meta.env.VITE_KAKAO_REDIRECT_URI
+
+const auth_code_path = import.meta.env.VITE_KAKAO_AUTH_CODE_PATH
+const access_token_url = import.meta.env.VITE_KAKAO_ACCESS_TOKEN_URL
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL
 const endpoints = {
@@ -8,6 +13,7 @@ const endpoints = {
     signupSellerStep1: 'auth/signup/sellers/step1',
     signupSellerStep2: 'auth/signup/sellers/step2',
     signin: 'auth/signin',
+    signinKakao: 'auth/signin/kakao',
     otpSend: 'auth/otp/send',
     otpVerify: 'auth/otp/verify',
     verifyBusiness: 'auth/business/verify',
@@ -65,6 +71,71 @@ export const postSellerSignupStep2 = async (formData) => {
     }
 }
 
+// 로그인 해서 토큰 얻어오기
+export const getToken = async(userId, password) => {
+    try {
+        const res = await axios.post(`${baseUrl}/${endpoints.signin}`, {userId, password}, {
+            headers: { 'Content-Type': 'application/json' }
+        })
+        console.log(res.data)
+        return res.data
+
+    } catch (error) {
+        throw error
+    }
+}
+
+// [카카오로그인] 링크
+export const getKakaoLoginLink = () => {
+
+    const kakaoURL = `${auth_code_path}?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`
+
+    return kakaoURL
+}
+
+// [카카오로그인] 액세스 토큰 얻기
+export const getKakaoAccessToken = async (authCode) => {
+ 
+    const header = {
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        }
+    }
+    const params = {
+        grant_type: "authorization_code",
+        client_id: rest_api_key,
+        redirect_uri: redirect_uri,
+        code: authCode
+    }
+    try {
+        const res = await axios.post(access_token_url, params , header)
+    
+        const accessToken = res.data.access_token
+    
+        return accessToken
+    } catch (error) {
+
+        console.error("카카오 토큰 요청 에러", error);
+        throw error
+    }
+}
+
+// [카카오로그인] 토큰으로 유저 정보 획득
+export const getMemberWithAccessToken = async (accessToken) => {
+
+    const header = {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        }
+    }
+    const res = await axios.post(`${baseUrl}/${endpoints.signinKakao}`, {}, header)
+
+    console.log("getMemberWithAccessToken---res.data: ", res.data)
+
+    return res.data
+}
+
+
 // 휴대폰 인증 호출 - 인증 코드 받기
 export const getVerificationCode = async(data) => {
     try {
@@ -113,21 +184,6 @@ export const verifyBusiness = async(businessData) => {
     }
 }
 
-
-// 로그인 해서 토큰 얻어오기
-export const getToken = async(userId, password) => {
-    try {
-        const res = await axios.post(`${baseUrl}/${endpoints.signin}`, {userId, password}, {
-            headers: { 'Content-Type': 'application/json' }
-        })
-        console.log(res.data)
-        return res.data
-
-    } catch (error) {
-        throw error
-    }
-}
-
 // (탈퇴 전)비밀번호 확인
 export const verifyPassword = async(form) => {
     try {
@@ -159,7 +215,7 @@ export const changePassword = async(form) => {
 
 // ---------------------------테스트용------------------------------
 
-// 로그인 -> 쿠키에 저장된 토큰으로 다른 경로 접근
+// [TEST] 로그인 후 토큰 접근 테스트 (토큰 검증용)
 export const testToken = async() => {
     try {
         const res = await jwtAxios.get(`${baseUrl}/${endpoints.tokenTest}`)
@@ -172,7 +228,7 @@ export const testToken = async() => {
     }
 }
 
-// 판매자만 접근 가능. 역할 테스트
+// [TEST] 판매자 접근 권한 테스트
 export const testSellerOnly = async() => {
     try {
         const res = await jwtAxios.get(`${baseUrl}/${endpoints.sellerOnly}`, header)
@@ -185,7 +241,7 @@ export const testSellerOnly = async() => {
     }
 }
 
-// 관리자만 접근 가능. 역할 테스트
+// [TEST] 관리자 접근 권한 테스트
 export const testAdminOnly = async() => {
     try {
         const res = await jwtAxios.get(`${baseUrl}/${endpoints.adminOnly}`, header)

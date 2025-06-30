@@ -73,12 +73,12 @@ const SignupBuyerPage = () => {
         const { userId, password, verifyPassword, uname, phoneNumber, publicInfo } = form
 
         const userIdRegex = /^[a-zA-Z0-9]{4,20}$/
-        const unameRegex = /^(?=.*[가-힣a-zA-Z])([가-힣a-zA-Z0-9]{1,19})$/
+        const unameRegex = /^(?=.*[가-힣a-zA-Z])([가-힣a-zA-Z0-9]{1,20})$/
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+=-])[A-Za-z\d!@#$%^&*()_+=-]{8,20}$/
         const phoneRegex = /^\d{3}-\d{3,4}-\d{4}$/
 
         if (!userIdRegex.test(userId)) return "아이디는 영문 또는 숫자 4~20자여야 합니다."
-        if (!unameRegex.test(uname)) return "이름은 한글 또는 영어 포함 1~19자여야 합니다."
+        if (!unameRegex.test(uname)) return "이름은 한글 또는 영어 포함 20자이내여야 합니다."
         if (!passwordRegex.test(password)) return "비밀번호는 문자, 숫자, 특수문자 포함 8~20자여야 합니다."
         if (password !== verifyPassword) return "비밀번호가 일치하지 않습니다."
         if (!phoneRegex.test(phoneNumber)) return "전화번호는 010-1234-5678 형식이어야 합니다."

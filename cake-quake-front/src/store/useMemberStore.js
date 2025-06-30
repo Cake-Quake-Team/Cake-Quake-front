@@ -6,4 +6,4 @@ const useMemberStore = create((set) => ({
     clearProfile: () => set({ profile: null }),
 }))
 
-export default useMemberStore
+export default useMemberStore;
