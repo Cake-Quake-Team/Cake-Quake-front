@@ -38,8 +38,12 @@ const SellerOrderDetail = ({ order, onStatusChange, isUpdating }) => {
                     <h2 className="font-semibold text-lg mb-2">픽업 및 결제 정보</h2>
                     {/* ✅ DTO의 pickupDate와 pickupTime 필드 사용 */}
                     <p><strong>픽업 시간:</strong> {formattedPickupDateTime}</p>
-                    {/* ✅ DTO의 orderTotalPrice 필드 사용 */}
-                    <p><strong>결제 금액:</strong> <span className="font-bold text-blue-600">{formatPrice(order.orderTotalPrice)}</span></p>
+                    {/* ⭐⭐ 가격 정보 표시 추가 ⭐⭐ */}
+                    <p><strong>총 주문 금액:</strong> <span className="font-bold text-gray-700">{formatPrice(order.orderTotalPrice)}</span></p>
+                    {order.discountAmount > 0 && ( // 할인 금액이 0보다 클 때만 표시
+                        <p><strong>포인트 할인:</strong> <span className="font-bold text-red-600"> -{formatPrice(order.discountAmount)}</span></p>
+                    )}
+                    <p><strong>최종 결제 금액:</strong> <span className="font-bold text-blue-600">{formatPrice(order.finalPaymentAmount)}</span></p>
                 </div>
             </div>
 

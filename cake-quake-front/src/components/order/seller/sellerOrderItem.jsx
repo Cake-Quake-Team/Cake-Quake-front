@@ -50,7 +50,21 @@ const SellerOrderItem = ({ order }) => {
                     <p className="text-blue-600 font-semibold mt-1">픽업 시간: {formattedPickupDateTime}</p>
                 </div>
                 <div className="flex flex-col items-end">
-                    <p className="font-bold text-xl">{formatPrice(order.orderTotalPrice)}</p>
+                    {/* ⭐⭐ 기존 주문 금액 (할인 전) ⭐⭐ */}
+                    <p className="font-bold text-xl text-gray-700">{formatPrice(order.orderTotalPrice)}</p>
+
+                    {/* ⭐⭐ 포인트 할인 금액 (0보다 클 때만 표시) ⭐⭐ */}
+                    {order.discountAmount > 0 && (
+                        <p className="text-sm text-red-600 font-semibold">
+                            할인: -{formatPrice(order.discountAmount)}
+                        </p>
+                    )}
+
+                    {/* ⭐⭐ 최종 결제 금액 ⭐⭐ */}
+                    <p className="font-bold text-xl text-blue-800 mt-1">
+                        최종: {formatPrice(order.finalPaymentAmount)}
+                    </p>
+
                     <select
                         value={order.status}
                         onChange={handleStatusChange}
@@ -78,7 +92,8 @@ const SellerOrderItem = ({ order }) => {
                 <div className="flex items-center mt-2">
                     {order.thumbnailImageUrl && (
                         <div className="w-16 h-16 mr-3 flex-shrink-0">
-                            <img src={order.thumbnailImageUrl} alt={order.cname} className="w-full h-full object-cover rounded-full" />
+                            <img src={order.thumbnailImageUrl} alt={order.cname}
+                                 className="w-full h-full object-cover rounded-full"/>
                         </div>
                     )}
                     <div>

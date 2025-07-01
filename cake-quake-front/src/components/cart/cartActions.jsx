@@ -4,8 +4,7 @@ export default function CartActions({
                                         selectedCount,
                                         onClearSelected,
                                         onContinueShopping,
-                                        onOrderSelected,
-                                        onOrderAll
+                                        onOrderSelected
                                     }) {
     return (
         <div className="space-x-2">
@@ -40,13 +39,7 @@ export default function CartActions({
                 선택 주문
             </button>
 
-            <button
-                className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50"
-                onClick={onOrderAll}
-                disabled={selectedCount !== 0}
-            >
-                전체 주문
-            </button>
+
         </div>
     );
 }

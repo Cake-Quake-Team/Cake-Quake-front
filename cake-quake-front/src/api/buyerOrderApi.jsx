@@ -23,7 +23,12 @@ export const getOrderDetail = async (orderId) => {
     return response.data;
 };
 
-// ✅ 주문 취소
+// ⭐⭐ 주문 취소 API 수정: status 페이로드 전달 ⭐⭐
 export const cancelMyOrder = async (orderId) => {
-    return jwtAxios.patch(`${prefix}/orders/${orderId}`);
+    // Controller의 @PatchMapping("/{orderId}")에 맞추어 호출
+    // userId는 @AuthenticationPrincipal로 받으므로 URL에 포함시키지 않습니다.
+    return jwtAxios.patch(
+        `${prefix}/orders/${orderId}`,
+        { status: "RESERVATION_CANCELLED" } // ⭐⭐⭐ 여기에 status 페이로드 객체 추가 ⭐⭐⭐
+    );
 };
