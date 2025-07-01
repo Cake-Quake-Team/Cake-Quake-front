@@ -3,12 +3,13 @@ import { Link } from "react-router";
 
 
 const SigninComponent = ({
-  userId,
-  password,
-  errorMessage,
-  onUserIdChange,
-  onPasswordChange,
-  handleSubmit,
+    userId,
+    password,
+    errorMessage,
+    onUserIdChange,
+    onPasswordChange,
+    handleSubmit,
+    kakaoLink,
 }) => {
 
     return (
@@ -50,7 +51,7 @@ const SigninComponent = ({
                         <div style={{ color: 'red', marginTop: '8px' }}>{errorMessage}</div>
                     )}
                     <button type="submit"
-                            className="w-full bg-teal-400 text-white py-2 rounded-lg hover:bg-teal-500 transition font-bold">
+                            className="w-full bg-teal-400 text-gray-700 py-2 rounded-lg hover:bg-teal-500 transition font-bold">
                         로그인
                     </button>
                     <Link to="/auth/signup" className="w-full block text-center bg-rose-50 text-gray-700 py-2 rounded-lg hover:bg-rose-200 transition font-bold">
@@ -61,9 +62,9 @@ const SigninComponent = ({
                         Login with OAuth 2.0
                     </div>
 
-                    <button className="w-full flex items-center justify-center">
+                    <Link to={kakaoLink} className="w-full flex items-center justify-center">
                         <img src={kakaoIcon} alt="Kakao" className="mt-3 transition py-2 rounded-lg  gap-2" />
-                    </button>
+                    </Link >
                 </form>
             </div>
         </div>

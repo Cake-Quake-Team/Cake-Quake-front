@@ -48,6 +48,17 @@ function CakeAddPage() {
         e.target.value = null; // input 초기화
     };
 
+    // 썸네일 선택 핸들러 추가
+    const handleThumbnailSelect = (indexToSelect) => {
+        setCakeImage((prev) =>
+            prev.map((img, index) => ({
+                ...img,
+                isThumbnail: index === indexToSelect,
+            }))
+        );
+    };
+
+
 
     // 이미지 삭제
     const handleImageRemove = (indexToRemove) => {
@@ -155,6 +166,7 @@ function CakeAddPage() {
                     images={cakeImage}
                     onImageChange={handleImageChange}
                     onImageRemove={handleImageRemove}
+                    onThumbnailSelect={handleThumbnailSelect}
                 />
                 <CakeBasicInfoForm formData={addCakeDTO} onChange={handleChange}/>
                 <CakeOptionForm optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>

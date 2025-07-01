@@ -6,6 +6,7 @@ import { detailCategories } from "../../../constants/cakeCategory.js";
 import ShopList from "../../../components/shop/list/shopList.jsx";
 import ShopFilterBar from "../../../components/shop/list/shopFilterBar.jsx";
 import { Link } from "react-router";
+import BannerCarousel from "../../../components/common/BannerCarousel.jsx";
 
 // 메인 분류 목록
 const mainCategories = [
@@ -14,7 +15,20 @@ const mainCategories = [
     { label: "매장별 분류", id: "STORE_BY_CATEGORY", description: "매장 상세 페이지로" }
 ];
 
+// assets 폴더에서 바로 import
+import banner1 from "../../../assets/banner1.jpg";
+import banner2 from "../../../assets/banner2.jpg";
+import banner3 from "../../../assets/banner3.jpg";
+import banner4 from "../../../assets/banner4.jpg";
+
 function CakeAllList() {
+
+    const banners = [
+        { imageUrl: banner1, link: "/event/lottery",  alt: "100% 당첨 랜덤 복권" },
+        { imageUrl: banner2, link: "/event/sale",     alt: "케이크 세일 이벤트" },
+        { imageUrl: banner3, link: "/event/cookie",   alt: "프리미엄 쿠키 출시" },
+        { imageUrl: banner4, link: "/event/birthday", alt: "생일 쿠폰 이벤트" },
+    ];
     // 상품 목록 관련 상태
     const [cakes, setCakes] = useState([]);
     const [page, setPage] = useState(1);
@@ -115,9 +129,12 @@ function CakeAllList() {
     }, [hasNext, isLoading, selectedMainCategory]);
 
 
+
     return (
         <div className="flex flex-col min-h-screen">
+            <BannerCarousel banners={banners} interval={5000} />
             <main className="flex-grow container mx-auto px-6 py-8">
+
                 {/* 상단 메인 분류 */}
                 <div className="flex items-center text-gray-700 mb-6 border-b border-gray-200 pb-2">
                     {mainCategories.map((mainCat, index) => (

@@ -6,6 +6,7 @@ import {Link, useParams, useNavigate} from "react-router"; // Link, useParams, u
 import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
 import { addCartItem } from "../../../api/cartApi.jsx";
 import {getCakeReviews} from "../../../api/reviewApi.jsx";
+import {getShopDetail} from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx"; // 장바구니 추가 API 함수 import (가정)
 
 // ⭐ 새로운 모달 컴포넌트 추가 ⭐
@@ -29,6 +30,7 @@ function BuyerCakeReadPage() {
     const { shopId, cakeId } = useParams();
     const navigate = useNavigate();
     const [cake, setCake] = useState(null); // 케이크 상세 정보
+    const [shop, setShop] = useState(null); // 매장 상세 정보
     const [optionTypes, setOptionTypes] = useState([]); // 병합된 최종 옵션 타입 데이터 (CakeDetailComponent로 전달)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -97,6 +99,20 @@ function BuyerCakeReadPage() {
 
         fetchCakeDetail();
     }, [cakeId, shopId]);
+
+    // 매장 상세 정보 가져오기
+    useEffect(() => {
+        if (!shopId) return;
+        (async () => {
+            try {
+                const data = await getShopDetail(shopId);
+                setShop(data);
+            } catch (error) {
+                console.error("매장 상세 정보를 불러오는 데 실패했습니다:", error);
+            }
+        })();
+    }, [shopId]);
+
 
     // 2) 리뷰 가져오기 (첫 페이지만 미리 불러옴, 더보기 버튼 클릭 시 page++)
     useEffect(() => {
@@ -228,6 +244,7 @@ function BuyerCakeReadPage() {
                     setSelectedOptions={setSelectedOptions}
                     apiBaseUrl={thumbnailUrl}
                     OptionComponent={CakeOptionForm}
+                    shop={shop}
                 />
                 <div className="mt-6 flex justify-center">
                     <button

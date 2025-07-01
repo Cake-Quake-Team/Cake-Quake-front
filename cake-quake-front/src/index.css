@@ -1,1 +1,212 @@
+/* 1. Pretendard 폰트 불러오기 (CDN) */
+/* Pretendard는 Google Fonts가 아닌 별도의 CDN을 사용합니다. */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+/* src/index.css */
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+/* 2. 그 다음 Tailwind CSS를 불러옵니다. */
 @import "tailwindcss";
+
+/* 3. 새로운 `@theme` 블록에서 디자인 토큰 정의 */
+/* 이 변수들은 Tailwind의 JIT 엔진이 컴포넌트에서 감지하여 CSS 속성으로 변환합니다. */
+@theme {
+    /* ----- 색상 공통 변수 (베이커리 톤으로 재정의) ----- */
+    --color-primary: rgba(146, 136, 136, 0.85);   /* 코랄 오렌지 */
+    --color-secondary: #FFD2A6; /* 부드러운 베이지 */
+    --color-tertiary: #5C4033;  /* 짙은 브라운 */
+    --color-cream: #F8F5F2;     /* 크림 화이트 */
+
+}
+
+/* 4. 그 이후에 사용자 정의 스타일을 추가합니다. */
+@layer utilities {
+
+    /* --- 애니메이션 (유지 및 개선) --- */
+    /* 텍스트 한 글자씩 서서히 나타나는 애니메이션 */
+    .animate-char-reveal {
+        animation-name: charReveal;
+        animation-duration: 0.8s;
+        animation-timing-function: ease-out;
+        animation-fill-mode: forwards;
+        opacity: 0;
+    }
+    @keyframes charReveal {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 텍스트 한 글자씩 서서히 나타나고 계속 반복되는 애니메이션 */
+    .animate-char-reveal-infinite {
+        animation-name: charReveal;
+        animation-duration: 0.8s;
+        animation-timing-function: ease-out;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        opacity: 0;
+    }
+    @keyframes zoomIn {
+        0% { opacity: 0; transform: scale(0.8); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    /* 버튼이 부드럽게 커지는 애니메이션 */
+    .animate-button-grow {
+        transition: transform 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+    }
+    .animate-button-grow:hover {
+        transform: scale(1.03) translateY(-3px);
+        font-size: 1.1em;
+        color: var(--color-primary); /* CSS 변수를 직접 사용 */
+    }
+
+    /* --- 커스텀 디자인 클래스 --- */
+
+    /* 마우스 올렸을 때 인터랙션 효과를 가진 카드 스타일 */
+    .interactive-card {
+        @apply transition-all duration-300 ease-in-out cursor-pointer relative z-0;
+    }
+    /* hover 시 효과 */
+    .interactive-card:hover {
+        @apply transform scale-105 z-10 ;
+    }
+
+    /* product-card (상품 카드) - Tailwind 클래스 기반으로 재정의 */
+    .product-card {
+        @apply bg-white rounded-2xl transition-all duration-300 overflow-hidden cursor-pointer relative;
+        @apply hover:scale-[1.02] hover:z-10 ;
+    }
+
+    .product-image {
+        @apply w-full h-56 object-cover;
+    }
+
+    .product-content {
+        @apply p-5 flex flex-col gap-2 h-32 overflow-hidden;
+    }
+
+    .card-title {
+        @apply text-lg font-bold text-gray-800 line-clamp-2;
+    }
+
+    .card-price {
+        @apply text-xl font-bold text-[--color-primary]; /* Tailwind CSS 변수 구문 사용 */
+    }
+
+    .card-shop-info {
+        @apply text-sm text-gray-500 flex items-center gap-1;
+    }
+
+    /* --- 섹션 및 레이아웃 --- */
+    .hero-section {
+        @apply relative min-h-screen flex items-center justify-center text-white text-center p-8;
+        background-image: url('https://images.unsplash.com/photo-1558961363-fa5c151121d8?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .hero-overlay {
+        @apply absolute inset-0 bg-black opacity-30;
+    }
+
+    .category-button {
+        @apply px-6 py-2 border-2 rounded-full font-semibold transition-colors duration-300;
+        @apply border-[--color-secondary] text-stone-600 hover:bg-[--color-secondary] hover:text-white hover:border-[--color-secondary];
+    }
+
+    /* ----- 색상 공통 클래스 (변수 사용) ----- */
+    /* 아래 클래스들은 Tailwind가 직접 생성하는 클래스와 충돌하거나
+       인식되지 않을 수 있으므로, Tailwind의 기본 유틸리티를 사용하거나
+       `@apply` 내에서 변수 구문을 사용하세요. */
+    .bg-primary { background-color: var(--color-primary); }
+    .bg-secondary { background-color: var(--color-secondary); }
+    .bg-tertiary { background-color: var(--color-cream); } /* --color-cream 변수 사용 */
+    .text-primary { color: var(--color-primary); }
+    .text-secondary { color: var(--color-secondary); }
+    .text-tertiary { color: var(--color-tertiary); }
+
+    /* ----- 카드 기본 ----- */
+    .card {
+        @apply bg-white p-6 rounded-3xl ;
+    }
+
+    .page-container {
+        @apply max-w-6xl mx-auto px-6 py-12;
+    }
+
+    .section-title {
+        @apply text-4xl font-extrabold mb-4 text-[--color-tertiary];
+    }
+
+    .section-subtitle {
+        @apply text-lg text-gray-500 mb-12;
+    }
+
+    .btn {
+        @apply bg-[--color-primary] text-white font-semibold px-6 py-3 rounded-full shadow-md transition-all duration-300;
+    }
+    .btn:hover {
+        @apply opacity-90 scale-105 -translate-y-1;
+    }
+
+    .btn-outline {
+        @apply border-2 border-[--color-primary] text-[--color-primary] bg-white hover:bg-[--color-primary] hover:text-white;
+    }
+
+    .form-input {
+        @apply w-full p-4 border border-stone-200 rounded-xl mb-4 focus:outline-none focus:ring-2 focus:ring-[--color-primary] focus:border-transparent;
+    }
+
+    .form-label {
+        @apply block mb-2 font-semibold text-stone-700;
+    }
+    .slick-dots {
+        bottom: -30px; /* 점 위치를 아래로 내립니다. 필요에 따라 값 조정 */
+        position: relative;
+        display: flex !important;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* 각 점(dot)을 나타내는 li 요소의 스타일 */
+    .slick-dots li {
+        margin: 0 5px; /* 점 사이의 간격 */
+    }
+
+    /* 점(dot) 자체의 스타일 (button:before) */
+    .slick-dots li button:before {
+        font-size: 10px; /* 점의 크기 */
+        color: #ddd; /* 비활성 점의 색상 (회색) */
+        opacity: 0.75;
+        content: '•'; /* 점 모양 */
+        display: block;
+    }
+
+    /* 선택된 점(active dot)의 스타일 */
+    .slick-dots li.slick-active button:before {
+        color: #000; /* 활성 점의 색상 (검정색) */
+        opacity: 1;
+    }
+}
+
+/* 5. 마지막으로, 기본 폰트를 오버라이드합니다. */
+body { font-family: 'Pretendard', sans-serif !important; }
+h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Pretendard', sans-serif !important; }
+
+/* 기존 border-b-2 border-dashed를 얇은 실선으로 변경 */
+.border-dashed {
+    border-style: solid;
+    border-width: 1px;
+    border-color: #e5e7eb;
+}
+
+/* 6. 반응형 스타일 (모바일 화면) 추가 */
+@media (max-width: 767px) {
+    .animate-char-reveal { animation-duration: 0.6s; }
+    .animate-button-grow:hover { transform: scale(1.02); font-size: 1em; }
+    .drop-shadow-2xl {
+        filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
+    }
+}
