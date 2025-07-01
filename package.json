@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "react-chartjs-2": "^5.3.0"
   }
 }

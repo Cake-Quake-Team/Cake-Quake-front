@@ -66,7 +66,9 @@ export default function SellerHeader() {
                                 <div className="absolute right-0 top-1/2 transform -translate-y-1/2 h-6 w-px bg-gray-300" />
                             )}
                         </li>
+
                     ))}
+
                 </ul>
             </nav>
         </header>

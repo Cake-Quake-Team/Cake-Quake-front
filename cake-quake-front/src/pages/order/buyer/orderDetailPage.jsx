@@ -1,11 +1,11 @@
-import React from 'react'; // useEffect, useState 대신 React만 필요
+import React from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; // ⭐ useQuery, useMutation, useQueryClient 임포트 ⭐
 import { getOrderDetail, cancelMyOrder } from '../../../api/buyerOrderApi';
 import OrderDetailComponent from '../../../components/order/buyer/OrderDetail';
 
-// ⭐ 로딩 및 에러 컴포넌트 분리 (재사용성 목적) ⭐
+// 로딩 및 에러 컴포넌트 분리 (재사용성 목적)
 const PageLoading = () => (
     <div className="text-center p-8 text-blue-600 font-semibold">
         주문 상세 정보를 불러오는 중...
@@ -21,15 +21,15 @@ const PageErrorDisplay = ({ message }) => (
 export default function OrderDetailPageWrapper() {
     const { orderId } = useParams();
     const navigate = useNavigate();
-    const queryClient = useQueryClient(); // ⭐ queryClient 훅 초기화 ⭐
+    const queryClient = useQueryClient(); // queryClient 훅 초기화
 
-    // ⭐ useQuery 훅을 사용하여 데이터 로딩 관리 ⭐
+    // useQuery 훅을 사용하여 데이터 로딩 관리
     const {
-        data: order, // 조회된 데이터를 'order'라는 변수명으로 받음
-        isLoading,   // 데이터가 아직 로드되지 않았거나 백그라운드에서 로딩 중일 때 true
-        isFetching,  // 쿼리가 현재 백그라운드에서 데이터를 가져오는 중일 때 true (로딩 스피너 등에 유용)
-        error,       // 오류 발생 시 오류 객체
-        isError      // 오류 발생 여부 (boolean)
+        data: order,
+        isLoading,
+        isFetching,
+        error,
+        isError
     } = useQuery({
         queryKey: ['orderDetail', orderId], // 고유한 쿼리 키
         queryFn: () => {
@@ -45,24 +45,31 @@ export default function OrderDetailPageWrapper() {
         retry: 1, // 실패 시 1회 재시도
         onError: (err) => {
             console.error("❌ useQuery: 주문 상세 정보 불러오기 실패:", err);
-            // 에러 시 사용자에게 알림 (선택 사항)
-            // alert(`주문 상세 정보 로딩 실패: ${err.message || '알 수 없는 오류'}`);
         }
     });
 
-    // ⭐ useMutation 훅을 사용하여 주문 취소 로직 관리 ⭐
+    // useMutation 훅을 사용하여 주문 취소 로직 관리
     const cancelOrderMutation = useMutation({
-        mutationFn: cancelMyOrder, // 백엔드 API 함수
+        mutationFn: cancelMyOrder,
         onSuccess: () => {
-            alert('주문이 취소되었습니다.');
-            // 주문 취소 성공 후, 'orderDetail' 쿼리의 캐시를 무효화하여 최신 데이터를 다시 불러오도록 함
+            // ⭐⭐⭐ 주문 취소 성공 시 포인트 반환 메시지 추가 ⭐⭐⭐
+            // orderDetail?.discountAmount를 사용하여 주문 상세 정보에서 할인된 포인트 금액을 가져옵니다.
+            const refundedPoints = order?.discountAmount || 0;
+
+            let successMessage = "주문이 성공적으로 취소되었습니다.";
+            if (refundedPoints > 0) {
+                successMessage += `\n사용하신 포인트 ${refundedPoints.toLocaleString()}P가 반환되었습니다.`;
+            }
+            alert(successMessage);
+            // ⭐⭐⭐ 포인트 반환 메시지 추가 끝 ⭐⭐⭐
+
             queryClient.invalidateQueries(['orderDetail', orderId]);
-            // 필요하다면 주문 목록 쿼리도 무효화
-            // queryClient.invalidateQueries(['myOrders']);
+            queryClient.invalidateQueries(['myOrders']); // 주문 목록 쿼리도 무효화 (만약 사용한다면)
+            navigate('/buyer/orders'); // 주문 목록 페이지로 이동
         },
         onError: (err) => {
             console.error('❌ 주문 취소 실패 (mutation):', err);
-            alert(`주문 취소 중 오류가 발생했습니다: ${err.message || '알 수 없는 오류'}`);
+            alert(`주문 취소 중 오류가 발생했습니다: ${err.response?.data?.message || err.message || '알 수 없는 오류'}`);
         }
     });
 

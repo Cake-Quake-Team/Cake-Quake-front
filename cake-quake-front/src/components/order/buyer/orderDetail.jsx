@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router';
 
 export default function OrderDetail({
                                         order,
-                                        onCancel, // 이 props는 주문 취소 로직을 상위 컴포넌트에서 처리할 때 사용
+                                        onCancel,
                                         onBack,
-                                        onPay,    // 추가: 결제하기 버튼 클릭 핸들러
-                                        isPaying  // 추가: 결제 진행 중 상태
+                                        onPay,
+                                        isPaying
                                     }) {
     const [isCancelling, setIsCancelling] = useState(false);
     const navigate = useNavigate();
 
-    // 주문 상태 한글화 함수
+    // 주문 상태 한글화 맵 (기존과 동일)
     const orderStatusMap = {
         RESERVATION_PENDING: '예약 확인 중',
         RESERVATION_CONFIRMED: '예약 확정',
@@ -29,8 +29,8 @@ export default function OrderDetail({
         setIsCancelling(true);
         try {
             await onCancel(order.orderId);
-        } catch (err) {
-            console.error('❌ 주문 취소 실패:', err);
+        } catch (_err) {
+            console.error('❌ 주문 취소 실패:', _err);
             alert('주문 취소 중 오류가 발생했습니다.');
         } finally {
             setIsCancelling(false);
@@ -38,7 +38,7 @@ export default function OrderDetail({
     };
 
     const handleWriteReview = () => {
-        const firstCakeId = order.items && order.items.length > 0 && order.items[0].cakeItem ? order.items[0].cakeItem.cakeId : null;
+        const firstCakeId = order.items && order.items.length > 0 ? order.items[0].cakeId : null;
 
         navigate(`/buyer/reviews/create/${order.orderId}`, {
             state: { cakeId: firstCakeId }
@@ -69,25 +69,42 @@ export default function OrderDetail({
 
     if (!order) return <div className="p-4 text-center">로딩 중…</div>;
 
-    // 주문 취소 불가능한 상태 정의
-    const nonCancellableStatuses = [
-        'READY_FOR_PICKUP',      // 픽업 준비 완료
-        'PICKUP_COMPLETED',      // 픽업 완료
-        'RESERVATION_CANCELLED', // 이미 취소됨
-        'NO_SHOW'                // 노쇼
-    ];
+    // 주문 상태에 따른 버튼 가시성 로직 재조정
+    let showPaymentButton = false;
+    let showCancelButton = false;
+    let showReviewButton = false;
 
-    // 주문 취소 버튼 활성화 여부
-    const isCancelButtonDisabled = nonCancellableStatuses.includes(order.status) || isCancelling;
+    switch (order.status) {
+        case 'RESERVATION_PENDING': // 예약 확인 중
+            showPaymentButton = true; // ⭐ "결제하기" 버튼 다시 보이도록 (사용자 요청) ⭐
+            showCancelButton = true;  // 주문 취소하기 버튼 보임
+            break;
+        case 'RESERVATION_CONFIRMED': // 예약 확정
+            // 결제는 이미 진행되었거나 이전에 진행했으므로 "결제하기"는 숨김
+            showCancelButton = true;  // 주문 취소하기 버튼 보임
+            break;
+        case 'PREPARING':       // 준비 중
+            showCancelButton = true;  // 주문 취소하기 버튼 보임
+            break;
+        case 'READY_FOR_PICKUP': // 픽업 준비 완료
+            // 이 시점에서는 취소 불가능한 것으로 가정하고 숨김
+            break;
+        case 'PICKUP_COMPLETED': // 픽업 완료
+            showReviewButton = true;  // "리뷰 쓰기" 보임
+            break;
+        case 'RESERVATION_CANCELLED': // 이미 취소됨
+        case 'NO_SHOW':          // 노쇼
+            // 모든 액션 버튼 숨김
+            break;
+        default:
+            // 그 외 알 수 없는 상태는 모두 숨김
+            break;
+    }
 
-    // ⭐ 결제하기 버튼 활성화 여부 ⭐
-    // 'RESERVATION_PENDING' (예약 확인 중) 상태일 때만 결제 가능
-    const isPayButtonActive = order.status === "RESERVATION_PENDING";
+    // 주문 취소 버튼의 비활성화 상태
+    const isCancelButtonDisabled = isCancelling;
 
-    // 리뷰 쓰기 버튼 활성화 여부 (일반적으로 픽업 완료 후 가능)
-    const isReviewButtonVisible = order.status === 'PICKUP_COMPLETED'; // 'PICKUP_CONFIRMED'는 결제 후 상태이므로, 픽업 완료 시에만 리뷰를 쓰는 것이 일반적.
-
-    // 주문 상태를 한국어로 표시하기 위한 변수
+    // 주문 상태를 한국어로 표시
     const displayStatus = orderStatusMap[order.status] || order.status;
 
     return (
@@ -121,7 +138,7 @@ export default function OrderDetail({
                                     <span className="text-gray-600 sm:ml-auto">{item.productCnt}개</span>
                                 </div>
                                 <div className="text-right mt-1">
-                                    <span className="text-lg font-bold">₩{(item.price ?? 0) * (item.productCnt ?? 0).toLocaleString()}원</span>
+                                    <span className="text-lg font-bold">₩{((item.price ?? 0) * (item.productCnt ?? 0)).toLocaleString()}원</span>
                                 </div>
                             </div>
                         </div>
@@ -131,35 +148,50 @@ export default function OrderDetail({
                 )}
             </div>
 
-            <div className="mt-6 text-right font-bold text-lg">
-                총 결제 금액: ₩{(order.totalPrice ?? 0).toLocaleString()}원
+            {/* ⭐⭐ 가격 정보 표시 추가 ⭐⭐ */}
+            <div className="mt-6 text-right space-y-1">
+                <p className="text-lg text-gray-700">
+                    기존 주문 금액: ₩{(order.totalPrice ?? 0).toLocaleString()}원
+                </p>
+                {order.discountAmount > 0 && ( // 할인 금액이 0보다 클 때만 표시
+                    <p className="text-lg text-red-600 font-semibold">
+                        포인트 할인: -₩{(order.discountAmount ?? 0).toLocaleString()}원
+                    </p>
+                )}
+                <p className="text-xl font-bold text-blue-800 mt-2 pt-2 border-t border-gray-300">
+                    최종 결제 금액: ₩{(order.finalPaymentAmount ?? 0).toLocaleString()}원
+                </p>
             </div>
 
+            {/* 버튼 영역: 재조정된 로직에 따라 동적으로 렌더링 */}
             <div className="mt-6 flex justify-end gap-4">
-                {/* ⭐ 결제하기 버튼 ⭐ */}
-                <button
-                    onClick={onPay} // 상위 컴포넌트에서 전달받은 onPay 핸들러 연결
-                    disabled={!isPayButtonActive || isPaying} // 활성화 조건 및 결제 로딩 상태 연결
-                    className={`px-4 py-2 rounded-md text-white font-semibold transition-colors
-                        ${isPayButtonActive && !isPaying
-                        ? 'bg-blue-600 hover:bg-blue-700' // 활성화 시 파란색
-                        : 'bg-gray-400 text-gray-700 cursor-not-allowed' // 비활성화 시 회색
-                    }`}
-                >
-                    {isPaying ? '결제 진행 중...' : '결제하기'}
-                </button>
+                {showPaymentButton && ( // 조건부 렌더링
+                    <button
+                        onClick={onPay}
+                        disabled={isPaying} // 결제 진행 중일 때 비활성화
+                        className={`px-4 py-2 rounded-md text-white font-semibold transition-colors
+                            ${!isPaying
+                            ? 'bg-blue-600 hover:bg-blue-700'
+                            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                        }`}
+                    >
+                        {isPaying ? '결제 진행 중...' : '결제하기'}
+                    </button>
+                )}
 
-                {/* 주문 취소 버튼 */}
-                <button
-                    onClick={handleCancel}
-                    className={`px-4 py-2 rounded ${isCancelButtonDisabled ? 'bg-gray-400 text-gray-700 cursor-not-allowed' : 'bg-red-500 text-white hover:bg-red-600'}`}
-                    disabled={isCancelButtonDisabled}
-                >
-                    주문 취소하기
-                </button>
+                {showCancelButton && ( // 조건부 렌더링
+                    <button
+                        onClick={handleCancel}
+                        disabled={isCancelButtonDisabled} // 취소 진행 중일 때 비활성화
+                        className={`px-4 py-2 rounded ${isCancelButtonDisabled
+                            ? 'bg-gray-400 text-gray-700 cursor-not-allowed'
+                            : 'bg-red-500 text-white hover:bg-red-600'}`}
+                    >
+                        {isCancelling ? '취소 중...' : '주문 취소하기'}
+                    </button>
+                )}
 
-                {/* 리뷰 쓰기 버튼 */}
-                {isReviewButtonVisible && (
+                {showReviewButton && ( // 조건부 렌더링
                     <button
                         onClick={handleWriteReview}
                         className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
@@ -168,7 +200,6 @@ export default function OrderDetail({
                     </button>
                 )}
 
-                {/* 뒤로가기 버튼 */}
                 <button
                     onClick={onBack}
                     className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"

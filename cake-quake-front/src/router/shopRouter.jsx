@@ -1,6 +1,7 @@
 import SellerLayout from "../layouts/sellerLayout.jsx";
 import {lazy, Suspense} from "react";
 import BasicLayout from "../layouts/basicLayout.jsx";
+import TotalSalesPage from "../pages/order/seller/sales/TotalSalesPage.jsx";
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 const ShopNotice=lazy(()=>import("../pages/shop/shopNoticeListPage.jsx"))
@@ -109,6 +110,11 @@ const shopRouter = () => {
             {
                 path: ":shopId/orders/:orderId",
                 element: <Suspense fallback={Loading}><SellerOrderDetailPage/></Suspense>
+            },
+            //--------------------------판매자 주문 통계 관련 라우트--------------------//
+            {
+                path: ":shopId/sales",
+                element: <Suspense fallback={Loading}><TotalSalesPage/></Suspense>
             }
         ]
     };

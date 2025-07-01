@@ -12,7 +12,7 @@ import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx"
 // ⭐ 새로운 모달 컴포넌트 추가 ⭐
 const AddToCartSuccessModal = ({ message, onConfirm }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50"> {/* bg-black bg-opacity-50 제거 */}
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
                 <p className="text-lg font-semibold mb-4">{message}</p>
                 <button
