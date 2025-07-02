@@ -191,9 +191,30 @@
     }
 }
 
-/* 5. 마지막으로, 기본 폰트를 오버라이드합니다. */
-body { font-family: 'Pretendard', sans-serif !important; }
-h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Pretendard', sans-serif !important; }
+.min-w-\[120px\] span { /* min-w-[120px] 클래스를 가진 버튼의 span에 적용 */
+    transform: none !important;
+    font-stretch: 100% !important; /* 혹시 모르니 다시 한번 */
+    letter-spacing: normal !important;
+    white-space: nowrap; /* 글자가 작아져야 할 때 줄바꿈 대신 한 줄로 유지 (필요 시) */
+}
+/* 또는 버튼 자체에 직접 적용 (span에 없을 경우) */
+.min-w-\[120px\] { /* 장바구니/바로주문 버튼의 기본 클래스에 직접 적용 */
+    transform: none !important;
+    font-stretch: 100% !important;
+}
+
+/* 아래는 기존 Pretendard 폰트 정의와 찌그러짐 방지 CSS 블록 */
+body {
+    font-family: 'Pretendard', sans-serif !important;
+    font-stretch: 100%;
+    font-size-adjust: none;
+    transform: none;
+    letter-spacing: normal;
+    line-height: normal;
+}
+h1, h2, h3, h4, h5, h6, .font-heading {
+    font-family: 'Pretendard', sans-serif !important;
+}
 
 /* 기존 border-b-2 border-dashed를 얇은 실선으로 변경 */
 .border-dashed {
@@ -202,7 +223,7 @@ h1, h2, h3, h4, h5, h6, .font-heading { font-family: 'Pretendard', sans-serif !i
     border-color: #e5e7eb;
 }
 
-/* 6. 반응형 스타일 (모바일 화면) 추가 */
+/* 반응형 스타일 (모바일 화면) - 여기 안에는 추가하지 않습니다. */
 @media (max-width: 767px) {
     .animate-char-reveal { animation-duration: 0.6s; }
     .animate-button-grow:hover { transform: scale(1.02); font-size: 1em; }
