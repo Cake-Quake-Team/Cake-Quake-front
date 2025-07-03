@@ -14,3 +14,14 @@ export const markAsRead = async (notificationId) => {
     const response = await jwtAxios.patch(`${prefix}/notifications/${notificationId}/read`);
     return response.data;
 }
+
+// 알림 삭제
+export const deleteNotification = async (notificationId) => {
+    try {
+        const response = await jwtAxios.delete(`${prefix}/notifications/${notificationId}`);
+        return response.data;
+    } catch (error) {
+        console.error(`알림 삭제 실패 (ID: ${notificationId}):`, error);
+        throw error;
+    }
+};
