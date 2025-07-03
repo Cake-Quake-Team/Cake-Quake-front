@@ -1,15 +1,17 @@
 import {useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router";
 import {deleteNotification, getMyNotifications, markAsRead} from "../../api/notificationApi";
 import {useAuth} from "../../store/AuthContext.jsx";
 import {Bell, Trash2, Loader2} from "lucide-react";
-import { parseISO, formatDistanceToNow, differenceInSeconds } from 'date-fns'; // formatDistanceToNow 추가
-import { ko } from 'date-fns/locale'; // 한국어 locale 추가
+import { parseISO, formatDistanceToNow, differenceInSeconds } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 function NotificationBell() {
     const [notifications, setNotifications] = useState([]);
     const [showList, setShowList] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const bellRef = useRef(null);
+    const navigate = useNavigate();
     const {user} = useAuth();
 
     const isAuthenticated = !!user;
@@ -68,10 +70,25 @@ function NotificationBell() {
             }
         }
 
-        if (noti.type === "NEW_ORDER") {
-            window.location.href = `/seller/profile`;
-        } else if (noti.type === "PICKUP_REMINDER" || noti.type === "RESERVATION_CONFIRMATION") {
-            window.location.href = `/buyer/order/${noti.referenceId}`;
+        // 알림 타입별 경로 이동 처리
+        const buyerTypes = [
+            "PICKUP_REMINDER",
+            "RESERVATION_CONFIRMATION",
+            "CANCELLED_ORDER",
+            "READY_FOR_PICKUP",
+            "NO_SHOW_CONFIRMATION",
+        ];
+        const sellerTypes = [
+            "NEW_ORDER",
+            "ORDER_CANCELLED_BY_BUYER",
+        ];
+
+        if (buyerTypes.includes(noti.type)) {
+            navigate(`/buyer/orders/${noti.referenceId}`);
+        } else if (sellerTypes.includes(noti.type)) {
+            navigate(`/shops/${user.shopId}/orders/${noti.referenceId}`);
+        } else {
+            console.warn("알 수 없는 알림 타입:", noti.type);
         }
     };
 
