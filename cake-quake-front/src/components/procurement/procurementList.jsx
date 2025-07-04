@@ -13,7 +13,7 @@ export function ProcurementListComponent({
                                              hasNext,
                                              onLoadMore,
                                              onClickItem,
-                                             // onCreate,        // 추가하신다면 여기도
+                                             // onCreate,
                                          }) {
     return (
         <div>
@@ -83,7 +83,7 @@ ProcurementListComponent.propTypes = {
         PropTypes.shape({
             procurementId:           PropTypes.number.isRequired,
             regDate:                 PropTypes.string,
-            estimatedArrivalDate:    PropTypes.string,   // ← 여기도 변경
+            estimatedArrivalDate:    PropTypes.string,
             status:                  PropTypes.string.isRequired,
             note:                    PropTypes.string,
         })
@@ -91,5 +91,5 @@ ProcurementListComponent.propTypes = {
     hasNext:     PropTypes.bool.isRequired,
     onLoadMore:  PropTypes.func.isRequired,
     onClickItem: PropTypes.func.isRequired,
-    onCreate:    PropTypes.func,  // 필요 시 옵션
+    onCreate:    PropTypes.func,
 };
