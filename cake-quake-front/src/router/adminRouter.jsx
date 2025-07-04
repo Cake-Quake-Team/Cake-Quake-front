@@ -23,7 +23,6 @@ const AdminProcurementDetailPage = lazy (()=>import("../pages/admin/adminProcure
 // QnA (관리자)
 const QnAAdminListPage    = lazy(() => import("../pages/admin/qna/qnaAdminListPage.jsx"));
 const QnAAdminRespondPage = lazy(() => import("../pages/admin/qna/qnaAdminRespondPage.jsx"));
-const QnAAdminDetail = lazy(()=> import("../pages/admin/qna/qnaAdminDetailPage.jsx"))
 
 
 const Loading = <div>Loading...</div>;
