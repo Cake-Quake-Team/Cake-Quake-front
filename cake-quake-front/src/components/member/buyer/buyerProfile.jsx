@@ -98,11 +98,13 @@ function BuyerProfile( ) {
             <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-4">
                 <div className="flex items-center">
                     <div className="w-16 h-16 bg-gray-200 rounded-full flex-shrink-0 mr-4 overflow-hidden">
-                        <img
-                            src='/cakeImage/default-cake.png'
-                            alt="선택된 뱃지"
-                            className="w-full h-full object-cover"
-                        />
+                        <Link to="badges">
+                            <img
+                                src='/cakeImage/default-cake.png'
+                                alt="선택된 뱃지"
+                                className="w-full h-full object-cover"
+                            />
+                        </Link>
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-gray-800">
