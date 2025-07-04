@@ -12,8 +12,8 @@ function CakeCard({ cake,onClick }) {
     return (
         <div
             onClick={onClick}
-            className="hover:shadow-lg transition duration-300 overflow-hidden relative">
-            <img
+            className="bg-white p-6 rounded-3xl interactive-card">
+        <img
                 src={imgSrc}
                 alt={cname || '케이크 이미지'}
                 className="w-full h-64 object-cover"

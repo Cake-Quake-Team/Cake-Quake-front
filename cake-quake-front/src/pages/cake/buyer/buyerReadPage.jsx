@@ -6,12 +6,14 @@ import {Link, useParams, useNavigate} from "react-router"; // Link, useParams, u
 import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
 import { addCartItem } from "../../../api/cartApi.jsx";
 import {getCakeReviews} from "../../../api/reviewApi.jsx";
+import {getShopDetail} from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx"; // 장바구니 추가 API 함수 import (가정)
+import {ShoppingCart, Heart} from "lucide-react";
 
 // ⭐ 새로운 모달 컴포넌트 추가 ⭐
 const AddToCartSuccessModal = ({ message, onConfirm }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 flex items-center justify-center z-50"> {/* bg-black bg-opacity-50 제거 */}
             <div className="bg-white p-6 rounded-lg shadow-lg text-center">
                 <p className="text-lg font-semibold mb-4">{message}</p>
                 <button
@@ -29,6 +31,7 @@ function BuyerCakeReadPage() {
     const { shopId, cakeId } = useParams();
     const navigate = useNavigate();
     const [cake, setCake] = useState(null); // 케이크 상세 정보
+    const [shop, setShop] = useState(null); // 매장 상세 정보
     const [optionTypes, setOptionTypes] = useState([]); // 병합된 최종 옵션 타입 데이터 (CakeDetailComponent로 전달)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -37,6 +40,7 @@ function BuyerCakeReadPage() {
     // 모달 상태 추가
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [isLiked, setIsLiked] = useState(false); // 찜 상태 (true/false)
 
 
     // 리뷰
@@ -97,6 +101,25 @@ function BuyerCakeReadPage() {
 
         fetchCakeDetail();
     }, [cakeId, shopId]);
+
+    // 매장 상세 정보 가져오기
+    useEffect(() => {
+        if (!shopId) return;
+        (async () => {
+            try {
+                const data = await getShopDetail(shopId);
+                setShop(data);
+            } catch (error) {
+                console.error("매장 상세 정보를 불러오는 데 실패했습니다:", error);
+            }
+        })();
+    }, [shopId]);
+
+    // 찜 버튼 클릭 핸들러
+    const handleToggleLike = () => {
+        setIsLiked(prev => !prev);
+    };
+
 
     // 2) 리뷰 가져오기 (첫 페이지만 미리 불러옴, 더보기 버튼 클릭 시 page++)
     useEffect(() => {
@@ -228,22 +251,46 @@ function BuyerCakeReadPage() {
                     setSelectedOptions={setSelectedOptions}
                     apiBaseUrl={thumbnailUrl}
                     OptionComponent={CakeOptionForm}
+                    shop={shop}
+                    actionButtons={
+                        <div className="mt-6 flex justify-center gap-3 flex-shrink-0">
+                            {/* 1. 찜 버튼: 고정된 크기를 유지합니다. (flex-shrink-0 추가) */}
+                            <button
+                                onClick={handleToggleLike}
+                                className={`w-10 h-10 flex-shrink-0 flex items-center justify-center p-2 rounded-full border transition-colors duration-200
+                           ${isLiked ? ' text-red-300' : 'border-gray-300 text-gray-600 hover:bg-gray-100'}`}
+                                title={isLiked ? '찜 취소' : '찜하기'}
+                            >
+                                <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
+                            </button>
+
+                            {/* 2. 장바구니 담기 버튼: flex-1을 추가하여 남은 공간을 채우도록 합니다. */}
+                            <button
+                                onClick={handleAddToCart}
+                                disabled={isAddingToCart}
+                                className="min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
+                            >
+                                {isAddingToCart ? (
+                                    '담는 중...'
+                                ) : (
+                                    <>
+                                        <ShoppingCart size={16} />
+                                        <span style={{ transform: 'none', fontStretch: '100%', letterSpacing: 'normal' }}>장바구니 담기</span>
+                                    </>
+                                )}
+                            </button>
+
+                            {/* 3. 바로 주문하기 버튼: flex-1을 추가하여 남은 공간을 채우도록 합니다. */}
+                            <button
+                                onClick={handleDirectOrder}
+                                className="min-w-[120px] text-sm bg-black text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center justify-center gap-2 flex-1"
+                            >
+                                <span className="mr-1">₩</span>
+                                <span style={{ transform: 'none', fontStretch: '100%', letterSpacing: 'normal' }}>바로 주문하기</span>
+                            </button>
+                        </div>
+                    }
                 />
-                <div className="mt-6 flex justify-center">
-                    <button
-                        onClick={handleAddToCart} // `handleAddToCart` 함수 연결
-                        disabled={isAddingToCart} // 로딩 중 버튼 비활성화
-                        className="min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
-                    >
-                        {isAddingToCart ? '담는 중...' : '장바구니 담기'} {/* 로딩 텍스트 변화 */}
-                    </button>
-                    <button
-                        onClick={handleDirectOrder}
-                        className="min-w-[120px] text-sm ml-5 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
-                    >
-                        바로 주문하기
-                    </button>
-                </div>
             </div>
             <section className="max-w-6xl mx-auto py-12">
                 <h2 className="text-3xl font-bold text-center">BEST REVIEWS</h2>

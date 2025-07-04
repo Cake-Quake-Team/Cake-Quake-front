@@ -90,8 +90,20 @@ export default function OrderListItem({ order }) {
                 )}
             </div>
 
-            <div className="text-right mt-4 text-lg font-bold">
-                총 결제 금액: {formatPrice(order.orderTotalPrice)}
+            {/* ⭐⭐ 최종 가격 정보 표시 섹션 추가 ⭐⭐ */}
+            <div className="text-right mt-4 space-y-1">
+                <p className="text-lg text-gray-700">
+                    총 주문 금액: {formatPrice(order.orderTotalPrice)}
+                </p>
+                {/* discountAmount가 0보다 클 때만 포인트 할인 금액 표시 */}
+                {order.discountAmount > 0 && (
+                    <p className="text-lg text-red-600 font-semibold">
+                        포인트 할인: -{formatPrice(order.discountAmount)}
+                    </p>
+                )}
+                <p className="text-2xl font-bold text-blue-800 mt-2 pt-2 border-t border-gray-300">
+                    최종 결제 금액: {formatPrice(order.finalPaymentAmount)}
+                </p>
             </div>
 
             <div className="mt-4 text-right">

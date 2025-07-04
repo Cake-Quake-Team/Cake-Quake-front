@@ -12,7 +12,10 @@ const endpoints = {
     signupBuyers: 'auth/signup/buyers',
     signupSellerStep1: 'auth/signup/sellers/step1',
     signupSellerStep2: 'auth/signup/sellers/step2',
+    signupSocial: 'auth/signup/social',
     signin: 'auth/signin',
+    myInfo: 'auth/members/me',
+    signout: 'auth/signout',
     signinKakao: 'auth/signin/kakao',
     otpSend: 'auth/otp/send',
     otpVerify: 'auth/otp/verify',
@@ -71,11 +74,25 @@ export const postSellerSignupStep2 = async (formData) => {
     }
 }
 
+// // 로그인 해서 토큰 얻어오기
+// export const getToken = async(userId, password) => {
+//     try {
+//         const res = await axios.post(`${baseUrl}/${endpoints.signin}`, {userId, password}, {
+//             headers: { 'Content-Type': 'application/json' }
+//         })
+//         console.log(res.data)
+//         return res.data
+
+//     } catch (error) {
+//         throw error
+//     }
+// }
 // 로그인 해서 토큰 얻어오기
 export const getToken = async(userId, password) => {
     try {
-        const res = await axios.post(`${baseUrl}/${endpoints.signin}`, {userId, password}, {
-            headers: { 'Content-Type': 'application/json' }
+        const res = await axios.post(`${baseUrl}/${endpoints.signin}`, { userId, password }, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true  // 서버 쿠키를 저장하는 데 필요함.
         })
         console.log(res.data)
         return res.data
@@ -83,6 +100,32 @@ export const getToken = async(userId, password) => {
     } catch (error) {
         throw error
     }
+}
+
+// 로그인 후 서버에서 토큰 파싱한 정보 가져오기_uid, userId, username, role, shopId
+export const getSigninUserInfo = async() => {
+
+    try {
+        const res = await jwtAxios.get(`${baseUrl}/${endpoints.myInfo}`)
+        console.log(res.data)
+        return res.data
+
+    } catch (error) {
+        throw error
+    }
+    
+}
+
+// 로그아웃 (토큰 삭제)
+export const postSignout = async() => {
+
+    try {
+        await jwtAxios.post(`${baseUrl}/${endpoints.signout}`)
+
+    } catch (error) {
+        throw error
+    }
+    
 }
 
 // [카카오로그인] 링크
@@ -123,16 +166,34 @@ export const getKakaoAccessToken = async (authCode) => {
 // [카카오로그인] 토큰으로 유저 정보 획득
 export const getMemberWithAccessToken = async (accessToken) => {
 
-    const header = {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
+    const res = await axios.post(
+        `${baseUrl}/${endpoints.signinKakao}`,
+        {},
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+            withCredentials: true
         }
-    }
-    const res = await axios.post(`${baseUrl}/${endpoints.signinKakao}`, {}, header)
+    )
 
     console.log("getMemberWithAccessToken---res.data: ", res.data)
 
     return res.data
+}
+
+// [카카오로그인] 회원 가입
+export const singupKakao = async(signupData) => {
+    try {
+        const res = await axios.post(`${baseUrl}/${endpoints.signupSocial}`, signupData, {
+            headers: { 'Content-Type': 'application/json' },
+            withCredentials: true
+        })
+
+        console.log(res.data)
+        return res.data
+
+    } catch (error) {
+        throw error
+    }
 }
 
 

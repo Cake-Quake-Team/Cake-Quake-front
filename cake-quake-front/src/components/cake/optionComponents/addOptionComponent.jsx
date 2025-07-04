@@ -47,19 +47,17 @@ function OptionAdd({
     };
 
     return (
-        <div className="card w-full max-w-4xl mx-auto my-8 p-6 md:p-10">
-            {/* 2. 제목 스타일을 `common.css`에서 정의한 스타일로 변경 */}
-            <h2 className="text-center mb-8 font-heading text-secondary-color text-3xl">
+        <div className="max-w-xl mx-auto my-6 p-6 bg-white rounded-xl border border-gray-200 shadow-md">
+            <h2 className="text-3xl font-bold text-gray-800 mb-8 pb-4 border-b-2 border-gray-200 text-center">
                 옵션 등록
             </h2>
 
             <form onSubmit={handleSubmit}>
-                <div className="mb-8 pb-6 border-b border-dashed border-gray-300">
+                <div className="mb-8 p-6 border-b border-dashed border-gray-300">
                     <h3 className="text-xl text-gray-700 mb-4">옵션 타입</h3>
-                    <div className="flex flex-col sm:flex-row items-end gap-4">
-                        {/* 3. select 필드에 커스텀 스타일 클래스 제거 (common.css에서 자동 적용됨) */}
+                    <div className="flex items-center gap-10 mb-2">
                         <select
-                            className="w-full sm:flex-1"
+                            className="flex-grow p-2 border border-gray-300 rounded-md text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             value={selectedOptionTypeId || ''}
                             onChange={(e) => {
                                 const selectedId = Number(e.target.value);
@@ -76,31 +74,27 @@ function OptionAdd({
                                 </option>
                             ))}
                         </select>
-                        {/* 4. 새 옵션 타입 등록 버튼에 `btn-secondary` 커스텀 클래스 적용 */}
                         <button
                             type="button"
                             onClick={handleToggleNewOptionTypeInput}
-                            className="btn-secondary w-full sm:w-auto whitespace-nowrap py-3 px-5 text-sm"
-                        >
+                            className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200 whitespace-nowrap"                        >
                             + 새 옵션 타입 등록
                         </button>
                     </div>
 
                     {showNewOptionTypeInput && (
                         <div className="flex items-center gap-3 mt-4 pl-1">
-                            {/* 5. input 필드에 커스텀 스타일 클래스 제거 */}
                             <input
                                 type="text"
                                 placeholder="새 옵션 타입명을 입력하세요"
                                 value={newOptionTypeName}
                                 onChange={(e) => setNewOptionTypeName(e.target.value)}
-                                className="flex-grow"
+                                className="flex-grow p-2 border border-gray-300 rounded-md text-base text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-400"
                             />
-                            {/* 6. 등록 버튼에 `btn-secondary` 또는 적절한 스타일 적용 */}
                             <button
                                 type="button"
                                 onClick={handleRegisterOptionType}
-                                className="btn-secondary whitespace-nowrap py-2 px-5 text-base"
+                                className="px-5 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-base hover:bg-gray-300 transition-colors duration-200 whitespace-nowrap"
                             >
                                 등록
                             </button>
@@ -122,48 +116,49 @@ function OptionAdd({
                                     &minus;
                                 </button>
                             )}
-                            {/* 7. input 필드에 커스텀 스타일 클래스 제거 */}
                             <input
                                 type="text"
                                 placeholder="옵션명을 입력하세요"
                                 value={item.name}
                                 onChange={(e) => handleOptionItemChange(index, 'name', e.target.value)}
-                                className="flex-1"
+                                className="flex-[2] p-2 border border-gray-300 rounded-md text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
-                            {/* 8. 가격 입력 필드 및 '원' 텍스트 정렬 수정 */}
                             <div className="flex items-center gap-2">
-                                {/* '가격' input 필드에 포맷팅 로직 적용 */}
                                 <input
-                                    type="text" // 타입을 "text"로 변경
+                                    type="text"
                                     placeholder="가격"
                                     value={formatNumberWithCommas(item.price)} // 표시될 값에 포맷팅 적용
                                     onChange={(e) => handleFormattedOptionItemChange(index, 'price', e.target.value)} // onChange 핸들러 변경
-                                    className="w-28 text-right"
+                                    className="flex-1 p-2 border border-gray-300 rounded-md text-base text-gray-700 text-right focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                                 <span className="text-base text-gray-600 whitespace-nowrap">원</span>
                             </div>
                         </div>
                     ))}
 
-                    {/* 9. [+] 옵션 추가 버튼 최종 수정 */}
-                    <div className="border-t border-gray-200 pt-4 mt-6">
+                    <div className="border-t border-gray-200 bg-white">
                         <button
                             type="button"
                             onClick={handleAddOptionItem}
-                            className="btn-ghost flex items-center hover:underline px-0 py-0"
+                            className="text-sm text-gray-400 py-2 px-4 flex items-center hover:underline"
                         >
-                            <span className="text-primary-color text-lg font-bold mr-1">[+]</span>
-                            <span className="text-sm text-gray-400 font-semibold whitespace-nowrap">옵션 추가</span>
+                            <span className="mr-1">[+]</span> 옵션 추가
                         </button>
                     </div>
                 </div>
 
-                <div className="flex justify-center md:justify-end gap-4 mt-12">
-                    {/* 10. `btn-ghost`와 `btn-primary` 클래스 적용 */}
-                    <button type="button" onClick={handleToList} className="btn-ghost w-full sm:w-auto">
+                <div className="mt-30 flex justify-center gap-3">
+                    <button
+                        type="button"
+                        className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
+                        onClick={handleToList}
+                    >
                         취소
                     </button>
-                    <button type="submit" className="btn-primary w-full sm:w-auto">
+                    <button
+                               type="submit"
+                               className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
+                    >
                         등록
                     </button>
                 </div>

@@ -11,7 +11,7 @@ import SelectDeleteModal from '../../components/cart/SelectDeleteModal';
 // ⭐ 성공 메시지를 위한 새로운 모달 타입 컴포넌트 (DeleteModal을 재활용) ⭐
 // 필요하다면 SuccessModal.jsx 파일을 따로 만들 수도 있습니다.
 const SuccessMessageModal = ({ message, onConfirm }) => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50"> {/* bg-black bg-opacity-50 제거 */}
         <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <p className="text-lg font-semibold mb-4">{message}</p>
             <button

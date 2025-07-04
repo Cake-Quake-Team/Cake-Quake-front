@@ -127,7 +127,7 @@ const SignupBuyerComponent = ({
                 </form>
             </div>
         </div>
-    )
+    );
 }
 
 export default SignupBuyerComponent;

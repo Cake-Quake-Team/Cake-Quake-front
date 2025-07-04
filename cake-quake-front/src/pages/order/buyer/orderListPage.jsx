@@ -61,11 +61,8 @@ export default function OrderListPage() {
                     주문 내역이 없습니다.
                 </p>
             ) : (
-                // 주문 목록이 있을 때 (OrderListItem 컴포넌트 사용)
-                <div className="space-y-4"> {/* 각 주문 카드 간의 간격 */}
+                <div className="space-y-4 max-w-2xl mx-auto"> {/* max-w-2xl: 최대 너비 제한, mx-auto: 중앙 정렬 */}
                     {orders.map(order => (
-                        // key prop은 order.orderId 사용 (고유해야 함)
-                        // order prop으로 각 주문 객체를 OrderListItem에 전달
                         <OrderListItem key={order.orderId} order={order} />
                     ))}
                 </div>

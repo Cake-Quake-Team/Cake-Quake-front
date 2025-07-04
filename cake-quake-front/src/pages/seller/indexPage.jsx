@@ -70,12 +70,37 @@ export default function ShopManagement() {
 
     // 카테고리 변경 시 초기화
     useEffect(() => {
-        if (selectedShopCategory === "CAKE_MANAGEMENT") {
-            setCakes([]);
-            setPage(1);
-            setHasMore(true);
+        if (selectedShopCategory !== "CAKE_MANAGEMENT") return;
+        if (page === 1) return; // 1페이지는 위 useEffect에서 로드하므로 무시
+
+        let cancel = false;
+
+        async function fetchMoreCakes() {
+            setLoading(true);
+            try {
+                const cakeData = await getShopCakes(user.shopId, null, { page, size: 10 });
+                if (!cancel) {
+                    setCakes(prev => [...prev, ...cakeData.content]);
+                    setHasMore(cakeData.hasNext);
+                }
+            } catch {
+                if (!cancel) {
+                    setHasMore(false);
+                }
+            } finally {
+                if (!cancel) {
+                    setLoading(false);
+                }
+            }
         }
-    }, [selectedShopCategory]);
+
+        fetchMoreCakes();
+
+        return () => {
+            cancel = true;
+        };
+    }, [page, selectedShopCategory]);
+
 
     // 옵션 데이터 로드
     useEffect(() => {

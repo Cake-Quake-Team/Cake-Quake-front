@@ -36,7 +36,7 @@ function WelcomePage() {
         <div className="welcome-container flex flex-col gap-16 md:gap-20 pt-8 pb-16 md:pt-4 md:pb-24 animate-fadeIn">
             {/* 1. 브랜드 한 줄 슬로건 (Tagline) + 감성 이미지 */}
             <header className="flex flex-col items-center justify-center text-center gap-6 md:gap-8 w-full px-4">
-                <div className="relative w-full h-[80vh] rounded-3xl overflow-hidden shadow-soft mb-8"> {/* [디자인 개선] 모서리를 더 둥글게 */}
+                <div className="relative w-full h-[80vh] overflow-hidden shadow-soft mb-8">
                     {/* 모든 이미지를 absolute로 겹쳐서 배치 */}
                     {galleryImages.map((image, index) => (
                         <img
@@ -124,7 +124,7 @@ function WelcomePage() {
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 max-w-7xl mx-auto"> {/* [디자인 개선] 간격을 미세 조정 */}
                     {/* 가치 1 */}
-                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white shadow-soft transition-transform duration-300 hover:scale-105"> {/* [디자인 개선] card 대신 클래스를 직접 지정 */}
+                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white transition-transform duration-300 hover:scale-105"> {/* [디자인 개선] card 대신 클래스를 직접 지정 */}
                         <span className="text-6xl mb-2">🎂</span>
                         <h3 className="text-2xl font-bold text-text-dark">세상에 단 하나뿐인 커스텀 케이크</h3>
                         <p className="text-gray-600">
@@ -132,15 +132,16 @@ function WelcomePage() {
                         </p>
                     </div>
                     {/* 가치 2 */}
-                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white shadow-soft transition-transform duration-300 hover:scale-105">
+                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white transition-transform duration-300 hover:scale-105">
                         <span className="text-6xl mb-2">🚚</span>
-                        <h3 className="text-2xl font-bold text-text-dark">신뢰할 수 있는 판매자와 안전한 배송</h3>
-                        <p className="text-gray-600">
-                            엄선된 판매자 네트워크와 안전한 배송 시스템으로 안심하고 주문하세요.
+                        <h3 className="text-2xl font-bold text-text-dark">편리한 발주 시스템</h3>
+                        <p className="text-gray-600 text-center">
+                            직관적인 발주 인터페이스로 손쉽게 주문하고, 한눈에 관리하세요.
                         </p>
                     </div>
+
                     {/* 가치 3 */}
-                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white shadow-soft transition-transform duration-300 hover:scale-105">
+                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white transition-transform duration-300 hover:scale-105">
                         <span className="text-6xl mb-2">⭐</span>
                         <h3 className="text-2xl font-bold text-text-dark">실시간 리뷰 기반 신뢰도</h3>
                         <p className="text-gray-600">
@@ -148,7 +149,7 @@ function WelcomePage() {
                         </p>
                     </div>
                     {/* 가치 4 */}
-                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white shadow-soft transition-transform duration-300 hover:scale-105">
+                    <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-white transition-transform duration-300 hover:scale-105">
                         <span className="text-6xl mb-2">🧠</span>
                         <h3 className="text-2xl font-bold text-text-dark">AI로 추천하는 나만의 스타일</h3>
                         <p className="text-gray-600">
@@ -218,7 +219,7 @@ function WelcomePage() {
                     <div className="flex flex-row flex-wrap justify-center gap-6">
                         <Link to="auth/signin"
                          className="btn-primary w-full sm:w-auto text-lg md:text-xl px-12 py-5 animate-button-grow">
-                            케이크 보러가기 ->
+                            케이크 보러가기 →
                         </Link>
                     </div>
                 </div>
