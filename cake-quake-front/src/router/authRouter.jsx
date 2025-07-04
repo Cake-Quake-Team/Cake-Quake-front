@@ -6,7 +6,7 @@ const SignupPage = lazy(() => import("../pages/member/auth/signupPage"))
 const SignupBuyerPage = lazy(() => import("../pages/member/auth/signupBuyerPage"))
 const SignupSellersStep1Page = lazy(() => import("../pages/member/auth/signupSellerStep1Page"))
 const SignupSellersStep2Page = lazy(() => import("../pages/member/auth/signupSellerStep2Page"))
-const SignupKakaoUserPage = lazy(() => import("../pages/member/auth/SignupKakaoUserPage"))
+const SignupKakaoUserPage = lazy(() => import("../pages/member/auth/signupKakaoUserPage"))
 const ChangePasswordPage = lazy(() => import("../pages/member/auth/changePasswordPage"))
 
 const Loading = <div>Loading...</div>
