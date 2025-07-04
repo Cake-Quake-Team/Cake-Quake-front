@@ -18,6 +18,14 @@ const PendingSellerListPage = lazy(()=> import("../pages/admin/pendingSellerList
 const AdminProcurementListPage = lazy(() => import("../pages/admin/adminProcurementListPage.jsx"));
 const AdminProcurementDetailPage = lazy (()=>import("../pages/admin/adminProcurementDetailPage.jsx"))
 
+
+//--------------------QnA
+// QnA (관리자)
+const QnAAdminListPage    = lazy(() => import("../pages/admin/qna/qnaAdminListPage.jsx"));
+const QnAAdminRespondPage = lazy(() => import("../pages/admin/qna/qnaAdminRespondPage.jsx"));
+const QnAAdminDetail = lazy(()=> import("../pages/admin/qna/qnaAdminDetailPage.jsx"))
+
+
 const Loading = <div>Loading...</div>;
 
 const adminRouter = () => ({
@@ -94,6 +102,51 @@ const adminRouter = () => ({
                             element: (
                                 <Suspense fallback={Loading}>
                                     < AdminProcurementDetailPage/>
+                                </Suspense>
+                            ),
+                        },
+                    ],
+                },
+                {
+                    path: 'qna',
+                    children: [
+                        {
+                            index: true,
+                            element: (
+                                <Suspense fallback={Loading }>
+                                    <QnAAdminListPage />
+                                </Suspense>
+                            ),
+                        },
+                        {
+                            path: 'type/:type',
+                            element: (
+                                <Suspense fallback={Loading}>
+                                    <QnAAdminListPage />
+                                </Suspense>
+                            ),
+                        },
+                        {
+                            path: 'status/:status',
+                            element: (
+                                <Suspense fallback={Loading }>
+                                    <QnAAdminListPage />
+                                </Suspense>
+                            ),
+                        },
+                        {
+                            path: 'role/:role',
+                            element: (
+                                <Suspense fallback={Loading}>
+                                    <QnAAdminListPage />
+                                </Suspense>
+                            ),
+                        },
+                        {
+                            path: ":qnaId/respond",
+                            element: (
+                                <Suspense fallback={<Loading />}>
+                                    <QnAAdminRespondPage />
                                 </Suspense>
                             ),
                         },
