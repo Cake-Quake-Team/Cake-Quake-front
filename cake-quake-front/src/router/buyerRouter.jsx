@@ -34,6 +34,8 @@ const PointPage = lazy(() => import("../pages/buyer/point/pointPage.jsx"));
 const BuyerProfileDetailsPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsPage.jsx"));
 const BuyerProfileDetailsModifyPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsModifyPage.jsx"));
 const BuyerProfileDetailsModifyAlarmPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsAlarmPage.jsx"));
+//뱃지
+const BadgePage = lazy(() => import("../pages/buyer/badge/BadgePage.jsx"));
 
 //---------------------AI
 const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
@@ -241,6 +243,15 @@ const buyerRouter = () => ({
                     // 유저 알람 수정
                     path: "details/alarmsettings/:uid",
                     element: <Suspense fallback={Loading}><BuyerProfileDetailsModifyAlarmPage /></Suspense>
+                },
+                {
+                    // 뱃지
+                    path: "badges",
+                    element:(
+                        <Suspense fallback={Loading}>
+                            <BadgePage/>
+                        </Suspense>
+                    )
                 },
 
             ]

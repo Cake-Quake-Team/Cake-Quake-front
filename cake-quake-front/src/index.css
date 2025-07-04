@@ -231,3 +231,106 @@ h1, h2, h3, h4, h5, h6, .font-heading {
         filter: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
     }
 }
+
+/* buyerBadges.css 또는 BadgesPage.module.css */
+
+/* 뷰 모드 전환 버튼 스타일 */
+.view-mode-button {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    color: black;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.view-mode-button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.view-mode-button:not(:last-child) {
+    margin-right: 10px;
+}
+
+/* BadgeCard 관련 CSS (기존 HTML <style> 태그의 내용을 옮겨오거나 추가) */
+.badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.badge {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex; /* flexbox를 사용하여 내부 요소 정렬 */
+    flex-direction: column; /* 세로 방향 정렬 */
+    justify-content: center; /* 수직 중앙 정렬 */
+    align-items: center; /* 수평 중앙 정렬 */
+}
+
+.badge-icon {
+    font-size: 36px; /* 이모지 크기 */
+    display: block;
+    margin-bottom: 10px;
+    /* 이모지 색상이 필요하다면 여기에 추가 */
+}
+
+.badge-name {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.badge-desc {
+    font-size: 0.9em;
+    color: #666;
+    word-break: keep-all; /* 긴 설명이 잘리지 않도록 */
+}
+
+/* 획득하지 않은 뱃지에 대한 스타일 */
+.badge.unacquired { /* 'unacquired' 클래스로 변경 */
+    opacity: 0.4;
+    filter: grayscale(100%);
+}
+
+/* 획득한 뱃지에 대한 스타일 (선택 사항) */
+.badge.acquired {
+    /* 배경색 변경 등 */
+}
+
+/* 대표 뱃지 스타일 */
+.badge.representative {
+    border: 2px solid gold; /* 테두리 강조 */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5); /* 빛나는 효과 */
+}
+
+/* 대표 뱃지 설정 버튼 스타일 */
+.badge-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+}
+
+.badge-button:hover {
+    background-color: #218838;
+}
+
+/* 기타 필요한 스타일 */
+p {
+    margin: 0.5em 0;
+}
