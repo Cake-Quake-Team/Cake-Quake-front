@@ -36,9 +36,6 @@ export default function QnAFormPage() {
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-4">
-                {isEdit ? '문의 수정' : '문의 작성'}
-            </h1>
             <QnAForm
                 initial={initial}
                 onSubmit={handleSubmit}

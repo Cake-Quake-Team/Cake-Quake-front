@@ -30,17 +30,7 @@ export default function AdminLayout() {
                     <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 text-2xl hover:text-gray-300 transition-colors duration-200">
                         ☰
                     </button>
-                    {/* <div className="relative flex items-center">
-                        <input
-                            type="text"
-                            placeholder="Search"
-                            className="border border-gray-300 rounded-full px-4 py-1 pl-8 w-64 text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-300"
-                        />
-                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 ">
-                            <Search className="w-5 h-5 cursor-pointer" />
-                        </span>
-                    </div> */}
-                    <Link to="/buyer">
+                    <Link to="/admin">
                         <h1 className="text-2xl font-bold">Cake Quake</h1>
                     </Link>
                 </div>
@@ -123,6 +113,16 @@ export default function AdminLayout() {
                                 {isActive("/admin/ingredients")}
                             </Link>
 
+                            {/* 문의 관리 */}
+                            <div className="text-sm font-semibold text-gray-500 mb-2">문의 관리</div>
+                            <Link
+                                to="/admin/qna"
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
+                                    isActive('/admin/qna/list') ? 'bg-blue-50 text-blue-700 font-medium' : ''
+                                }`}
+                            >
+                                <span>문의 목록</span>
+                            </Link>
 
                             <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">회원 관리</div>
                             <Link

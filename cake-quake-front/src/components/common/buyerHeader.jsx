@@ -141,13 +141,25 @@ function BuyerHeader() {
                     {user ? (
                         <>
                             {user.role !== "ADMIN" && (
-                                <Link
-                                    to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
-                                    onClick={() => setSidebarOpen(false)}
-                                    className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
-                                >
-                                    마이페이지
-                                </Link>
+                                <>
+                                    {/* 마이페이지 */}
+                                    <Link
+                                        to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
+                                        onClick={() => setSidebarOpen(false)}
+                                        className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                                    >
+                                        마이페이지
+                                    </Link>
+
+                                    {/* 문의 페이지 */}
+                                    <Link
+                                        to={user.role === "SELLER" ? "/seller/qna" : "/buyer/qna"}
+                                        onClick={() => setSidebarOpen(false)}
+                                        className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                                    >
+                                        고객 센터
+                                    </Link>
+                                </>
                             )}
                             {user.role === "ADMIN" && (
                                 <Link
@@ -157,6 +169,7 @@ function BuyerHeader() {
                                     관리자 페이지
                                 </Link>
                             )}
+
                             <button
                                 onClick={() => {
                                     setSidebarOpen(false);
