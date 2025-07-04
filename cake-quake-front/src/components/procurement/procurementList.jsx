@@ -13,7 +13,7 @@ export function ProcurementListComponent({
                                              hasNext,
                                              onLoadMore,
                                              onClickItem,
-                                             //onCreate,        // 추가
+                                             // onCreate,        // 추가하신다면 여기도
                                          }) {
     return (
         <div>
@@ -22,13 +22,15 @@ export function ProcurementListComponent({
                     const createdDate = req.regDate
                         ? format(new Date(req.regDate), 'yyyy.MM.dd')
                         : '–';
-                    const scheduledDate = req.scheduleDate
-                        ? format(new Date(req.scheduleDate), 'yyyy.MM.dd')
+
+                    // ⚡️ scheduleDate → estimatedArrivalDate
+                    const estimatedDate = req.estimatedArrivalDate
+                        ? format(new Date(req.estimatedArrivalDate), 'yyyy.MM.dd')
                         : '미정';
 
                     const statusClasses = {
                         REQUESTED: 'bg-yellow-100 text-yellow-800',
-                        COMPLETED: 'bg-green-100 text-green-800',  // ← 새로운 상태
+                        COMPLETED: 'bg-green-100 text-green-800',
                         SHIPPED:   'bg-blue-100 text-blue-800',
                         DELIVERED: 'bg-indigo-100 text-indigo-800',
                         CANCELLED: 'bg-red-100 text-red-800',
@@ -48,15 +50,15 @@ export function ProcurementListComponent({
                                         발주 #{req.procurementId}
                                     </h3>
                                     <p className="text-sm text-gray-600">요청일: {createdDate}</p>
-                                    <p className="text-sm text-gray-600">예정일: {scheduledDate}</p>
+                                    <p className="text-sm text-gray-600">예상도착일: {estimatedDate}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
-                <span
-                    className={`px-2 py-0.5 rounded-full text-sm font-medium ${statusClass}`}
-                >
-                  {req.status}
-                </span>
+                                <span
+                                    className={`px-2 py-0.5 rounded-full text-sm font-medium ${statusClass}`}
+                                >
+                                    {req.status}
+                                </span>
                                 <ChevronRightIcon className="h-5 w-5 text-gray-400" />
                             </div>
                         </div>
@@ -79,15 +81,15 @@ export function ProcurementListComponent({
 ProcurementListComponent.propTypes = {
     requests: PropTypes.arrayOf(
         PropTypes.shape({
-            procurementId: PropTypes.number.isRequired,
-            regDate:        PropTypes.string,
-            scheduleDate:   PropTypes.string,
-            status:         PropTypes.string.isRequired,
-            note:           PropTypes.string,
+            procurementId:           PropTypes.number.isRequired,
+            regDate:                 PropTypes.string,
+            estimatedArrivalDate:    PropTypes.string,   // ← 여기도 변경
+            status:                  PropTypes.string.isRequired,
+            note:                    PropTypes.string,
         })
     ).isRequired,
-    hasNext:    PropTypes.bool.isRequired,
-    onLoadMore: PropTypes.func.isRequired,
-    onClickItem:PropTypes.func.isRequired,
-    onCreate:   PropTypes.func.isRequired,  // 추가
+    hasNext:     PropTypes.bool.isRequired,
+    onLoadMore:  PropTypes.func.isRequired,
+    onClickItem: PropTypes.func.isRequired,
+    onCreate:    PropTypes.func,  // 필요 시 옵션
 };
