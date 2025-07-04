@@ -17,6 +17,11 @@ const ProcurementDetailPage= lazy(()=>import("../pages/procurement/shopProcureme
 const SellerOrderListPage = lazy(() => import("../pages/order/seller/sellerOrderListPage.jsx"));
 const SellerOrderDetailPage = lazy(() => import("../pages/order/seller/sellerOrderDetailPage.jsx"));
 
+//QnA
+const QnAListPage = lazy(() => import("../pages/qna/qnaListPage"));
+const QnADetailPage = lazy(()=> import("../pages/qna/qnaDetailPage"));
+const QnAFormPage = lazy (() => import("../pages/qna/QnAFormPage"));
+
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 
 const sellerRouter = () => {
@@ -56,9 +61,47 @@ const sellerRouter = () => {
             {
                 path: ":shopId/procurements/:procurementId",
                 element: <Suspense fallback={Loading}><ProcurementDetailPage/></Suspense>
+            },
+            {
+                path:'qna',
+                children: [
+                    {
+                        index : true,
+                        element: (
+                            <Suspense fallback={Loading}>
+                                <QnAListPage/>
+                            </Suspense>
+                        )
+                    },
+                    {
+                        path: 'create',
+                        element: (
+                            <Suspense fallback={Loading}>
+                                <QnAFormPage/>
+                            </Suspense>
+                        )
+                    },
+                    {
+                        path: ':qnaId',
+                        element: (
+                            <Suspense fallback={Loading}>
+                                <QnADetailPage/>
+                            </Suspense>
+                        )
+                    },
+                    {
+                        path: ':qnaId/edit',
+                        element: (
+                            <Suspense fallback={Loading}>
+                                <QnAFormPage/>
+                            </Suspense>
+                        )
+                    }
+                ]
             }
         ]
-    };
+    }
+
 };
 
 export default sellerRouter;

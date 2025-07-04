@@ -6,8 +6,8 @@ const prefix = `${ API_SERVER_HOST }/api`;
 {/* -------------------------케이크 상품 ----------------------------*/}
 
 // 케이크 목록 가져오기
-export const getAllCakeList = async ({ page = 1, keyword, size = 8 }) => {
-    const params = { page, size };
+export const getAllCakeList = async ({ page = 1, keyword, size = 8, sort = "regDate,desc" }) => {
+    const params = { page, size, sort };
     if (keyword) params.keyword = keyword; // keyword가 있을 때만 추가
 
     const response = await jwtAxios.get(`${prefix}/cakes`, { params });

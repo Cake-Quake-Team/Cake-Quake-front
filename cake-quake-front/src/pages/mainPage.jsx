@@ -219,7 +219,7 @@ function WelcomePage() {
                     <div className="flex flex-row flex-wrap justify-center gap-6">
                         <Link to="auth/signin"
                          className="btn-primary w-full sm:w-auto text-lg md:text-xl px-12 py-5 animate-button-grow">
-                            케이크 보러가기 ->
+                            케이크 보러가기 →
                         </Link>
                     </div>
                 </div>

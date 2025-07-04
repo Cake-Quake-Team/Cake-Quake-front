@@ -10,9 +10,9 @@ import BannerCarousel from "../../../components/common/BannerCarousel.jsx";
 
 // 메인 분류 목록
 const mainCategories = [
-    { label: "추천상품", id: "RECOMMENDED_PRODUCTS", description: "전체 매장보기" },
-    { label: "케이크별 분류", id: "CAKE_BY_CATEGORY", description: "상품 상세 페이지로" },
-    { label: "매장별 분류", id: "STORE_BY_CATEGORY", description: "매장 상세 페이지로" }
+    { label: "추천상품", id: "RECOMMENDED_PRODUCTS", description: "Recommended" },
+    { label: "케이크별 분류", id: "CAKE_BY_CATEGORY", description: "By Category" },
+    { label: "매장별 분류", id: "STORE_BY_CATEGORY", description: "Find Shops" }
 ];
 
 // assets 폴더에서 바로 import
@@ -38,6 +38,9 @@ function CakeAllList() {
     // 카테고리 선택 상태
     const [selectedMainCategory, setSelectedMainCategory] = useState("RECOMMENDED_PRODUCTS");
     const [selectedDetailKeyword, setSelectedDetailKeyword] = useState("LETTERING");
+
+    // 추천상품 정렬 기준
+    const [selectedSort, setSelectedSort] = useState("regDate,desc"); // 기본값: 최신순
 
     // 매장 관련 상태
     const [filter, setFilter] = useState("");
@@ -70,7 +73,7 @@ function CakeAllList() {
 
         const fetchCakes = async () => {
             try {
-                const data = await getAllCakeList({ page, keyword: fetchKeyword });
+                const data = await getAllCakeList({ page, keyword: fetchKeyword, sort: selectedSort, size: 20 });
 
                 // 페이지가 1이면(새로운 카테고리/키워드 선택 시) 목록을 초기화
                 // 페이지가 1보다 크면(무한 스크롤) 기존 목록에 추가
@@ -86,7 +89,7 @@ function CakeAllList() {
 
         fetchCakes();
 
-    }, [page, selectedMainCategory, selectedDetailKeyword]);
+    }, [page, selectedMainCategory, selectedDetailKeyword, selectedSort]);
 
 
     // 카테고리 변경 시 상태 초기화
@@ -101,7 +104,7 @@ function CakeAllList() {
         setCakes([]);
         setHasNext(true);
 
-    }, [selectedMainCategory, selectedDetailKeyword]);
+    }, [selectedMainCategory, selectedDetailKeyword, selectedSort]);
 
 
     // 스크롤 이벤트 핸들러 (무한 스크롤 트리거)
@@ -150,6 +153,9 @@ function CakeAllList() {
                                 if (mainCat.id === "CAKE_BY_CATEGORY") {
                                     setSelectedDetailKeyword("LETTERING");
                                 }
+                                if (mainCat.id === "RECOMMENDED_PRODUCTS") {
+                                    setSelectedSort("regDate,desc");
+                                }
                             }}
                         >
                             <span className="text-xl">{mainCat.label}</span>
@@ -159,6 +165,30 @@ function CakeAllList() {
                         </div>
                     ))}
                 </div>
+
+                {/* 추천상품 정렬 버튼 */}
+                {selectedMainCategory === "RECOMMENDED_PRODUCTS" && (
+                    <div className="flex flex-wrap gap-2 mb-4">
+                        <button
+                            className={`px-4 py-1 rounded-md text-sm font-medium ${selectedSort === "regDate,desc" ? "text-black" : "text-gray-400 hover:text-black"}`}
+                            onClick={() => setSelectedSort("regDate,desc")}
+                        >
+                            최신순
+                        </button>
+                        <button
+                            className={`px-4 py-1 rounded-md text-sm font-medium ${selectedSort === "viewCount,desc" ? "text-black" : "text-gray-400 hover:text-black"}`}
+                            onClick={() => setSelectedSort("viewCount,desc")}
+                        >
+                            조회순
+                        </button>
+                        <button
+                            className={`px-4 py-1 rounded-md text-sm font-medium ${selectedSort === "orderCount,desc" ? "text-black" : "text-gray-400 hover:text-black"}`}
+                            onClick={() => setSelectedSort("orderCount,desc")}
+                        >
+                            주문순
+                        </button>
+                    </div>
+                )}
 
                 {/* 케이크 카테고리 버튼 */}
                 {selectedMainCategory === "CAKE_BY_CATEGORY" && (

@@ -32,7 +32,7 @@ const SamplePrevArrow = (props) => {
 };
 
 
-function CakeDetailComponent({ cake, shop, optionTypes, selectedOptions, setSelectedOptions, OptionComponent }) {
+function CakeDetailComponent({ cake, shop, optionTypes, selectedOptions, setSelectedOptions, OptionComponent, actionButtons  }) {
 
     const { user } = useAuth();
 
@@ -59,14 +59,13 @@ function CakeDetailComponent({ cake, shop, optionTypes, selectedOptions, setSele
 
     // 슬라이더 설정
     const sliderSettings = {
-        dots: true,
-        infinite: true,
+        dots: allImages.length > 1, // 이미지가 1개 초과일 때만 dots 표시
+        infinite: allImages.length > 1, // 이미지가 1개 초과일 때만 무한 루프
         speed: 500,
         slidesToShow: 1,
         slidesToScroll: 1,
-        nextArrow: <SampleNextArrow />,
-        prevArrow: <SamplePrevArrow />
-        // customPaging 속성을 제거했습니다.
+        nextArrow: allImages.length > 1 ? <SampleNextArrow /> : null, // 이미지가 1개 초과일 때만 화살표 표시
+        prevArrow: allImages.length > 1 ? <SamplePrevArrow /> : null, // 이미지가 1개 초과일 때만 화살표 표시
     };
 
     const currentShopName = shop?.shopName || '매장 정보 없음';
@@ -101,7 +100,7 @@ function CakeDetailComponent({ cake, shop, optionTypes, selectedOptions, setSele
                 </div>
 
                 {/* 오른쪽: 상품 정보 및 옵션 영역 */}
-                <div className="md:w-1/2 flex flex-col justify-between">
+                <div className="md:w-1/2 flex flex-col justify-between w-full max-w-lg">
                     <div>
                         <h2 className="mt-3 text-2xl font-bold text-gray-900 mb-2">{cname}</h2>
                         <p className="text-2xl text-gray-900 mb-6">{price.toLocaleString()}원</p>
@@ -114,6 +113,7 @@ function CakeDetailComponent({ cake, shop, optionTypes, selectedOptions, setSele
                             />
                         )}
                     </div>
+                    {actionButtons}
                 </div>
             </div>
             <hr className="mt-15"/>

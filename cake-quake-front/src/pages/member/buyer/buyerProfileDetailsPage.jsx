@@ -18,6 +18,7 @@ const BuyerProfileDetailsPage = () => {
     }, [])
 
     const { user } = useAuth() // 로그인한 유저 정보
+    console.log("---BuyerProfileDetailsPage---user: ", user.uid)
     const navigate = useNavigate()
     const { setProfile } = useMemberStore()
 
