@@ -5,42 +5,40 @@ import useCart from '../../../hooks/useCart';
 import { useAuth } from '../../../store/AuthContext';
 import { getPointBalance } from '../../../api/pointApi';
 
-const CreateOrder = () => {
+const CreateOrder = ({ shopId: propShopId, pickupDate: propPickupDate, pickupTime: propPickupTime }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useAuth(); // 로그인된 사용자 정보
+    const { user } = useAuth();
     const { items: cartItems, clearCart } = useCart();
 
     const orderItemsFromSource = location.state?.selectedItems || cartItems;
 
-    // 폼 입력값 상태 (픽업 날짜/시간은 input/select 방식 유지)
-    const [pickupDate, setPickupDate] = useState("");
-    const [pickupTime, setPickupTime] = useState("");
+    const [pickupDate, setPickupDate] = useState(propPickupDate || "");
+    const [pickupTime, setPickupTime] = useState(propPickupTime || "");
     const [orderNote, setOrderNote] = useState("");
 
-    // ⭐ 포인트 관련 상태
-    const [userPoints, setUserPoints] = useState(0); // 보유 포인트
-    const [pointsToUse, setPointsToUse] = useState(""); // 사용할 포인트 입력값 (문자열로 관리)
-    const [totalOrderPrice, setTotalOrderPrice] = useState(0); // 기존 주문 금액
-    const [discountAmount, setDiscountAmount] = useState(0); // 포인트로 적용될 할인 금액
-    const [finalPaymentPrice, setFinalPaymentPrice] = useState(0); // 최종 결제 금액
+    const [userPoints, setUserPoints] = useState(0);
+    const [pointsToUse, setPointsToUse] = useState("");
+    const [totalOrderPrice, setTotalOrderPrice] = useState(0);
+    const [discountAmount, setDiscountAmount] = useState(0);
+    const [finalPaymentPrice, setFinalPaymentPrice] = useState(0);
 
-    // shopId 추출 로직
-    let extractedShopId = null;
-    if (orderItemsFromSource && orderItemsFromSource.length > 0) {
-        if (orderItemsFromSource[0].shopId !== undefined) {
-            extractedShopId = orderItemsFromSource[0].shopId;
-        } else if (orderItemsFromSource[0].cakeItem?.shopId !== undefined) {
-            extractedShopId = orderItemsFromSource[0].cakeItem.shopId;
-        } else if (location.state?.shopId !== undefined) {
-            extractedShopId = location.state.shopId;
-        } else if (orderItemsFromSource[0].cakeDetailDTO?.shopId !== undefined) {
-            extractedShopId = orderItemsFromSource[0].cakeDetailDTO.shopId;
+    const shopId = propShopId || (() => {
+        let extracted = null;
+        if (orderItemsFromSource && orderItemsFromSource.length > 0) {
+            if (orderItemsFromSource[0].shopId !== undefined) {
+                extracted = orderItemsFromSource[0].shopId;
+            } else if (orderItemsFromSource[0].cakeItem?.shopId !== undefined) {
+                extracted = orderItemsFromSource[0].cakeItem.shopId;
+            } else if (location.state?.shopId !== undefined) {
+                extracted = location.state.shopId;
+            } else if (orderItemsFromSource[0].cakeDetailDTO?.shopId !== undefined) {
+                extracted = orderItemsFromSource[0].cakeDetailDTO.shopId;
+            }
         }
-    }
-    const shopId = extractedShopId;
+        return extracted;
+    })();
 
-    // 30분 단위 시간 목록 생성 함수 (기존 로직 유지)
     const generateTimeOptions = () => {
         const times = [];
         for (let h = 0; h < 24; h++) {
@@ -52,15 +50,13 @@ const CreateOrder = () => {
         }
         return times;
     };
-
     const timeOptions = generateTimeOptions();
 
-    // 컴포넌트 마운트 시 사용자 포인트 및 총 주문 금액 계산
     useEffect(() => {
         if (user && user.userId) {
             const fetchUserPoints = async () => {
                 try {
-                    const points = await getPointBalance(); // getPointBalance 호출
+                    const points = await getPointBalance();
                     setUserPoints(points);
                 } catch (err) {
                     console.error("사용자 포인트를 불러오는 데 실패했습니다:", err);
@@ -70,7 +66,6 @@ const CreateOrder = () => {
             fetchUserPoints();
         }
 
-        // 총 주문 금액 계산 (기존 로직 유지)
         const calculatedTotalPrice = orderItemsFromSource.reduce((sum, item) => {
             let itemPrice = 0;
             let quantity = 0;
@@ -101,38 +96,40 @@ const CreateOrder = () => {
 
     }, [user, orderItemsFromSource]);
 
-    // 포인트 사용 금액 변경 시 최종 결제 금액 업데이트
+    useEffect(() => {
+        if (propPickupDate) {
+            setPickupDate(propPickupDate);
+        }
+        if (propPickupTime) {
+            setPickupTime(propPickupTime);
+        }
+    }, [propPickupDate, propPickupTime]);
+
     useEffect(() => {
         const parsedPoints = parseInt(pointsToUse) || 0;
         let appliedDiscount = 0;
 
-        // 사용할 포인트가 보유 포인트를 초과하지 않도록
         const actualPointsToUse = Math.min(parsedPoints, userPoints);
-        // 사용할 포인트가 총 주문 금액을 초과하지 않도록 (총 주문 금액을 초과하여 할인 불가)
         appliedDiscount = Math.min(actualPointsToUse, totalOrderPrice);
 
         setDiscountAmount(appliedDiscount);
         setFinalPaymentPrice(totalOrderPrice - appliedDiscount);
     }, [pointsToUse, userPoints, totalOrderPrice]);
 
-    // 포인트 입력 핸들러
     const handlePointsToUseChange = (e) => {
         const value = e.target.value;
-        // 숫자가 아닌 입력 제거
         const numericValue = value.replace(/[^0-9]/g, '');
         setPointsToUse(numericValue);
     };
 
-    // "모두 사용" 버튼 핸들러
     const handleUseAllPoints = () => {
-        setPointsToUse(String(userPoints)); // 보유 포인트를 문자열로 변환하여 입력 필드에 설정
+        setPointsToUse(String(userPoints));
     };
 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // 프론트엔드 유효성 검사
         if (!orderItemsFromSource || orderItemsFromSource.length === 0) {
             alert("주문할 상품이 없습니다.");
             return;
@@ -145,7 +142,7 @@ const CreateOrder = () => {
             alert("가게 정보가 없습니다. 주문 상품을 확인해주세요.");
             return;
         }
-        if (finalPaymentPrice < 0) { // 최종 결제 금액이 0원 미만인 경우 방지
+        if (finalPaymentPrice < 0) {
             alert("결제 금액이 0원 미만이 될 수 없습니다. 포인트 사용을 조절해주세요.");
             return;
         }
@@ -179,18 +176,17 @@ const CreateOrder = () => {
             cartItemIds: cartItemIds.length > 0 ? cartItemIds : undefined,
             directItems: directItems.length > 0 ? directItems : undefined,
             pickupDate: pickupDate,
-            pickupTime: pickupTime + ":00",
+            pickupTime: pickupTime, // ⭐⭐ "+ :00" 제거 ⭐⭐
             orderNote: orderNote,
-            // 포인트 관련 필드 추가
-            usedPoints: discountAmount, // 실제로 할인에 사용된 포인트 금액
+            usedPoints: discountAmount,
         };
 
-        console.log("전송될 payload:", payload);
+        console.log("전송될 payload:", payload); // 디버깅용: payload에 담긴 usedPoints 확인
 
         try {
             await createOrder(payload);
 
-            alert("주문이 완료되었습니다."); // 성공 메시지 먼저 띄움
+            alert("주문이 완료되었습니다.");
             navigate("/buyer/orders");
 
             if (cartItemIds.length > 0 && (!directItems || directItems.length === 0)) {
@@ -200,7 +196,6 @@ const CreateOrder = () => {
         } catch (error) {
             console.error("주문 실패했습니다. 다시 한번 더 시도해주세요:", error);
             console.log("Full error object from catch:", error);
-
         }
     };
 
@@ -219,6 +214,8 @@ const CreateOrder = () => {
                     value={pickupDate}
                     onChange={(e) => setPickupDate(e.target.value)}
                     required
+                    readOnly={!!propPickupDate}
+                    style={propPickupDate ? { backgroundColor: '#f0f0f0' } : {}}
                 />
             </div>
 
@@ -230,9 +227,11 @@ const CreateOrder = () => {
                     value={pickupTime}
                     onChange={(e) => setPickupTime(e.target.value)}
                     required
+                    disabled={!!propPickupTime}
+                    style={propPickupTime ? { backgroundColor: '#f0f0f0' } : {}}
                 >
                     <option value="">시간 선택</option>
-                    {timeOptions.map((time) => (
+                    {timeOptions && timeOptions.map((time) => (
                         <option key={time} value={time}>
                             {time}
                         </option>
@@ -252,7 +251,6 @@ const CreateOrder = () => {
                 ></textarea>
             </div>
 
-            {/* ⭐ 포인트 사용 섹션 ⭐ */}
             <div className="border p-4 rounded-lg shadow-sm space-y-3 bg-purple-50 border-purple-200">
                 <h3 className="font-semibold text-lg text-purple-800">포인트 사용</h3>
                 <p className="text-sm text-gray-700">
@@ -283,7 +281,6 @@ const CreateOrder = () => {
                 </p>
             </div>
 
-            {/* ⭐ 결제 정보 섹션 ⭐ */}
             <div className="border p-4 rounded-lg shadow-sm space-y-2 bg-green-50 border-green-200">
                 <h3 className="font-semibold text-lg text-green-800">결제 정보</h3>
                 <div className="flex justify-between">
@@ -303,6 +300,7 @@ const CreateOrder = () => {
             <button
                 type="submit"
                 className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors"
+                disabled={!pickupDate || !pickupTime || !shopId || finalPaymentPrice < 0}
             >
                 주문하기
             </button>

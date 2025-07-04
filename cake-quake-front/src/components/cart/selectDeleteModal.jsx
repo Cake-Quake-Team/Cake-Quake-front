@@ -1,7 +1,10 @@
 export default function SelectDeleteModal({ message, onConfirm, onCancel }) {
     return (
         <div
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+            // fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50
+            // ⭐⭐⭐ 위 라인을 아래와 같이 수정합니다 ⭐⭐⭐
+            // 배경 투명하게 (혹은 아예 없애고 싶으면 이 div 자체를 없애고 모달만 직접 렌더링)
+            className="fixed inset-0 flex items-center justify-center z-50" // 배경 색상 및 투명도 관련 클래스 제거
             onClick={onCancel}
         >
             <div

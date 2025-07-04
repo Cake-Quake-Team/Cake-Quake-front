@@ -4,42 +4,55 @@ import {useCallback, useEffect, useState} from "react";
 import{getAvailableTimes,getAvailableShops} from "../../api/scheduleApi.jsx";
 import TimeSelection from "./TimeSelection.jsx";
 
-function PickupScheduler() {
+// 부모 컴포넌트에서 onComplete 콜백을 받을 수 있도록 prop 추가
+function PickupScheduler({ onComplete }) { // ⭐ onComplete prop 추가 ⭐
     const [selectedDate, setSelectedDate] = useState(null);
     const [availableShops, setAvailableShops] = useState([]);
     const [selectedShop, setSelectedShop] = useState(null);
-    const [selectedTime, setSelectedTime] = useState(null); // 사용자가 선택한 최종 시간
+    const [selectedTime, setSelectedTime] = useState(null);
 
-    const now = new Date();
+    const now = new Date(); //
+
     // --- 이벤트 핸들러 ---
     const handleCalendarDateChange = async (date) => {
         setSelectedDate(date);
         setSelectedShop(null); // 날짜 변경 시 매장 및 시간 초기화
-        setSelectedTime(null);
+        setSelectedTime(null); //
 
-        const dateString = date.toISOString().split('T')[0];
+        const dateString = date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }); // 'en-CA'는 YYYY-MM-DD 형식을 보장
 
         try {
-            const shops = await getAvailableShops(dateString);
-            setAvailableShops(shops);
+            const shops = await getAvailableShops(dateString); //
+            setAvailableShops(shops); //
         } catch (error) {
-            console.error('예약 가능한 매장 조회 실패:', error);
-            alert('예약 가능한 매장을 불러오는 데 실패했습니다.');
-            setAvailableShops([]);
+            console.error('예약 가능한 매장 조회 실패:', error); //
+            alert('예약 가능한 매장을 불러오는 데 실패했습니다.'); //
+            setAvailableShops([]); //
         }
     };
 
     const handleShopSelect = (shop) => {
-        setSelectedShop(shop);
+        setSelectedShop(shop); //
         setSelectedTime(null); // 매장 변경 시 시간 초기화
-        console.log('최종 선택된 매장:', shop);
+        console.log('최종 선택된 매장:', shop); //
     };
 
     const handleTimeSelect = (time) => {
         setSelectedTime(time); // 선택된 시간 상태 업데이트
-        console.log('최종 선택된 시간:', time);
-        // ✨ 이 시점에서 매장, 날짜, 시간이 모두 선택됨
-        // 최종 예약 확인 또는 다음 단계로 이동하는 로직을 여기에 추가
+        console.log('최종 선택된 시간:', time); //
+    };
+
+    // ⭐ 예약 확정 및 다음 단계로 이동 버튼 클릭 시 호출될 함수 ⭐
+    const handleProceedToOrder = () => {
+        if (selectedDate && selectedShop && selectedTime) {
+            onComplete({ // 부모 컴포넌트로 선택된 정보 전달
+                selectedDate,
+                selectedShop,
+                selectedTime
+            });
+        } else {
+            alert("날짜, 매장, 시간을 모두 선택해주세요.");
+        }
     };
 
     return (
@@ -50,17 +63,17 @@ function PickupScheduler() {
             margin: 'auto',
             display: 'flex',
             gap: '20px',
-            flexWrap: 'wrap' // 화면이 작아질 때 줄바꿈
+            flexWrap: 'wrap'
         }}>
             {/* 왼쪽 섹션: 캘린더 */}
             <div style={{ flex: '1 1 45%', minWidth: '320px', marginBottom: '20px' }}>
                 <h2>1. 픽업 날짜를 선택해주세요</h2>
                 <div style={{ width: '100%', maxWidth: '400px', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', margin: '0 auto' }}>
                     <Calendar
-                        onChange={handleCalendarDateChange}
-                        value={selectedDate}
-                        minDate={new Date()} // 현재 날짜
-                        maxDate={new Date(now.setMonth(now.getMonth() + 3))} // 오늘로부터 3개월 뒤
+                        onChange={handleCalendarDateChange} //
+                        value={selectedDate} //
+                        minDate={new Date()} //
+                        maxDate={new Date(now.setMonth(now.getMonth() + 3))} //
                         selectRange={false}
                         className="react-calendar-custom"
                     />
@@ -89,7 +102,7 @@ function PickupScheduler() {
                                         backgroundColor: selectedShop?.shopId === shop.shopId ? '#eaf4ff' : '#f9f9f9',
                                         transition: 'background-color 0.2s, border-color 0.2s',
                                     }}
-                                    onClick={() => handleShopSelect(shop)}
+                                    onClick={() => handleShopSelect(shop)} //
                                     onMouseOver={e => e.currentTarget.style.backgroundColor = selectedShop?.shopId === shop.shopId ? '#eaf4ff' : '#eef'}
                                     onMouseOut={e => e.currentTarget.style.backgroundColor = selectedShop?.shopId === shop.shopId ? '#eaf4ff' : '#f9f9f9'}
                                 >
@@ -121,8 +134,8 @@ function PickupScheduler() {
                     border: '1px solid #007bff',
                     borderRadius: '8px',
                     backgroundColor: '#eaf4ff',
-                    width: '100%', // 전체 너비 사용
-                    flexBasis: '100%' // flexbox에서 한 줄 전체를 차지
+                    width: '100%',
+                    flexBasis: '100%'
                 }}>
                     <h2>선택된 픽업 정보 확인</h2>
                     <p><strong>날짜:</strong> {selectedDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' })}</p>
@@ -130,17 +143,14 @@ function PickupScheduler() {
 
                     {selectedShop && selectedDate && (
                         <TimeSelection
-                            shopId={selectedShop.shopId}
-                            date={selectedDate}
-                            onSelectTime={handleTimeSelect}
+                            shopId={selectedShop.shopId} //
+                            date={selectedDate} //
+                            onSelectTime={handleTimeSelect} //
                         />
                     )}
                     {selectedTime && (
                         <button
-                            onClick={() => {
-                                alert(`최종 예약! 날짜: ${selectedDate.toLocaleDateString()}, 매장: ${selectedShop.shopName}, 시간: ${selectedTime.substring(0, 5)}`);
-                                // navigate('/order-confirmation', { state: { selectedDate, selectedShop, selectedTime } });
-                            }}
+                            onClick={handleProceedToOrder} // ⭐ 수정: 최종 제출 함수 호출 ⭐
                             style={{
                                 marginTop: '20px',
                                 padding: '12px 25px',
@@ -162,7 +172,4 @@ function PickupScheduler() {
     );
 }
 
-
 export default PickupScheduler;
-
-//픽업 날짜 선택 -> 예약하려는 날짜 선택

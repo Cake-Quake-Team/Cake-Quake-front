@@ -6,12 +6,9 @@ import CartPrice from '../../components/cart/CartPrice';
 import CartActions from "../../components/cart/cartActions.jsx";
 import DeleteModal from '../../components/cart/DeleteModal';
 import SelectDeleteModal from '../../components/cart/SelectDeleteModal';
-// import { getCartItems } from '../../api/cartApi'; // useCart 내부에서 처리
 
-// ⭐ 성공 메시지를 위한 새로운 모달 타입 컴포넌트 (DeleteModal을 재활용) ⭐
-// 필요하다면 SuccessModal.jsx 파일을 따로 만들 수도 있습니다.
 const SuccessMessageModal = ({ message, onConfirm }) => (
-    <div className="fixed inset-0 flex items-center justify-center z-50"> {/* bg-black bg-opacity-50 제거 */}
+    <div className="fixed inset-0 flex items-center justify-center z-50">
         <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <p className="text-lg font-semibold mb-4">{message}</p>
             <button
@@ -27,12 +24,10 @@ const SuccessMessageModal = ({ message, onConfirm }) => (
 
 export default function CartPage() {
     const navigate = useNavigate();
-    // useCart 훅에서 fetchCart도 받아옴
-    const { items, cartTotalPrice, updateItem, removeItem } = useCart();
+    // useCart 훅에서 fetchCart와 clearAllItems도 받아옴
+    const { items, cartTotalPrice, updateItem, removeItem, clearAllItems } = useCart(); // ⭐ clearAllItems 추가 ⭐
     const [selectedIds, setSelectedIds] = useState([]);
-    // modal 상태에 'success' 타입을 추가
     const [modal, setModal] = useState({ type: null, id: null, message: '' });
-
 
     const cartItems = Array.isArray(items) ? items : [];
 
@@ -44,54 +39,48 @@ export default function CartPage() {
     const handleQuantityChange = async (id, newQty) => {
         try {
             await updateItem(id, newQty);
-            // alert('수량이 성공적으로 변경되었습니다.'); // 기존 alert 제거
         } catch (e) {
-            // useCart 훅에서 이미 alert 처리하고 있다면 중복될 수 있음
+            // 에러 처리
         }
     };
 
-    // ⭐ 단일 아이템 삭제 핸들러 (모달 연동) ⭐
     const handleRemoveSingleItem = async (id) => {
         try {
             await removeItem(id);
-            openModal('success', null, '상품이 장바구니에서 삭제되었습니다.'); // 성공 모달 띄우기
+            openModal('success', null, '상품이 장바구니에서 삭제되었습니다.');
         } catch (e) {
-            // useCart 훅에서 이미 alert 처리하고 있다면 중복될 수 있음
+            // 에러 처리
         } finally {
-            closeModal(); // 삭제 확인 모달 닫기
+            closeModal();
         }
     };
 
-    // ⭐ 선택된 아이템 삭제 핸들러 (모달 연동) ⭐
     const deleteSelected = async () => {
         try {
-            // Promise.all로 여러 아이템을 삭제 시도 (useCart.removeItem이 각자 API 호출)
             await Promise.all(selectedIds.map(id => removeItem(id)));
-            setSelectedIds([]); // 삭제 성공 시 선택된 ID 초기화
-            openModal('success', null, '선택된 상품들이 장바구니에서 삭제되었습니다.'); // 성공 모달 띄우기
+            setSelectedIds([]);
+            openModal('success', null, '선택된 상품들이 장바구니에서 삭제되었습니다.');
         } catch (e) {
-            // useCart 훅에서 이미 alert 처리하고 있다면 중복될 수 있음
+            // 에러 처리
         } finally {
-            closeModal(); // 선택 삭제 확인 모달 닫기
+            closeModal();
         }
     };
 
     // ⭐ 전체 비우기 핸들러 (모달 연동) ⭐
-    // const handleClearAll = async () => {
-    //     try {
-    //         await clearAllItems();
-    //         openModal('success', null, '장바구니가 모두 비워졌습니다.'); // 성공 모달 띄우기
-    //     } catch (e) {
-    //         // useCart 훅에서 이미 alert 처리하고 있다면 중복될 수 있음
-    //     } finally {
-    //         closeModal(); // 전체 비우기 확인 모달 닫기
-    //     }
-    // };
-
+    const handleClearAll = async () => {
+        try {
+            await clearAllItems(); // ⭐ 이제 clearAllItems가 정의됨 ⭐
+            openModal('success', null, '장바구니가 모두 비워졌습니다.');
+        } catch (e) {
+            // useCart 훅에서 이미 alert 처리하고 있다면 중복될 수 있음
+        } finally {
+            closeModal();
+        }
+    };
 
     const openModal = (type, id = null, message = '') => setModal({ type, id, message });
     const closeModal = () => setModal({ type: null, id: null, message: '' });
-
 
     const handleOrderSelected = () => {
         const selectedItems = cartItems.filter(item => selectedIds.includes(item.cartItemId));
@@ -125,8 +114,7 @@ export default function CartPage() {
                     selectedIds={selectedIds}
                     onToggleSelect={toggleSelect}
                     onQuantityChange={handleQuantityChange}
-                    // 단일 삭제 시 handleDeleteSingleItem 호출
-                    onRemoveClick={(id) => openModal('single', id)} // 기존 onRemoveClick 그대로 사용
+                    onRemoveClick={(id) => openModal('single', id)}
                 />
             )}
             <CartPrice
@@ -143,7 +131,7 @@ export default function CartPage() {
                     }
                     openModal('multiple');
                 }}
-                onClearAll={() => {
+                onClearAll={() => { // ⭐ onClearAll prop 사용 ⭐
                     if (cartItems.length === 0) {
                         alert("장바구니가 이미 비어있습니다.");
                         return;
@@ -159,7 +147,7 @@ export default function CartPage() {
             {modal.type === 'single' && (
                 <DeleteModal
                     message="이 상품을 삭제하시겠어요?"
-                    onConfirm={() => handleRemoveSingleItem(modal.id)} // ⭐ handleRemoveSingleItem 호출 ⭐
+                    onConfirm={() => handleRemoveSingleItem(modal.id)}
                     onCancel={closeModal}
                 />
             )}
@@ -168,25 +156,25 @@ export default function CartPage() {
             {modal.type === 'multiple' && (
                 <SelectDeleteModal
                     message="선택한 상품들을 삭제하시겠어요?"
-                    onConfirm={deleteSelected} // deleteSelected 함수 실행
+                    onConfirm={deleteSelected}
                     onCancel={closeModal}
                 />
             )}
 
             {/* 전체 비우기 확인 모달 */}
-            {/*{modal.type === 'all' && (*/}
-            {/*    <DeleteModal*/}
-            {/*        message="장바구니를 모두 비우시겠어요?"*/}
-            {/*        onConfirm={handleClearAll} // ⭐ handleClearAll 호출 ⭐*/}
-            {/*        onCancel={closeModal}*/}
-            {/*    />*/}
-            {/*)}*/}
+            {modal.type === 'all' && (
+                <DeleteModal
+                    message="장바구니를 모두 비우시겠어요?"
+                    onConfirm={handleClearAll} // ⭐ handleClearAll 호출 ⭐
+                    onCancel={closeModal}
+                />
+            )}
 
             {/* ⭐ 삭제 성공 메시지 모달 ⭐ */}
             {modal.type === 'success' && (
                 <SuccessMessageModal
                     message={modal.message}
-                    onConfirm={closeModal} // '확인' 버튼 누르면 모달 닫기 (이후 화면은 이미 업데이트됨)
+                    onConfirm={closeModal}
                 />
             )}
         </div>
