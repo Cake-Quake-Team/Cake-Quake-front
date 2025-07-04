@@ -3,7 +3,7 @@ import { updateSellerOrderStatus } from "../../../api/sellerOrderApi";
 import { Link } from "react-router";
 import { useParams } from "react-router";
 
-// 주문 상태 옵션 상수
+// 주문 상태 옵션 상수 (label을 한국어로 변경)
 const ORDER_STATUS_OPTIONS = [
     { value: "RESERVATION_PENDING", label: "예약 확인 중" },
     { value: "RESERVATION_CONFIRMED", label: "예약 확정" },
@@ -31,12 +31,18 @@ const SellerOrderItem = ({ order }) => {
     });
 
     const handleStatusChange = (e) => {
-        const newStatus = e.target.value;
+        const newStatusValue = e.target.value; // 변경될 Enum 값 (예: "RESERVATION_CONFIRMED")
 
-        const confirmChange = confirm(`정말로 상태를 '${newStatus}'로 변경하시겠습니까?`);
+        // newStatusValue에 해당하는 한국어 label 찾기
+        const newStatusLabel = ORDER_STATUS_OPTIONS.find(
+            option => option.value === newStatusValue
+        )?.label || newStatusValue; // 찾지 못하면 그냥 value 표시
+
+        // confirm 메시지를 한국어로 변경하고, 변경될 상태의 한국어 label 사용
+        const confirmChange = confirm(`정말로 상태를 '${newStatusLabel}'(으)로 변경하시겠습니까?`); //
         if (!confirmChange) return;
 
-        updateStatusMutation.mutate({ orderId: order.orderId, status: newStatus });
+        updateStatusMutation.mutate({ orderId: order.orderId, status: newStatusValue });
     };
 
     const formattedPickupDateTime = `${order.pickupDate} ${order.pickupTime}`;
@@ -70,14 +76,16 @@ const SellerOrderItem = ({ order }) => {
                         onChange={handleStatusChange}
                         disabled={
                             updateStatusMutation.isPending ||
-                            order.status === "픽업 완료" ||
-                            order.status === "주문 취소" ||
-                            order.status === "노쇼"
+                            // Enum 값과 직접 비교하도록 수정
+                            order.status === "PICKUP_COMPLETED" ||
+                            order.status === "RESERVATION_CANCELLED" ||
+                            order.status === "NO_SHOW"
                         }
                         className="mt-2 p-2 border rounded-md disabled:bg-gray-100 disabled:text-gray-500"
                     >
                         <option disabled value="">-- 상태 선택 --</option>
                         {ORDER_STATUS_OPTIONS.map((option) => (
+                            // label을 UI에 표시
                             <option key={option.value} value={option.value}>{option.label}</option>
                         ))}
                     </select>
@@ -98,7 +106,8 @@ const SellerOrderItem = ({ order }) => {
                     )}
                     <div>
                         <p className="text-sm text-gray-700">수량: {order.productCnt}개</p>
-                        <p className="text-sm text-gray-700">단가: {formatPrice(order.orderTotalPrice / order.productCnt)}</p>
+                        {/* 단가 계산 시 orderTotalPrice가 0이 아닐 때만 나누기 수행 */}
+                        <p className="text-sm text-gray-700">단가: {order.orderTotalPrice && order.productCnt ? formatPrice(order.orderTotalPrice / order.productCnt) : formatPrice(0)}</p>
                     </div>
                 </div>
 

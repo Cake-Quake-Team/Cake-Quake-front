@@ -43,6 +43,10 @@ const BuyerNoticeListPage=lazy(()=>import("../pages/buyer/shop/buyerNoticeListPa
 const BuyerNoticeDetailPage = lazy(()=>import("../pages/buyer/shop/buyerNoticeDetailPage.jsx"));
 const BuyerShopDetailPage=lazy(()=>import("../pages/buyer/shop/buyerShopDetailPage.jsx"));
 
+//-------------------찜
+const LikedMainPage = lazy(() => import("../pages/buyer/like/LikedMainPage.jsx"));
+
+
 const Loading = <div>Loading...</div>;
 
 const buyerRouter = () => ({
@@ -185,6 +189,15 @@ const buyerRouter = () => ({
                     element: (
                         <Suspense fallback={Loading}>
                             <BuyerProfilePage/>
+                        </Suspense>
+                    )
+                },
+                // 찜
+                {
+                    path: "likes/:type?", // '/buyer/profile/likes' 또는 '/buyer/profile/likes/cake', '/buyer/profile/likes/shop'
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <LikedMainPage />
                         </Suspense>
                     )
                 },
