@@ -295,22 +295,6 @@ function BuyerCakeReadPage() {
                     }
                 />
 
-                <div className="mt-6 flex justify-center">
-                    <button
-                        onClick={handleAddToCart}
-                        disabled={isAddingToCart}
-                        className="min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
-                    >
-                        {isAddingToCart ? '담는 중...' : '장바구니 담기'}
-                    </button>
-                    <button
-                        onClick={handleDirectOrder}
-                        className="min-w-[120px] text-sm ml-5 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
-                    >
-                        바로 주문하기
-                    </button>
-                </div>
-
             </div>
             <section className="max-w-6xl mx-auto py-12">
                 <h2 className="text-3xl font-bold text-center">BEST REVIEWS</h2>

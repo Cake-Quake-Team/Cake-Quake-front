@@ -6,7 +6,7 @@ function BadgeCard({ badge, isAcquiredView, onSetProfileBadge }) {
     const icon = badge.icon; // 백엔드에서 받은 'icon' 필드 사용
     const description = badge.description;
     const acquiredDate = badge.acquiredDate;
-    const name = isAcquiredView ? badge.badgeName : badge.name; // DTO에 따라 필드명 다름
+    const name = isAcquiredView ? badge.name : badge.name; // DTO에 따라 필드명 다름
     const acquired = isAcquiredView ? true : badge.acquired; // isAcquiredView면 항상 획득으로 간주
     const isRepresentative = isAcquiredView ? badge.isRepresentative : false;
 
@@ -24,8 +24,7 @@ function BadgeCard({ badge, isAcquiredView, onSetProfileBadge }) {
     return (
         <div className={cardClasses}>
             <span
-                className="badge-icon" // 기존 CSS의 .badge-icon 스타일을 재사용합니다.
-                // 이모지 폰트 크기, 정렬 등은 buyerBadges.css에 정의되어 있다고 가정합니다.
+                className="badge-icon"
             >
                 {icon || '❓'}
             </span>

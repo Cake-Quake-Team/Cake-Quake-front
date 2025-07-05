@@ -6,6 +6,7 @@ import {useNavigate} from "react-router";
 import {getPointBalance} from "../../../api/pointApi.jsx";
 import {getOrderList} from "../../../api/buyerOrderApi.jsx"; // 구매자 주문 목록 API 임포트
 import {useAuth} from '../../../store/AuthContext.jsx'; // useAuth 훅 임포트
+import {getRepresentativeBadge} from "../../../api/badgeApi.jsx";
 
 function MyPage() {
     const navigate = useNavigate();
@@ -20,6 +21,8 @@ function MyPage() {
     const [recentOrders, setRecentOrders] = useState([]);
     const [loadingRecentOrders, setLoadingRecentOrders] = useState(true);
     const [errorRecentOrders, setErrorRecentOrders] = useState(null);
+    const [representativeBadge, setRepresentativeBadge] = useState(null); // 대표 뱃지 상태
+
 
     const orderStatusMap = {
         RESERVATION_PENDING: '예약 확인 중',
@@ -38,81 +41,74 @@ function MyPage() {
     useEffect(() => {
         if (!currentUserUid) return;
 
-        (async () => {
+        const fetchAllData = async () => {
+            // 리뷰 수 조회
             try {
                 const payload = await getMyReviewList(currentUserUid, { page: 0, size: 1 });
-                console.log('✅ getMyReviewList payload:', payload);
                 setReviewCount(payload.totalCount);
             } catch (e) {
                 console.error('리뷰 수 조회 실패', e);
+                setReviewCount(0);
             }
-        })();
-    }, [currentUserUid]);
 
-    useEffect(() => {
-        if (!currentUserUid) return;
-
-        async function fetchPoint() {
+            // 포인트 잔액 조회
             try {
                 const bal = await getPointBalance(currentUserUid);
                 setPointBalance(bal);
             } catch (e) {
                 console.error('포인트 잔액 조회 실패', e);
+                setPointBalance(0);
             }
-        }
-        fetchPoint();
-    }, [currentUserUid]);
 
-    useEffect(() => {
-        if (!currentUserUid) return;
-
-        async function fetchOrderCount() {
-            try {
-                const response = await getOrderList(currentUserUid, { page: 0, size: 1 });
-                setOrderCount(response.pageInfo?.totalElements ?? 0);
-            } catch (e) {
-                console.error('전체 주문 수 조회 실패', e);
-            }
-        }
-        fetchOrderCount();
-    }, [currentUserUid]);
-
-    useEffect(() => {
-        if (!currentUserUid) {
-            setErrorRecentOrders("로그인 정보가 필요합니다.");
-            setLoadingRecentOrders(false);
-            return;
-        }
-
-        const fetchRecentOrders = async () => {
+            // 전체 주문 수 및 최신 주문 내역 조회
             try {
                 setLoadingRecentOrders(true);
                 setErrorRecentOrders(null);
-                const response = await getOrderList(currentUserUid, {
+
+                const allOrdersResponse = await getOrderList(currentUserUid, { page: 0, size: 1 });
+                setOrderCount(allOrdersResponse.pageInfo?.totalElements ?? 0);
+
+                const recentOrdersResponse = await getOrderList(currentUserUid, {
                     page: 0,
                     size: 3,
                     sort: 'modDate,desc'
                 });
 
-                if (response && Array.isArray(response.orders)) {
-                    setRecentOrders(response.orders);
-                } else if (response && Array.isArray(response.content)) {
-                    setRecentOrders(response.content);
+                if (recentOrdersResponse && Array.isArray(recentOrdersResponse.orders)) {
+                    setRecentOrders(recentOrdersResponse.orders);
+                } else if (recentOrdersResponse && Array.isArray(recentOrdersResponse.content)) {
+                    setRecentOrders(recentOrdersResponse.content);
                 } else {
-                    console.error("구매자 최신 주문 API 응답 구조가 예상과 다릅니다:", response);
+                    console.error("구매자 최신 주문 API 응답 구조가 예상과 다릅니다:", recentOrdersResponse);
                     setRecentOrders([]);
                     setErrorRecentOrders("최신 주문 데이터를 불러오는 데 문제가 발생했습니다.");
                 }
 
             } catch (err) {
-                console.error("최신 주문 불러오기 실패:", err);
-                setErrorRecentOrders("최신 주문을 불러오는 데 실패했습니다.");
+                console.error("주문 정보 불러오기 실패:", err);
+                setErrorRecentOrders("주문 정보를 불러오는 데 실패했습니다.");
+                setOrderCount(0);
+                setRecentOrders([]);
             } finally {
                 setLoadingRecentOrders(false);
             }
+
+            // 대표 뱃지 정보 조회
+            try {
+                const badge = await getRepresentativeBadge(user.uid);
+                if (badge) {
+                    setRepresentativeBadge(badge);
+                } else {
+                    setRepresentativeBadge(null);
+                }
+            } catch (e) {
+                console.error('대표 뱃지 정보 조회 실패:', e);
+                setRepresentativeBadge(null);
+            }
+
         };
 
-        fetchRecentOrders();
+        fetchAllData();
     }, [currentUserUid]);
 
     const handleViewOrderDetail = (orderId) => {
@@ -131,7 +127,7 @@ function MyPage() {
         <div className="container mx-auto p-4 sm:px-6 lg:px-8 max-w-4xl min-h-screen">
 
             {/* 1. 온도 표시 컴포넌트 사용 */}
-            <BuyerProfile currentUserUid={currentUserUid} />
+            <BuyerProfile representativeBadge={representativeBadge}/>
 
             {/* 2. 요약 정보 (쿠폰, 나의 리뷰, 전체 주문 내역, 찜) */}
             <section className="bg-white rounded-lg p-6 mb-6 border border-gray-300">
