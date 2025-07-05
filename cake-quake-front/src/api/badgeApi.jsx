@@ -5,7 +5,17 @@ const prefix = `${API_SERVER_HOST}/api`;
 
 // 대표 뱃지 설정
 export const setProfileBadge = async (uid, badgeId) => {
-    const response = await jwtAxios.put(`${prefix}/buyers/${uid}/badges/profile`, {badgeId});
+    const response = await jwtAxios.put(`${prefix}/buyers/${uid}/badges/profile`, {badgeId}, {
+        headers: {
+            "Content-Type": "application/json",
+        }
+    });
+    return response.data;
+};
+
+// 대표 뱃지 조회
+export const getRepresentativeBadge = async (uid) => {
+    const response = await jwtAxios.get(`${prefix}/buyers/${uid}/badges/profile`);
     return response.data;
 };
 

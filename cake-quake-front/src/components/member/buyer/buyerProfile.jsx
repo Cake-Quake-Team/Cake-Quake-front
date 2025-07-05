@@ -3,7 +3,7 @@ import { getTemperature } from '../../../api/temperatureApi.jsx';
 import {Link} from "react-router";
 import {getBuyerProfile} from "../../../api/memberApi.js";
 
-function BuyerProfile( ) {
+function BuyerProfile({ representativeBadge }) {
     const [temperature, setTemperature] = useState(null); // 온도 데이터 저장
     const [loading, setLoading] = useState(true); //전체 로딩 상태
     const [error, setError] = useState(""); //오류 메시지 저장
@@ -97,19 +97,36 @@ function BuyerProfile( ) {
         <div className="bg-white rounded-lg p-6">
             <div className="flex items-center justify-between pb-4 border-b border-gray-200 mb-4">
                 <div className="flex items-center">
-                    <div className="w-16 h-16 bg-gray-200 rounded-full flex-shrink-0 mr-4 overflow-hidden">
-                        <Link to="badges">
-                            <img
-                                src='/cakeImage/default-cake.png'
-                                alt="선택된 뱃지"
-                                className="w-full h-full object-cover"
-                            />
+                    <div className="w-25 h-25 bg-white border border-gray-300 rounded-full flex-shrink-0 mr-4 overflow-hidden flex items-center justify-center">
+                        <Link to="badges" className="flex flex-col items-center justify-center w-full h-full">
+                            {representativeBadge && representativeBadge.icon ? (
+                                <div className="flex flex-col items-center justify-center w-full h-full">
+                                    <div className="text-3xl mb-1">
+                                        {representativeBadge.icon}
+                                    </div>
+                                    <div className="text-xs font-medium text-gray-700 text-center px-1"> {/* ⭐ 글씨 크기 조정: text-sm -> text-xs, 중앙 정렬, 패딩 추가 */}
+                                        {representativeBadge.name}
+                                    </div>
+                                </div>
+                            ) : (
+                                <img
+                                    src="/cakeImage/default-cake.png"
+                                    alt="기본 뱃지"
+                                    className="w-full h-full object-cover"
+                                />
+                            )}
                         </Link>
                     </div>
-                    <div>
+                    <div className="ml-4">
                         <h2 className="text-xl font-bold text-gray-800">
                             <span id="user-id-display">{buyerProfile.uname || '사용자'}</span>
                         </h2>
+
+                        {representativeBadge && representativeBadge.name && (
+                            <p className="text-sm text-gray-600 mt-1">
+                                {representativeBadge.name}
+                            </p>
+                        )}
 
                         {loading && <p className="text-sm text-gray-500">온도 불러오는 중...</p>}
                         {error && <p className="text-sm text-red-500">{error}</p>}

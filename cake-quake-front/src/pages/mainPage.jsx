@@ -34,8 +34,34 @@ function WelcomePage() {
     return (
         // [디자인 개선] 섹션 간 간격을 좁혀서 더 밀도 있고 세련된 레이아웃으로 변경
         <div className="welcome-container flex flex-col gap-16 md:gap-20 pt-8 pb-16 md:pt-4 md:pb-24 animate-fadeIn">
+            <header className="w-full">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+                {/* Logo */}
+                <div className="flex items-center gap-2 relative -mt-9">
+                    <img src="/logo.png" alt="Cake Quake Logo" className="w-15 h-15"/>
+                    <h1 className="text-2xl font-bold">Cake Quake</h1>
+                </div>
+                <div className="top-0 right-0 p-6 flex justify-end items-center space-x-4 z-30 relative -mt-9">
+                    {/* 로그인 버튼 */}
+                    <Link
+                        to="/auth/signin"
+                        className=" text-sm text-center px-3 py-2 hover:underline transition"
+                    >
+                        로그인
+                    </Link>
+
+                    {/* 회원가입 - 데스크탑 */}
+                    <Link
+                        to="/auth/signup"
+                        className="text-sm text-center hover:underline transition hidden md:inline"
+                    >
+                        회원가입
+                    </Link>
+                </div>
+            </div>
+            </header>
             {/* 1. 브랜드 한 줄 슬로건 (Tagline) + 감성 이미지 */}
-            <header className="flex flex-col items-center justify-center text-center gap-6 md:gap-8 w-full px-4">
+            <header className="flex flex-col items-center justify-center text-center gap-6 md:gap-8 w-full px-4 -mt-24">
                 <div className="relative w-full h-[80vh] overflow-hidden shadow-soft mb-8">
                     {/* 모든 이미지를 absolute로 겹쳐서 배치 */}
                     {galleryImages.map((image, index) => (
