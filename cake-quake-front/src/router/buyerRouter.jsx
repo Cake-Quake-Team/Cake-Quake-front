@@ -34,6 +34,8 @@ const PointPage = lazy(() => import("../pages/buyer/point/pointPage.jsx"));
 const BuyerProfileDetailsPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsPage.jsx"));
 const BuyerProfileDetailsModifyPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsModifyPage.jsx"));
 const BuyerProfileDetailsModifyAlarmPage = lazy(() => import("../pages/member/buyer/buyerProfileDetailsAlarmPage.jsx"));
+//뱃지
+const BadgePage = lazy(() => import("../pages/buyer/badge/BadgePage.jsx"));
 
 //---------------------AI
 const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
@@ -42,6 +44,18 @@ const AIRecommendPage = lazy(() => import("../pages/ai/aiRecommendPage.jsx"));
 const BuyerNoticeListPage=lazy(()=>import("../pages/buyer/shop/buyerNoticeListPage.jsx"));
 const BuyerNoticeDetailPage = lazy(()=>import("../pages/buyer/shop/buyerNoticeDetailPage.jsx"));
 const BuyerShopDetailPage=lazy(()=>import("../pages/buyer/shop/buyerShopDetailPage.jsx"));
+
+
+//-------------------찜
+const LikedMainPage = lazy(() => import("../pages/buyer/like/LikedMainPage.jsx"));
+
+
+
+//QnA
+const QnAListPage = lazy(() => import("../pages/qna/qnaListPage"));
+const QnADetailPage = lazy(()=> import("../pages/qna/qnaDetailPage"));
+const QnAFormPage = lazy (() => import("../pages/qna/QnAFormPage"));
+
 
 const Loading = <div>Loading...</div>;
 
@@ -188,6 +202,15 @@ const buyerRouter = () => ({
                         </Suspense>
                     )
                 },
+                // 찜
+                {
+                    path: "likes/:type?", // '/buyer/profile/likes' 또는 '/buyer/profile/likes/cake', '/buyer/profile/likes/shop'
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <LikedMainPage />
+                        </Suspense>
+                    )
+                },
                 {
                     //포인트
                     path: "points",
@@ -221,6 +244,15 @@ const buyerRouter = () => ({
                     path: "details/alarmsettings/:uid",
                     element: <Suspense fallback={Loading}><BuyerProfileDetailsModifyAlarmPage /></Suspense>
                 },
+                {
+                    // 뱃지
+                    path: "badges",
+                    element:(
+                        <Suspense fallback={Loading}>
+                            <BadgePage/>
+                        </Suspense>
+                    )
+                },
 
             ]
         },
@@ -233,9 +265,47 @@ const buyerRouter = () => ({
                     <AIRecommendPage/>
                 </Suspense>
     )
+        },
+
+
+        //------------------------QnA
+        {
+            path:'qna',
+            children: [
+                {
+                    index : true,
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <QnAListPage/>
+                        </Suspense>
+                    )
+                },
+                {
+                    path: 'create',
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <QnAFormPage/>
+                        </Suspense>
+                    )
+                },
+                {
+                    path: ':qnaId',
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <QnADetailPage/>
+                        </Suspense>
+                    )
+                },
+                {
+                    path: ':qnaId/edit',
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <QnAFormPage/>
+                        </Suspense>
+                    )
+                }
+            ]
         }
-
-
     ]
 });
 

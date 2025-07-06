@@ -1,4 +1,3 @@
-// src/components/procurement/procurementDetail.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 import { format } from 'date-fns';
@@ -14,16 +13,16 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
         regDate,
         status,
         note,
-        scheduleDate,
+        estimatedArrivalDate,
         items = [],
     } = data;
 
-    // 요청일 & 예정일 포맷팅
+    // 요청일 & 예상도착일 포맷팅
     const createdDate = regDate
         ? format(new Date(regDate), 'yyyy.MM.dd')
         : '–';
-    const scheduled = scheduleDate
-        ? format(new Date(scheduleDate), 'yyyy.MM.dd')
+    const etaDate = estimatedArrivalDate
+        ? format(new Date(estimatedArrivalDate), 'yyyy.MM.dd')
         : '미정';
 
     // 상태 배지 클래스
@@ -46,17 +45,17 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
                         발주 #{procurementId}
                     </h2>
                     <div className="mt-2 space-x-4 text-sm text-gray-600">
-            <span className="inline-flex items-center">
-              <ClockIcon className="h-4 w-4 mr-1" /> 요청일: {createdDate}
-            </span>
                         <span className="inline-flex items-center">
-              <ClockIcon className="h-4 w-4 mr-1" /> 예정일: {scheduled}
-            </span>
+                            <ClockIcon className="h-4 w-4 mr-1" /> 요청일: {createdDate}
+                        </span>
+                        <span className="inline-flex items-center">
+                            <ClockIcon className="h-4 w-4 mr-1" /> 예상도착일: {etaDate}
+                        </span>
                     </div>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusClass}`}>
-          {status}
-        </span>
+                    {status}
+                </span>
             </div>
 
             {/* 메모 */}
@@ -96,8 +95,8 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-100">
                         {items.map(({ itemId, ingredientName, unit, quantity, unitPrice }) => {
-                            const price   = unitPrice ?? 0;
-                            const qty     = quantity ?? 0;
+                            const price    = unitPrice ?? 0;
+                            const qty      = quantity ?? 0;
                             const subTotal = price * qty;
                             return (
                                 <tr key={itemId} className="hover:bg-gray-50">
@@ -135,18 +134,18 @@ export function ProcurementDetailComponent({ data, totalPrice }) {
 
 ProcurementDetailComponent.propTypes = {
     data: PropTypes.shape({
-        procurementId:  PropTypes.number.isRequired,
-        regDate:        PropTypes.string,
-        status:         PropTypes.string.isRequired,
-        note:           PropTypes.string,
-        scheduleDate:   PropTypes.string,
+        procurementId:         PropTypes.number.isRequired,
+        regDate:               PropTypes.string,
+        status:                PropTypes.string.isRequired,
+        note:                  PropTypes.string,
+        estimatedArrivalDate:  PropTypes.string,
         items: PropTypes.arrayOf(
             PropTypes.shape({
                 itemId:         PropTypes.number.isRequired,
                 ingredientName: PropTypes.string.isRequired,
                 unit:           PropTypes.string.isRequired,
                 quantity:       PropTypes.number.isRequired,
-                unitPrice:      PropTypes.number,  // 스냅샷으로 저장된 단가
+                unitPrice:      PropTypes.number,    
             })
         ).isRequired,
     }).isRequired,

@@ -21,27 +21,33 @@ function BuyerHeader() {
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
-                    {user?.role === "BUYER" && (
+                    {/* 로고 이미지 */}
+                    {user?.role === "BUYER" ? (
                         <Link to="/buyer">
                             <img src="/logo.png" alt="Cake Quake Logo" className="w-15 h-15" />
                         </Link>
-                    )}
-                    {user?.role === "SELLER" && (
+                    ) : user?.role === "SELLER" ? (
                         <Link to={`shops/${user.shopId}`}>
                             <img src="/logo.png" alt="Cake Quake Logo" className="w-15 h-15" />
                         </Link>
+                    ) : (
+                        <img src="/logo.png" alt="Cake Quake Logo" className="w-15 h-15" />
                     )}
-                    {user?.role === "BUYER" && (
+
+                    {/* 텍스트 */}
+                    {user?.role === "BUYER" ? (
                         <Link to="/buyer">
                             <h1 className="text-2xl font-bold">Cake Quake</h1>
                         </Link>
-                    )}
-                    {user?.role === "SELLER" && (
-                         <Link to={`shops/${user.shopId}`}>
+                    ) : user?.role === "SELLER" ? (
+                        <Link to={`shops/${user.shopId}`}>
                             <h1 className="text-2xl font-bold">Cake Quake</h1>
                         </Link>
+                    ) : (
+                        <h1 className="text-2xl font-bold">Cake Quake</h1>
                     )}
                 </div>
+
 
                 <div className="flex items-center space-x-4">
 
@@ -55,8 +61,9 @@ function BuyerHeader() {
                     {/* 🔔 알림 종 아이콘 추가 */}
                     <NotificationBell />
 
-
+                    {user?.role === "BUYER" && "SELLER" && (
                     <MessageCircle   className="w-5 h-5 cursor-pointer" />
+                    )}
 
                     {/* 장바구니 - BUYER만 보임*/}
                     {user?.role === "BUYER" && (
@@ -86,7 +93,7 @@ function BuyerHeader() {
                             {/* 로그인 버튼 */}
                             <Link
                                 to="/auth/signin"
-                                className="w-[90px] text-sm text-center bg-teal-400 text-white px-3 py-2 rounded-lg hover:bg-teal-500 transition font-bold"
+                                className=" text-sm text-center px-3 py-2 hover:underline transition"
                             >
                                 로그인
                             </Link>
@@ -94,9 +101,9 @@ function BuyerHeader() {
                             {/* 회원가입 - 데스크탑 */}
                             <Link
                                 to="/auth/signup"
-                                className="w-[90px] text-sm text-center bg-rose-50 text-gray-700 px-3 py-2 rounded-lg hover:bg-rose-200 transition font-bold hidden md:inline"
+                                className="text-sm text-center hover:underline transition hidden md:inline"
                             >
-                                회원 가입
+                                회원가입
                             </Link>
 
                             {/* 모바일 메뉴 토글 */}
@@ -141,13 +148,25 @@ function BuyerHeader() {
                     {user ? (
                         <>
                             {user.role !== "ADMIN" && (
-                                <Link
-                                    to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
-                                    onClick={() => setSidebarOpen(false)}
-                                    className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
-                                >
-                                    마이페이지
-                                </Link>
+                                <>
+                                    {/* 마이페이지 */}
+                                    <Link
+                                        to={user.role === "SELLER" ? "/seller/profile" : "/buyer/profile"}
+                                        onClick={() => setSidebarOpen(false)}
+                                        className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                                    >
+                                        마이페이지
+                                    </Link>
+
+                                    {/* 문의 페이지 */}
+                                    <Link
+                                        to={user.role === "SELLER" ? "/seller/qna" : "/buyer/qna"}
+                                        onClick={() => setSidebarOpen(false)}
+                                        className="block text-center bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 font-bold"
+                                    >
+                                        고객 센터
+                                    </Link>
+                                </>
                             )}
                             {user.role === "ADMIN" && (
                                 <Link
@@ -157,6 +176,7 @@ function BuyerHeader() {
                                     관리자 페이지
                                 </Link>
                             )}
+
                             <button
                                 onClick={() => {
                                     setSidebarOpen(false);
