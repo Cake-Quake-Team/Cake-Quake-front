@@ -20,6 +20,7 @@ import banner1 from "../../../assets/banner1.jpg";
 import banner2 from "../../../assets/banner2.jpg";
 import banner3 from "../../../assets/banner3.jpg";
 import banner4 from "../../../assets/banner4.jpg";
+import PickupScheduler from "../../../components/scheduler/PickupScheduler.jsx";
 
 function CakeAllList() {
 
@@ -46,6 +47,8 @@ function CakeAllList() {
     const [filter, setFilter] = useState("");
     const [sort, setSort] = useState("shopId");
     const [keyword, setKeyword] = useState("");
+
+    const [pickupScheduleInfo, setPickupScheduleInfo] = useState(null);
 
     // API 호출을 위한 단일 useEffect
     // mainCategory, detailKeyword, page가 변경될 때마다 실행
@@ -131,12 +134,21 @@ function CakeAllList() {
 
     }, [hasNext, isLoading, selectedMainCategory]);
 
+    const handlePickupSchedulerComplete = (scheduleInfo) => {
+        console.log("픽업 스케줄러에서 선택된 정보:", scheduleInfo);
+        setPickupScheduleInfo(scheduleInfo); // 상태에 저장 (필요하다면)
+        // 여기서는 매장 상세 페이지로 이동하는 로직은 PickupScheduler 내부에서 처리하므로,
+        // 이 콜백에서는 추가적인 라우팅 없이 정보를 받기만 합니다.
+    };
 
 
     return (
         <div className="flex flex-col min-h-screen">
             <BannerCarousel banners={banners} interval={5000} />
             <main className="flex-grow container mx-auto px-6 py-8">
+                <div className="mb-8"> {/* 아래 내용과의 간격을 위해 마진 추가 */}
+                    <PickupScheduler onComplete={handlePickupSchedulerComplete} />
+                </div>
 
                 {/* 상단 메인 분류 */}
                 <div className="flex items-center text-gray-700 mb-6 border-b border-gray-200 pb-2">
