@@ -66,25 +66,50 @@ export const AuthProvider = ({ children }) => {
 
     // }, [])
 
-    // 중복 호출 방지
-    const didFetchRef = useRef(false)
+    // // 중복 호출 방지
+    // const didFetchRef = useRef(false)
+    //
+    // useEffect(() => {
+    //
+    //     if (!user == null && !didFetchRef.current) {
+    //         didFetchRef.current = true;
+    //         const fetchUserInfo = async () => {
+    //             try {
+    //                 const res = await getSigninUserInfo()
+    //                 setUser(res)
+    //             } catch (err) {
+    //                 console.error("사용자 정보 조회 실패", err)
+    //                 setUser(null)
+    //             }
+    //         }
+    //         fetchUserInfo()
+    //     }
+    // }, [user])
+    const [isLoading, setIsLoading] = useState(true); // 사용자 정보 로딩 상태
 
     useEffect(() => {
-
-        if (!user == null && !didFetchRef.current) {
-            didFetchRef.current = true;
-            const fetchUserInfo = async () => {
-                try {
-                    const res = await getSigninUserInfo()
-                    setUser(res)
-                } catch (err) {
-                    console.error("사용자 정보 조회 실패", err)
-                    setUser(null)
-                }
+        const fetchUserInfo = async () => {
+            try {
+                // 백엔드 /api/v1/member/info 또는 유사한 엔드포인트 호출
+                // 이 요청은 브라우저에 저장된 httponly 쿠키(accessToken)를 자동으로 포함하여 보냄
+                const res = await getSigninUserInfo();
+                // getSigninUserInfo의 응답 데이터 구조에 따라 setUser를 조정해야 함
+                // 예: 백엔드가 { data: { uid: ..., userId: ..., uname: ..., role: ..., shopId: ... } } 반환 시
+                setUser(res); // 백엔드에서 반환된 사용자 정보를 그대로 user 상태에 설정
+            } catch (err) {
+                console.error("사용자 정보 조회 실패:", err);
+                setUser(null); // 에러 발생 시 user 상태 초기화 (로그아웃 상태로 간주)
+                // 선택: 사용자 정보 로딩 실패 시 로그인 페이지로 강제 리다이렉트
+                // if (location.pathname !== '/auth/signin' && location.pathname !== '/') {
+                //    window.location.replace('/auth/signin');
+                // }
+            } finally {
+                setIsLoading(false); // 로딩 완료
             }
-            fetchUserInfo()
-        }
-    }, [user])
+        };
+
+        fetchUserInfo();
+    }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 단 한 번만 실행
 
     // useEffect(() => {
     //     if(user == null && !didFetchRef.current) {
