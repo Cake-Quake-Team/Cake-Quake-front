@@ -2,8 +2,9 @@
 
 // src/pages/payment/PaymentListPage.jsx
 import React, { useEffect, useState } from 'react';
-import { getMyPaymentList } from '../../api/paymentAPI';
+
 import { useNavigate } from 'react-router';
+import {listMyPayments} from "../../api/paymentApi.jsx";
 
 export default function PaymentListPage() {
     const [payments, setPayments] = useState([]);
@@ -13,7 +14,7 @@ export default function PaymentListPage() {
     useEffect(() => {
         async function fetchPayments() {
             try {
-                const data = await getMyPaymentList({ page: 1, size: 20 });
+                const data = await listMyPayments({ page: 1, size: 20 });
                 const list = Array.isArray(data) ? data : data.content;
                 const enriched = list.map(p => ({
                     ...p,
