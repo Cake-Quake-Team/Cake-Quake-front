@@ -4,6 +4,8 @@ import {Navigate, useNavigate} from "react-router";
 import MapModal from "./mapModal.jsx";
 import {useAuth} from "../../../store/AuthContext.jsx";
 import jwtAxios from "../../../utils/jwtUtil.js";
+import useWebSocket from "../../../hooks/useWebSocket.jsx";
+import * as user from "@babel/types";
 
 
 //평점 별 채우기
@@ -36,7 +38,6 @@ const ShopDetailSection=({shop})=>{
     console.log("[ShopDetailSection] Current user:", user);
     console.log("[ShopDetailSection] Access Token:", accessToken ? accessToken.substring(0, 10) + '...' : 'No Token'); // 토큰 전체 대신 일부만 출력
 
-    // ✨ 채팅하기 버튼 클릭 핸들러
     const handleChatWithShop = async () => {
         console.log("[ShopDetailSection] '채팅하기' 버튼 클릭됨");
 
@@ -47,69 +48,26 @@ const ShopDetailSection=({shop})=>{
             navigate('/auth/signin');
             return;
         }
-        console.log("[ShopDetailSection] 사용자 로그인 확인됨. UID:", user.uid);
 
-
-        // 2. 자신과 채팅하는 것을 방지
-        // shop.uid는 ShopDetailResponseDTO에서 판매자(가게 주인)의 UID라고 가정합니다.
         if (user.uid === shop.uid) {
-            console.warn("[ShopDetailSection] 자신과 채팅 시도: user.uid", user.uid, "shop.uid", shop.uid);
-            alert('자신의 가게와 채팅할 수 없습니다. (판매자 본인)');
+            alert('자신의 가게와 채팅할 수 없습니다.');
             return;
         }
-        console.log("[ShopDetailSection] 판매자 UID:", shop.uid, "구매자 UID:", user.uid);
-
-
-        // 3. 백엔드에 채팅방 생성/조회 요청
-        const requestBody = {
-            sellerUid: shop.uid,   // 가게 주인의 UID
-            buyerUid: user.uid,    // 현재 로그인된 사용자(구매자)의 UID
-        };
-        console.log("[ShopDetailSection] 채팅방 생성 요청 본문:", requestBody);
-
 
         try {
-            console.log("[ShopDetailSection] POST /api/v1/chatting/rooms 요청 시작...");
-            // ✨ 수정: API 엔드포인트와 응답 데이터 추출 방식 변경
-            const response = await jwtAxios.post('/api/v1/chatting/rooms', requestBody);
-
-            console.log("[ShopDetailSection] API 응답 수신:", response);
-            console.log("[ShopDetailSection] 응답 데이터:", response.data);
-
-            const roomId = response.data.data; // ApiResponseDTO<Long>의 data 필드에서 roomId 추출
-            console.log("[ShopDetailSection] 추출된 Room ID:", roomId);
-
-            // 4. 채팅 페이지로 이동
-            if (roomId) {
-                console.log(`[ShopDetailSection] 채팅 페이지로 이동: /shops/chatting/${roomId}`);
-                navigate(`/shops/chatting/${roomId}`);
-            } else {
-                console.error("[ShopDetailSection] Room ID가 응답에 없습니다. 응답:", response.data);
-                alert("채팅방 ID를 가져오지 못했습니다. 다시 시도해주세요.");
-            }
-
+            const response = await jwtAxios.post('/api/v1/chatting/rooms', {
+                sellerUid: shop.uid,
+                buyerUid: user.uid,
+                shopId: shop.shopId
+            });
+            const roomKey = response.data.roomKey;  // ✅ roomKey로 정확히 꺼내기
+            navigate(`/shops/chatting/${roomKey}`);
         } catch (err) {
-            console.error('[ShopDetailSection] 채팅방 생성/조회 중 오류 발생:', err);
-
-            // 서버 응답 오류가 있는 경우
-            if (err.response) {
-                console.error("[ShopDetailSection] 서버 응답 오류 상태:", err.response.status);
-                console.error("[ShopDetailSection] 서버 응답 데이터 (err.response.data):", err.response.data);
-                console.error("[ShopDetailSection] 서버 응답 헤더:", err.response.headers);
-                alert(`채팅방을 시작할 수 없습니다: ${err.response?.data?.message || `서버 오류 (${err.response.status})`}`);
-            }
-            // 요청이 전송되었으나 응답을 받지 못한 경우
-            else if (err.request) {
-                console.error("[ShopDetailSection] 요청 전송 후 응답 없음 (err.request):", err.request);
-                alert("채팅방을 시작할 수 없습니다: 서버로부터 응답이 없습니다.");
-            }
-            // 그 외 오류
-            else {
-                console.error("[ShopDetailSection] 요청 설정 중 오류 (err.message):", err.message);
-                alert(`채팅방을 시작할 수 없습니다: ${err.message}`);
-            }
+            console.error('채팅방 생성 실패:', err);
+            alert('채팅방을 생성할 수 없습니다.');
         }
     };
+
 
 
     return(

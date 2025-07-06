@@ -13,12 +13,11 @@ const queryClient = new QueryClient();
   로그인 전역 상태 관리를 위한 AuthProvider 추가
 */
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={mainRouter} />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </AuthProvider>
-  </React.StrictMode>
 );
