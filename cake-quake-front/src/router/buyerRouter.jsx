@@ -24,6 +24,12 @@ const ReviewEditPage = lazy(()=> import("../pages/buyer/review/reviewEditPage.js
 //-------------------결제 내역 조회
 const PaymentListPage = lazy(()=>import('../pages/payment/PaymentListPage.jsx'));
 const PaymentDetailPage = lazy(()=>import('../pages/payment/paymentDetailPage.jsx'));
+// 결제 시작 & 콜백 페이지
+const PaymentStartPage      = lazy(() => import('../pages/payment/PaymentStartPage.jsx'));
+const KakaoApprovePage      = lazy(() => import('../pages/payment/KakaoApprovePage.jsx'));
+const TossSuccessPage       = lazy(() => import('../pages/payment/TossSuccessPage.jsx'));
+const TossFailPage          = lazy(() => import('../pages/payment/TossFailPage.jsx'));
+
 
 //---------------------마이페이지
 const BuyerProfilePage = lazy(() => import("../pages/buyer/profile/buyerProfilePage.jsx"));
@@ -169,19 +175,57 @@ const buyerRouter = () => ({
         {
             path: "payments",
             children: [
+                // 1) 결제 시작 페이지: /buyer/payments/start
+                {
+                    path: "start",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <PaymentStartPage />
+                        </Suspense>
+                    )
+                },
+                // 2) 결제 내역 목록: /buyer/payments
                 {
                     index: true,
                     element: (
                         <Suspense fallback={Loading}>
-                            <PaymentListPage/>
+                            <PaymentListPage />
                         </Suspense>
                     )
                 },
+                // 3) 결제 상세: /buyer/payments/:paymentId
                 {
-                    path: ':paymentId',
+                    path: ":paymentId",
                     element: (
                         <Suspense fallback={Loading}>
-                            <PaymentDetailPage/>
+                            <PaymentDetailPage />
+                        </Suspense>
+                    )
+                },
+                // 4) 카카오페이 승인 콜백: /buyer/payments/kakao/approve
+                {
+                    path: "kakao/approve",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <KakaoApprovePage />
+                        </Suspense>
+                    )
+                },
+                // 5) 토스페이 성공 콜백: /buyer/payments/toss/success
+                {
+                    path: "toss/success",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <TossSuccessPage />
+                        </Suspense>
+                    )
+                },
+                // 6) 토스페이 실패 콜백: /buyer/payments/toss/fail
+                {
+                    path: "toss/fail",
+                    element: (
+                        <Suspense fallback={Loading}>
+                            <TossFailPage />
                         </Suspense>
                     )
                 }

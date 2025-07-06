@@ -100,12 +100,23 @@ export default function OrderDetailPageWrapper() {
         return <div className="p-4 text-center text-gray-500">주문 정보를 찾을 수 없습니다.</div>;
     }
 
+    // ✅ 결제하기 버튼 클릭 시 호출할 핸들러
+    const handlePay = () => {
+        // order.finalPaymentAmount 필드가 백엔드가 보내주는 최종 결제 금액
+        navigate(
+            `/buyer/payments/start?orderId=${order.orderId}&amount=${order.finalPaymentAmount}`
+        );
+    };
+
+
     // 모든 준비가 되면 OrderDetailComponent에 데이터 및 핸들러 전달
     return (
         <OrderDetailComponent
             order={order}
             onCancel={handleCancelOrder}
             onBack={handleBack}
+            onPay={handlePay}
+            isPaying={false}
             isCancelling={cancelOrderMutation.isPending} // 취소 요청 중인지 상태 전달
         />
     );
