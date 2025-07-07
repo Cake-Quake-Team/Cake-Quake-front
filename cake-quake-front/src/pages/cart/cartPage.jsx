@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import useCart from '../../hooks/useCart';
 import CartList from '../../components/cart/CartList';
@@ -8,7 +8,7 @@ import DeleteModal from '../../components/cart/DeleteModal';
 import SelectDeleteModal from '../../components/cart/SelectDeleteModal';
 
 const SuccessMessageModal = ({ message, onConfirm }) => (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
         <div className="bg-white p-6 rounded-lg shadow-lg text-center">
             <p className="text-lg font-semibold mb-4">{message}</p>
             <button
@@ -21,26 +21,59 @@ const SuccessMessageModal = ({ message, onConfirm }) => (
     </div>
 );
 
-
 export default function CartPage() {
     const navigate = useNavigate();
-    // useCart 훅에서 fetchCart와 clearAllItems도 받아옴
-    const { items, cartTotalPrice, updateItem, removeItem, clearAllItems } = useCart(); // ⭐ clearAllItems 추가 ⭐
-    const [selectedIds, setSelectedIds] = useState([]);
+    const { items, cartTotalPrice, updateItem, removeItem, clearAllItems, fetchCart } = useCart();
+    const [selectedIds, setSelectedIds] = useState(new Set());
     const [modal, setModal] = useState({ type: null, id: null, message: '' });
 
     const cartItems = Array.isArray(items) ? items : [];
 
-    const toggleSelect = (id) =>
-        setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-        );
+    const isAllSelected = cartItems.length > 0 && selectedIds.size === cartItems.length;
+
+    useEffect(() => {
+        const currentItemIds = new Set(cartItems.map(item => item.cartItemId));
+        const newSelectedIds = new Set();
+        selectedIds.forEach(id => {
+            if (currentItemIds.has(id)) {
+                newSelectedIds.add(id);
+            }
+        });
+        setSelectedIds(newSelectedIds);
+    }, [cartItems]);
+
+    useEffect(() => {
+        fetchCart();
+    }, [fetchCart]);
+
+    const toggleSelect = (id) => {
+        setSelectedIds((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleAllItems = () => {
+        if (isAllSelected) {
+            setSelectedIds(new Set());
+        } else {
+            const allItemIds = new Set(cartItems.map(item => item.cartItemId));
+            setSelectedIds(allItemIds);
+        }
+    };
 
     const handleQuantityChange = async (id, newQty) => {
         try {
             await updateItem(id, newQty);
         } catch (e) {
-            // 에러 처리
+            console.error('수량 변경 실패:', e);
+            alert('수량 변경에 실패했습니다.');
+            fetchCart();
         }
     };
 
@@ -49,7 +82,8 @@ export default function CartPage() {
             await removeItem(id);
             openModal('success', null, '상품이 장바구니에서 삭제되었습니다.');
         } catch (e) {
-            // 에러 처리
+            console.error('단일 상품 삭제 실패:', e);
+            alert('상품 삭제에 실패했습니다.');
         } finally {
             closeModal();
         }
@@ -57,23 +91,37 @@ export default function CartPage() {
 
     const deleteSelected = async () => {
         try {
-            await Promise.all(selectedIds.map(id => removeItem(id)));
-            setSelectedIds([]);
+            await Promise.all(Array.from(selectedIds).map(id => removeItem(id)));
+            setSelectedIds(new Set());
             openModal('success', null, '선택된 상품들이 장바구니에서 삭제되었습니다.');
         } catch (e) {
-            // 에러 처리
+            console.error('선택 상품 삭제 실패:', e);
+            alert('선택된 상품 삭제에 실패했습니다.');
         } finally {
             closeModal();
         }
     };
 
-    // ⭐ 전체 비우기 핸들러 (모달 연동) ⭐
-    const handleClearAll = async () => {
+    const handleOpenClearAllModal = () => {
+        if (!isAllSelected) {
+            alert("전체 선택을 해야만 장바구니를 비울 수 있습니다.");
+            return;
+        }
+        if (cartItems.length === 0) {
+            alert("장바구니가 이미 비어있습니다.");
+            return;
+        }
+        openModal('all');
+    };
+
+    const handleConfirmClearAll = async () => {
         try {
-            await clearAllItems(); // ⭐ 이제 clearAllItems가 정의됨 ⭐
+            await clearAllItems();
+            setSelectedIds(new Set());
             openModal('success', null, '장바구니가 모두 비워졌습니다.');
         } catch (e) {
-            // useCart 훅에서 이미 alert 처리하고 있다면 중복될 수 있음
+            console.error('장바구니 전체 비우기 실패:', e);
+            alert('장바구니를 비우는 데 실패했습니다.');
         } finally {
             closeModal();
         }
@@ -83,19 +131,21 @@ export default function CartPage() {
     const closeModal = () => setModal({ type: null, id: null, message: '' });
 
     const handleOrderSelected = () => {
-        const selectedItems = cartItems.filter(item => selectedIds.includes(item.cartItemId));
+        const selectedItems = cartItems.filter(item => selectedIds.has(item.cartItemId));
         if (selectedItems.length === 0) {
-            alert("선택된 상품이 없습니다.");
+            alert("주문할 상품을 1개 이상 선택해주세요.");
             return;
         }
         navigate('/buyer/orders/create', { state: { selectedItems } });
     };
 
+    // ⭐ [추가] 전체 주문 핸들러 ⭐
     const handleOrderAll = () => {
         if (cartItems.length === 0) {
-            alert("장바구니가 비어있습니다.");
+            alert("장바구니가 비어있습니다. 상품을 담아주세요.");
             return;
         }
+        // 모든 장바구니 아이템을 CreateOrder 페이지로 전달
         navigate('/buyer/orders/create', { state: { selectedItems: cartItems } });
     };
 
@@ -106,41 +156,56 @@ export default function CartPage() {
             <h1 className="text-3xl font-bold mb-6 text-center">CART</h1>
 
             {isCartEmpty ? (
-                <p className="text-center text-gray-500 mt-8">장바구니가 비어 있습니다.</p>
+                <p className="text-center text-gray-500 mt-8">
+                    장바구니가 비어 있습니다.
+                </p>
             ) : (
-                <CartList
-                    title=""
-                    items={cartItems}
-                    selectedIds={selectedIds}
-                    onToggleSelect={toggleSelect}
-                    onQuantityChange={handleQuantityChange}
-                    onRemoveClick={(id) => openModal('single', id)}
-                />
+                <>
+                    <div className="flex items-center justify-between border-b pb-3 mb-4">
+                        <div className="flex items-center">
+                            <input
+                                type="checkbox"
+                                checked={isAllSelected}
+                                onChange={toggleAllItems}
+                                className="mr-2 w-5 h-5 accent-blue-600"
+                                aria-label="전체 상품 선택"
+                            />
+                            <span className="font-medium text-gray-700">
+                                전체 선택 ({selectedIds.size}/{cartItems.length}개)
+                            </span>
+                        </div>
+                    </div>
+
+                    <CartList
+                        title=""
+                        items={cartItems}
+                        selectedIds={Array.from(selectedIds)}
+                        onToggleSelect={toggleSelect}
+                        onQuantityChange={handleQuantityChange}
+                        onRemoveClick={(id) => openModal('single', id)}
+                    />
+                </>
             )}
             <CartPrice
                 items={cartItems}
-                selectedIds={selectedIds}
+                selectedIds={Array.from(selectedIds)}
                 cartTotalPrice={cartTotalPrice}
             />
 
             <CartActions
+                selectedCount={selectedIds.size}
                 onClearSelected={() => {
-                    if (selectedIds.length === 0) {
+                    if (selectedIds.size === 0) {
                         alert("선택된 상품이 없습니다.");
                         return;
                     }
                     openModal('multiple');
                 }}
-                onClearAll={() => { // ⭐ onClearAll prop 사용 ⭐
-                    if (cartItems.length === 0) {
-                        alert("장바구니가 이미 비어있습니다.");
-                        return;
-                    }
-                    openModal('all');
-                }}
+                onClearAll={handleOpenClearAllModal}
                 onContinueShopping={() => navigate('/buyer')}
                 onOrderSelected={handleOrderSelected}
-                onOrderAll={handleOrderAll}
+                onOrderAll={handleOrderAll} // [추가] onOrderAll prop으로 핸들러 연결
+                isAllSelected={isAllSelected}
             />
 
             {/* 단일 삭제 확인 모달 */}
@@ -165,12 +230,12 @@ export default function CartPage() {
             {modal.type === 'all' && (
                 <DeleteModal
                     message="장바구니를 모두 비우시겠어요?"
-                    onConfirm={handleClearAll} // ⭐ handleClearAll 호출 ⭐
+                    onConfirm={handleConfirmClearAll}
                     onCancel={closeModal}
                 />
             )}
 
-            {/* ⭐ 삭제 성공 메시지 모달 ⭐ */}
+            {/* 삭제 성공 메시지 모달 */}
             {modal.type === 'success' && (
                 <SuccessMessageModal
                     message={modal.message}

@@ -1,5 +1,4 @@
 import React from 'react';
-import LikeButton from '../../common/LikeButton';
 
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
 
@@ -11,10 +10,6 @@ function CakeCard({ cake,onClick }) {
     if (!cake) return null;
 
 
-    // ⭐ 좋아요 버튼 클릭 핸들러 (이벤트 버블링 방지) ⭐
-    const handleLikeButtonClick = (e) => {
-        e.stopPropagation(); // ⭐ 이벤트 버블링 중지 ⭐
-    };
 
     return (
         <div
@@ -35,13 +30,6 @@ function CakeCard({ cake,onClick }) {
                     SOLD OUT
                 </div>
             )}
-
-            {/* ⭐ 좋아요 버튼 배치 ⭐ */}
-            {/* 이미지를 기준으로 absolute 포지셔닝하여 오른쪽 상단에 배치 */}
-            <div className="absolute top-2 right-2 z-20" onClick={handleLikeButtonClick}> {/* ⭐ onClick={handleLikeButtonClick} 적용 ⭐ */}
-                {/* cakeId가 유효할 때만 LikeButton 렌더링 */}
-                {cakeId && <LikeButton type="cake" itemId={cakeId}/>}
-            </div>
 
             <div className="text-center p-2">
                 <h3 className="text-lg font-semibold mb-1">{cname}</h3>

@@ -60,8 +60,8 @@ export default function SellerOrderListPage() {
         { label: "준비 중", value: "PREPARING" },
         { label: "픽업 준비 완료", value: "READY_FOR_PICKUP" },
         { label: "픽업 완료", value: "PICKUP_COMPLETED" },
-        { label: "주문 취소", value: "CANCELED" },
-        { label: "노쇼", value: "NOSHOW" },
+        { label: "주문 취소", value: "RESERVATION_CANCELLED" },
+        { label: "노쇼", value: "NO_SHOW" },
     ];
 
     if (isLoading && !isFetching) {
