@@ -26,6 +26,7 @@ const SellerReviewDetailPage = lazy(()=>import("../pages/shop/review/sellerRevie
 const SellerOrderListPage = lazy(()=>import("../pages/order/seller/sellerOrderListPage.jsx"));
 const SellerOrderDetailPage = lazy(()=>import("../pages/order/seller/sellerOrderDetailPage.jsx"))
 const ChattiingPage =lazy(()=>import("../pages/chatPage.jsx"));
+const SellerChatPage =lazy(()=>import("../pages/sellerChatRoomsPage.jsx"));
 
 const shopRouter = () => {
     return {
@@ -115,6 +116,10 @@ const shopRouter = () => {
             {
                 path: "chatting/:roomId",
                 element: <Suspense fallback={Loading}><ChattiingPage/></Suspense>
+            },
+            {
+                path: ":shopId/chat",
+                element: <Suspense fallback={Loading}><SellerChatPage/></Suspense>
             },
 
             //--------------------------판매자 주문 통계 관련 라우트--------------------//
