@@ -5,7 +5,7 @@ import MapModal from "./mapModal.jsx";
 import {useAuth} from "../../../store/AuthContext.jsx";
 import jwtAxios from "../../../utils/jwtUtil.js";
 import useWebSocket from "../../../hooks/useWebSocket.jsx";
-import * as user from "@babel/types";
+
 
 
 //평점 별 채우기
