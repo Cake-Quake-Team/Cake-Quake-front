@@ -6,6 +6,7 @@ import { getPaymentDetail } from '../../api/paymentApi';
 
 export default function PaymentDetailPage() {
     const { paymentId } = useParams();
+    console.log('🤔 useParams paymentId:', paymentId);
     const navigate = useNavigate();
 
     const {
@@ -15,7 +16,12 @@ export default function PaymentDetailPage() {
         error,
     } = useQuery({
         queryKey: ['paymentDetail', paymentId],
-        queryFn: () => getPaymentDetail(paymentId),
+        queryFn: () => {                         // 중괄호 블록 쓰실 거면…
+            console.log('🛰️ fetching detail for', paymentId);
+                 return getPaymentDetail(paymentId);    // ← 반드시 return!
+        },
+        // 또는 이처럼 한 줄로!
+        // queryFn: () => getPaymentDetail(paymentId),
         enabled: Boolean(paymentId),
         retry: 1,
         staleTime: 5 * 60 * 1000,
