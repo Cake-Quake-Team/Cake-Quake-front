@@ -11,23 +11,9 @@ import {getShopDetail} from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
 import LikeButton from "../../../components/common/LikeButton.jsx";
 import {ShoppingCart} from "lucide-react";
+import AddToCartSuccessModal from "../../../components/common/AddToCartSuccessModal";
 
 
-const AddToCartSuccessModal = ({ message, onConfirm }) => {
-    return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-                <p className="text-lg font-semibold mb-4">{message}</p>
-                <button
-                    onClick={onConfirm}
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                    확인
-                </button>
-            </div>
-        </div>
-    );
-};
 
 function BuyerCakeReadPage() {
     const { shopId, cakeId } = useParams();
@@ -179,7 +165,7 @@ function BuyerCakeReadPage() {
         }
     };
 
-    const handleModalConfirm = () => {
+    const handleCloseSuccessModal = () => {
         setShowSuccessModal(false);
     };
 
@@ -315,7 +301,8 @@ function BuyerCakeReadPage() {
             {showSuccessModal && (
                 <AddToCartSuccessModal
                     message={modalMessage}
-                    onConfirm={handleModalConfirm}
+                    onClose={handleCloseSuccessModal}
+                    navigate={navigate}
                 />
             )}
         </div>

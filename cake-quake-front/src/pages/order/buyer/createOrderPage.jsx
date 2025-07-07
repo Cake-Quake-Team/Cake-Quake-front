@@ -1,33 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import CreateOrderComponent from '../../../components/order/buyer/createOrder';
 import useCart from '../../../hooks/useCart';
 import { useAuth } from '../../../store/AuthContext';
 import { useNavigate, useLocation } from 'react-router';
-import PickupScheduler from '../../../components/scheduler/PickupScheduler'; //
+// import PickupScheduler from '../../../components/scheduler/PickupScheduler'; // PickupScheduler 임포트 제거
 
 export default function CreateOrderPage() {
-    const { user } = useAuth(); //
-    const navigate = useNavigate(); //
-    const location = useLocation(); //
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const selectedItemsFromState = location.state?.selectedItems || null; //
-    const { items: allCartItems } = useCart(); //
-    const itemsToOrder = selectedItemsFromState || allCartItems; //
+    const selectedItemsFromState = location.state?.selectedItems || null;
+    const { items: allCartItems } = useCart();
+    const itemsToOrder = selectedItemsFromState || allCartItems;
 
-    const [pickupInfo, setPickupInfo] = useState({
-        date: null,
-        shop: null,
-        time: null,
-    });
+    // pickupInfo 상태 제거
+    // const [pickupInfo, setPickupInfo] = useState({
+    //     date: null,
+    //     shop: null,
+    //     time: null,
+    // });
 
-    const handlePickupSelectionComplete = ({ selectedDate, selectedShop, selectedTime }) => {
-        setPickupInfo({
-            date: selectedDate, // This `selectedDate` is a Date object from PickupScheduler
-            shop: selectedShop,
-            time: selectedTime, // This `selectedTime` should now be HH:MM from TimeSelection.jsx
-        });
-        console.log("픽업 정보 최종 선택 완료:", { selectedDate, selectedShop, selectedTime }); //
-    };
+    // handlePickupSelectionComplete 함수 제거
+    // const handlePickupSelectionComplete = ({ selectedDate, selectedShop, selectedTime }) => {
+    //     setPickupInfo({
+    //         date: selectedDate,
+    //         shop: selectedShop,
+    //         time: selectedTime,
+    //     });
+    //     console.log("픽업 정보 최종 선택 완료:", { selectedDate, selectedShop, selectedTime });
+    // };
 
     useEffect(() => {
         if (!itemsToOrder || itemsToOrder.length === 0) {
@@ -42,36 +44,36 @@ export default function CreateOrderPage() {
         return null;
     }
 
-    if (!itemsToOrder || itemsToOrder.length === 0) { //
-        return <div className="text-center p-8 text-gray-500">주문할 상품 정보가 없습니다.</div>; //
+    if (!itemsToOrder || itemsToOrder.length === 0) {
+        return <div className="text-center p-8 text-gray-500">주문할 상품 정보가 없습니다.</div>;
     }
 
-    // ⭐⭐ pickupDateToPass 형식 변경: YYYY-MM-DD (로컬 시간대 기준) ⭐⭐
-    const shopIdToPass = pickupInfo.shop?.shopId || itemsToOrder[0]?.shopId;
-    const pickupDateToPass = pickupInfo.date
-        ? pickupInfo.date.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' })
-        : null;
-    const pickupTimeToPass = pickupInfo.time;
+    // ⭐⭐ 픽업 날짜 및 시간 정보는 이제 CreateOrderPage에서 직접 다루지 않습니다.
+    // CreateOrderComponent가 이 정보를 필요로 한다면, CreateOrderComponent 내부에서 처리하거나
+    // 백엔드 API와의 계약에 따라 다른 방식으로 전달해야 합니다.
+    // 여기서는 일단 itemsToOrder에서 shopId만 가져옵니다.
+    const shopIdToPass = itemsToOrder[0]?.shopId;
+    // const pickupDateToPass = null; // 필요에 따라 기본값 설정 또는 제거
+    // const pickupTimeToPass = null; // 필요에 따라 기본값 설정 또는 제거
 
     return (
         <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded">
-            <h2 className="text-2xl font-semibold mb-6">픽업 정보 및 주문 생성</h2>
+            <h2 className="text-2xl font-semibold mb-6">주문 생성</h2> {/* 제목 변경 */}
 
-            <PickupScheduler onComplete={handlePickupSelectionComplete} /> {/* */}
+            {/* <PickupScheduler onComplete={handlePickupSelectionComplete} /> 제거 */}
 
-            {pickupInfo.date && pickupInfo.shop && pickupInfo.time && ( //
-                <div style={{ marginTop: '30px' }}> {/* */}
-                    <h3>주문 상세 정보 입력</h3> {/* */}
-                    <CreateOrderComponent
-                        userId={user.userId} //
-                        itemsToOrder={itemsToOrder} //
-                        shopId={shopIdToPass} //
-                        pickupDate={pickupDateToPass} // Pass the correctly formatted date string
-                        pickupTime={pickupTimeToPass} // Pass the HH:MM time string
-                        onSuccess={() => navigate('/buyer/orders')} //
-                    />
-                </div>
-            )}
+            {/* 픽업 정보 조건부 렌더링 제거 (이제 이 페이지에서 직접 다루지 않으므로 항상 렌더링) */}
+            <div style={{ marginTop: '30px' }}>
+                <h3>주문 상세 정보 입력</h3>
+                <CreateOrderComponent
+                    userId={user.userId}
+                    itemsToOrder={itemsToOrder}
+                    shopId={shopIdToPass}
+                    // pickupDate={pickupDateToPass} // 픽업 날짜 prop 제거
+                    // pickupTime={pickupTimeToPass} // 픽업 시간 prop 제거
+                    onSuccess={() => navigate('/buyer/orders')}
+                />
+            </div>
         </div>
     );
 }

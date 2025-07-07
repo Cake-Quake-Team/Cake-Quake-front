@@ -79,8 +79,9 @@ export default function OrderDetailPageWrapper() {
         cancelOrderMutation.mutate(idToCancel);
     };
 
+    //이 부분을 수정
     const handleBack = () => {
-        navigate(-1); // 이전 페이지로 이동
+        navigate('/buyer/orders'); // 명확하게 주문 리스트 페이지로 이동
     };
 
     // ⭐ 로딩 상태 UI ⭐
