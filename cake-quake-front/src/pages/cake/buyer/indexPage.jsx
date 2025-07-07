@@ -144,7 +144,10 @@ function CakeAllList() {
 
     return (
         <div className="flex flex-col min-h-screen">
-            <BannerCarousel banners={banners} interval={5000} />
+            {/* BannerCarousel에 최대 너비와 패딩 적용 */}
+            <div className="container mx-auto px-4">
+                <BannerCarousel banners={banners} interval={5000} />
+            </div>
             <main className="flex-grow container mx-auto px-6 py-8">
                 <div className="mb-8"> {/* 아래 내용과의 간격을 위해 마진 추가 */}
                     <PickupScheduler onComplete={handlePickupSchedulerComplete} />
