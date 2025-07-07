@@ -1,20 +1,24 @@
-import {useEffect, useState} from "react";
-import {getCakeDetail, API_SERVER_HOST, deleteCake} from "../../../api/cakeApi.jsx";
-import {List} from "lucide-react";
+import { useEffect, useState } from "react";
+import { getCakeDetail, deleteCake } from "../../../api/cakeApi.jsx";
+import { List } from "lucide-react";
 import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
-import {Link, useNavigate, useParams} from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import CakeOptionList from "../../../components/cake/optionComponents/optionListComponent.jsx";
-import {useAuth} from "../../../store/AuthContext.jsx";
+import { useAuth } from "../../../store/AuthContext.jsx";
+import AlertModal from "../../../components/common/AlertModal";
 
 function SellerCakeReadPage() {
-    const {user} = useAuth()
-    const {  cakeId } = useParams();
+    const { user } = useAuth();
+    const { cakeId } = useParams();
     const navigate = useNavigate();
-    const [cake, setCake] = useState(null); // 케이크 상세 정보
-    const [optionTypes, setOptionTypes] = useState([]); // 병합된 최종 옵션 타입 데이터 (CakeDetailComponent로 전달)
+    const [cake, setCake] = useState(null);
+    const [optionTypes, setOptionTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedOptions, setSelectedOptions] = useState([]); // 선택된 옵션 상태
+    const [selectedOptions, setSelectedOptions] = useState([]);
+    const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     const fetchCakeDetail = async () => {
         if (!cakeId) {
@@ -26,10 +30,9 @@ function SellerCakeReadPage() {
             setLoading(true);
             setError(null);
 
-            const data = await getCakeDetail(user.shopId, cakeId); // 백엔드에서 cakeDetailDTO와 options를 모두 받아옴
+            const data = await getCakeDetail(user.shopId, cakeId);
             setCake(data);
 
-            // 백엔드에서 받은 options 데이터를 기반으로 optionTypes를 직접 구성
             if (data && data.options) {
                 const groupedOptions = data.options.reduce((acc, currentOption) => {
                     const typeId = currentOption.optionTypeId;
@@ -53,10 +56,9 @@ function SellerCakeReadPage() {
                     return acc;
                 }, {});
 
-                // 객체를 배열로 변환
                 setOptionTypes(Object.values(groupedOptions));
             } else {
-                setOptionTypes([]); // 옵션 데이터가 없으면 빈 배열로 설정
+                setOptionTypes([]);
             }
 
         } catch (err) {
@@ -67,34 +69,47 @@ function SellerCakeReadPage() {
         }
     };
 
-    // 초기 로딩 및 URL 변경 감지
     useEffect(() => {
-
-        // URL에서 수정 페이지에서 온 것인지 확인
         const isFromUpdate = location.state?.fromUpdate || false;
-
-        // 수정 페이지에서 온 경우 강제 새로고침
         fetchCakeDetail(isFromUpdate);
 
-        // location.state 초기화 (뒤로가기 시 재실행 방지)
         if (isFromUpdate) {
             window.history.replaceState({}, document.title);
         }
     }, [cakeId, location.pathname]);
 
-    // 페이지 포커스 시 데이터 새로고침 (탭 전환 후 돌아왔을 때)
     useEffect(() => {
         const handleFocus = () => {
-            console.log('페이지 포커스 - 데이터 새로고침');
             fetchCakeDetail(true);
         };
-
         window.addEventListener('focus', handleFocus);
         return () => window.removeEventListener('focus', handleFocus);
     }, [cakeId]);
 
-    // 전체 로딩 상태 및 에러 메시지 처리
-    if (loading) { // 케이크 정보 로딩에 옵션 정보 로딩도 포함
+    const handleDelete = async () => {
+        if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
+            try {
+                await deleteCake(cakeId);
+                setFormError("상품이 삭제되었습니다.");
+                setShowError(true);
+                navigate(`/shops/${user.shopId}`);
+            } catch (err) {
+                console.error("상품 삭제 실패:", err);
+                setFormError("상품 삭제에 실패했습니다.");
+                setShowError(true);
+            }
+        }
+    };
+
+    // formError 알림 자동 사라짐
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
+    if (loading) {
         return (
             <div className="text-center py-8 text-gray-500">
                 상품 정보를 불러오는 중...
@@ -102,23 +117,9 @@ function SellerCakeReadPage() {
         );
     }
 
-    if (error) { // 케이크 정보 로딩 중 에러 발생 시
+    if (error) {
         return <div className="text-center py-8 text-red-500">{error}</div>;
     }
-
-// '삭제' 버튼 클릭 핸들러
-    const handleDelete = async () => {
-        if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
-            try {
-                await deleteCake(cakeId);
-                alert("상품이 삭제되었습니다.");
-                navigate(`/shops/${user.shopId}`);
-            } catch (err) {
-                console.error("상품 삭제 실패:", err);
-                alert("상품 삭제에 실패했습니다.");
-            }
-        }
-    };
 
     return (
         <div>
@@ -130,23 +131,24 @@ function SellerCakeReadPage() {
                             className="absolute left-0 top-1/2 -translate-y-1/2 px-4 py-2 rounded-md hover:text-gray-500 transition-colors duration-200"
                             title="목록으로"
                         >
-                            <List size={30}/>
+                            <List size={30} />
                         </Link>
                     )}
 
                     <h1 className="text-2xl font-semibold">상품 상세 조회</h1>
                 </div>
-                <hr className="mb-6 w-1/4 mx-auto"/>
+                <hr className="mb-6 w-1/4 mx-auto" />
 
-                {/* CakeDetailComponent에 props 전달 */}
                 <CakeDetailComponent
-                    cake={cake} // cake 전체 객체를 전달
-                    optionTypes={optionTypes} // 새로 가공된 optionTypes 전달
+                    cake={cake}
+                    optionTypes={optionTypes}
                     selectedOptions={selectedOptions}
                     setSelectedOptions={setSelectedOptions}
-                    apiBaseUrl={API_SERVER_HOST} // 이미지 경로를 위해 API_SERVER_HOST 전달
+                    apiBaseUrl={S3_BASE_URL}
                     OptionComponent={CakeOptionList}
+                    // formError prop 제거
                 />
+
                 <div className="mt-6 flex justify-center">
                     <button
                         onClick={handleDelete}
@@ -164,6 +166,13 @@ function SellerCakeReadPage() {
                     )}
                 </div>
             </div>
+
+            <AlertModal
+                message={formError}
+                type="error" // 필요에 따라 성공/에러 구분 가능
+                show={showError}
+                onClose={() => setShowError(false)}
+            />
         </div>
     );
 }

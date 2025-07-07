@@ -1,17 +1,13 @@
 import React from 'react';
 
-// toLocaleString()으로 숫자를 쉼표 형식으로 변환하는 함수
-// 입력값은 숫자나 문자열이 될 수 있으므로, 숫자만 추출합니다.
 const formatNumberWithCommas = (value) => {
     if (value === '' || value === undefined || value === null) {
         return '';
     }
-    // 숫자만 남기고, 쉼표 등 제거
     const numericValue = value.toString().replace(/,/g, '');
     if (isNaN(numericValue)) {
-        return ''; // 숫자가 아니면 빈 문자열 반환
+        return '';
     }
-    // Number()로 변환 후 toLocaleString()으로 포맷팅
     return Number(numericValue).toLocaleString('ko-KR');
 };
 
@@ -34,12 +30,9 @@ function OptionAdd({
                        handleToList
                    }) {
 
-    // **주의: handleOptionItemChange 함수를 컴포넌트 내부에서 수정합니다.**
     const handleFormattedOptionItemChange = (index, field, value) => {
         if (field === 'price') {
-            // 입력값에서 쉼표 제거 후 숫자만 상태에 저장
             const rawValue = value.replace(/,/g, '');
-            // 부모 컴포넌트의 handleOptionItemChange를 호출
             handleOptionItemChange(index, field, rawValue);
         } else {
             handleOptionItemChange(index, field, value);
@@ -77,7 +70,8 @@ function OptionAdd({
                         <button
                             type="button"
                             onClick={handleToggleNewOptionTypeInput}
-                            className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200 whitespace-nowrap"                        >
+                            className="px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors duration-200 whitespace-nowrap"
+                        >
                             + 새 옵션 타입 등록
                         </button>
                     </div>
@@ -127,8 +121,8 @@ function OptionAdd({
                                 <input
                                     type="text"
                                     placeholder="가격"
-                                    value={formatNumberWithCommas(item.price)} // 표시될 값에 포맷팅 적용
-                                    onChange={(e) => handleFormattedOptionItemChange(index, 'price', e.target.value)} // onChange 핸들러 변경
+                                    value={formatNumberWithCommas(item.price)}
+                                    onChange={(e) => handleFormattedOptionItemChange(index, 'price', e.target.value)}
                                     className="flex-1 p-2 border border-gray-300 rounded-md text-base text-gray-700 text-right focus:outline-none focus:ring-2 focus:ring-blue-400 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 />
                                 <span className="text-base text-gray-600 whitespace-nowrap">원</span>
@@ -156,8 +150,8 @@ function OptionAdd({
                         취소
                     </button>
                     <button
-                               type="submit"
-                               className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
+                        type="submit"
+                        className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
                     >
                         등록
                     </button>

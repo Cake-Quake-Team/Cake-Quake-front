@@ -3,6 +3,7 @@ import { useRef, useEffect } from "react";
 function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnailSelect  }) {
     const inputRef = useRef(null);
     const scrollRef = useRef(null);
+    const s3BaseUrl=import.meta.env.VITE_S3_BASE_URL;
 
     const handleChange = (e) => {
         onImageChange(e);
@@ -25,12 +26,11 @@ function CakeImageUploadForm({ images, onImageChange, onImageRemove, onThumbnail
                 style={{ height: "120px", overflowY: "hidden" }}
             >
                 {images.map((img, index) => {
-                    const src = img.file ? URL.createObjectURL(img.file) : img.src;
                     return (
                         <div key={index} className="relative w-30 h-30 flex-shrink-0">
                             <img
-                                src={src}
-                                alt={`미리보기 ${index + 1}`}
+                                src={img.file ? img.src : `${s3BaseUrl}${img.src}`}
+                                alt="미리보기"
                                 onClick={() => onThumbnailSelect(index)}
                                 className={`w-full h-24 object-cover rounded-lg border-2 ${
                                     img.isThumbnail ? "border-blue-500" : "border-transparent"
