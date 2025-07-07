@@ -7,7 +7,6 @@ import ShopSelectionModal from "./ShopSelectionModal.jsx";
 import TimeSelectionModal from "./timeSelectionModal.jsx";
 import {useNavigate} from "react-router";
 
-
 function PickupScheduler({ onComplete }) {
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState(null);
@@ -21,7 +20,7 @@ function PickupScheduler({ onComplete }) {
     const [shopError, setShopError] = useState(null);
 
     // Effect to fetch shops when date changes
-    // 이펙트는 그대로 유지: 날짜가 바뀌면 해당 날짜에 이용 가능한 매장 목록을 불러옵니다.
+    // 날짜가 바뀌면 해당 날짜에 이용 가능한 매장 목록을 불러옵니다. (슬롯 체크 없이 단순 오픈 상태 및 휴무일만 체크)
     // 이 매장 목록은 ShopSelectionModal로 전달되어 모달 내에서 보여지게 됩니다.
     useEffect(() => {
         const fetchShops = async () => {
@@ -31,10 +30,14 @@ function PickupScheduler({ onComplete }) {
                 setSelectedShop(null); // 날짜 변경 시 매장 및 시간 초기화
                 setSelectedTime(null);
 
+                // 백엔드 날짜 형식 (YYYY-MM-DD)에 맞춰 변환
                 const dateString = selectedDate.toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
                 try {
-                    const shops = await getAvailableShops(dateString);
+                    // getAvailableShops 호출 시 time을 null로, checkSlots는 true로 전달
+                    // 백엔드에서 time이 null이면 현재 시간으로 기본 처리되지만, 여기서는 매장 목록만 가져오므로 time을 명시적으로 null 전달
+                    // 이 시점에서는 슬롯 체크(checkSlots: true)를 하는 것이 맞습니다.
+                    const shops = await getAvailableShops(dateString, null, true);
                     setAvailableShops(shops);
                 } catch (error) {
                     console.error('Failed to fetch available shops:', error);
@@ -60,7 +63,7 @@ function PickupScheduler({ onComplete }) {
     const handleShopSelectFromModal = (shop) => {
         setSelectedShop(shop);
         setIsShopSelectorOpen(false); // 모달 닫기
-        setSelectedTime(null); // 매장 변경 시 시간 초기화
+        setSelectedTime(null); // **매장 변경 시 시간 초기화 추가**
     };
 
     const handleTimeSelect = (time) => {
@@ -100,7 +103,8 @@ function PickupScheduler({ onComplete }) {
 
     const formatTimeDisplay = (time) => {
         if (!time) return '시간 선택';
-        return time.substring(0, 5); // HH:MM
+        // 백엔드 LocalTime은 HH:MM:SS 형태로 올 수 있으므로, HH:MM만 표시하도록 수정
+        return time.substring(0, 5);
     };
 
     const isProceedButtonDisabled = !selectedDate || !selectedShop || !selectedTime;
@@ -109,7 +113,7 @@ function PickupScheduler({ onComplete }) {
         <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: 'auto' }}>
             {/* 상단 픽업 스케줄 조회 섹션 (이미지: image_781113.png과 동일) */}
             <div style={{
-                marginBottom: '30px', // 하단 내용이 없으므로 margin-bottom은 그대로 유지하거나 조절
+                marginBottom: '30px',
                 padding: '20px',
                 border: '1px solid #ddd',
                 borderRadius: '10px',
@@ -124,7 +128,7 @@ function PickupScheduler({ onComplete }) {
                     <div style={{ flex: '1 1 28%', minWidth: '180px' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>1. 픽업 날짜</label>
                         <button
-                            onClick={() => setIsDatePickerOpen(true)} // <-- 버튼 클릭 시 DatePickerModal 열기
+                            onClick={() => setIsDatePickerOpen(true)}
                             style={{
                                 width: '100%', padding: '12px 15px', border: '1px solid #ccc', borderRadius: '8px',
                                 backgroundColor: 'white', textAlign: 'left', cursor: 'pointer', fontSize: '1em',
@@ -140,7 +144,7 @@ function PickupScheduler({ onComplete }) {
                     <div style={{ flex: '1 1 28%', minWidth: '180px' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>2. 매장 선택</label>
                         <button
-                            onClick={() => selectedDate && setIsShopSelectorOpen(true)} // 날짜 선택 시에만 활성화
+                            onClick={() => selectedDate && setIsShopSelectorOpen(true)}
                             disabled={!selectedDate}
                             style={{
                                 width: '100%', padding: '12px 15px', border: '1px solid #ccc', borderRadius: '8px',
@@ -159,7 +163,7 @@ function PickupScheduler({ onComplete }) {
                     <div style={{ flex: '1 1 28%', minWidth: '180px' }}>
                         <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>3. 픽업 시간</label>
                         <button
-                            onClick={() => selectedShop && setIsTimeSelectorOpen(true)} // 매장 선택 시에만 활성화
+                            onClick={() => selectedShop && setIsTimeSelectorOpen(true)}
                             disabled={!selectedShop}
                             style={{
                                 width: '100%', padding: '12px 15px', border: '1px solid #ccc', borderRadius: '8px',
@@ -204,12 +208,12 @@ function PickupScheduler({ onComplete }) {
                 onClose={() => setIsShopSelectorOpen(false)}
                 onSelectShop={handleShopSelectFromModal}
                 selectedShop={selectedShop}
-                availableShops={availableShops} // 날짜 선택 후 불러온 매장 목록을 모달에 전달
+                availableShops={availableShops}
                 loading={loadingShops}
                 error={shopError}
             />
 
-            {selectedShop && selectedDate && ( // 매장과 날짜가 선택되어야 시간 모달을 활성화 (선택 사항)
+            {selectedShop && selectedDate && (
                 <TimeSelectionModal
                     isOpen={isTimeSelectorOpen}
                     onClose={() => setIsTimeSelectorOpen(false)}
@@ -222,5 +226,6 @@ function PickupScheduler({ onComplete }) {
         </div>
     );
 }
+
 
 export default PickupScheduler;
