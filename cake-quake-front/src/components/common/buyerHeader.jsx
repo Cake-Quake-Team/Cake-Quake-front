@@ -76,9 +76,11 @@ function BuyerHeader() {
 
                     {user ? (
                         <>
-                            <span className="text-sm font-semibold text-gray-700">
+                            <Link to={user.role === 'BUYER' ? '/buyer/profile' : '/seller/profile'}>
+                              <span className="text-sm font-semibold text-gray-700">
                                 {user.uname}님
-                            </span>
+                              </span>
+                            </Link>
                             {/* 토글 버튼 (로그인 상태에도 보이게) */}
                             <button
                                 onClick={() => setSidebarOpen(true)}

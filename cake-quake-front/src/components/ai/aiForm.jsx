@@ -1,8 +1,9 @@
-import { Send } from 'lucide-react';
+// src/components/ai/AiForm.jsx
+import { Send } from 'lucide-react'; // 아이콘 (npm install lucide-react)
 
 function AiForm({ question, onQuestionChange, selectedType, onTypeChange, onSubmit }) {
     const handleKeyDown = (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+        if (e.key === "Enter" && !e.shiftKey) { // Shift+Enter는 줄바꿈, Enter만은 제출
             e.preventDefault();
             onSubmit(e);
         }
@@ -13,13 +14,13 @@ function AiForm({ question, onQuestionChange, selectedType, onTypeChange, onSubm
             onSubmit={onSubmit}
             className="mt-8 w-full max-w-2xl mx-auto flex flex-col items-center px-4 space-y-3"
         >
-            {/* 선택 영역 */}
+            {/* AI 추천 타입 선택 영역 */}
             <div className="flex gap-2 text-xs text-gray-600">
                 {[
                     { label: "문구", value: "lettering", color: "pink" },
                     { label: "옵션", value: "options", color: "pink" },
                     { label: "디자인", value: "image", color: "pink" },
-                    { label: "일반", value: "", color: "pink" },
+                    { label: "일반", value: "chat", color: "pink" }, // 여기를 "chat"으로 변경
                 ].map(({ label, value, color }) => (
                     <button
                         type="button"
@@ -36,7 +37,7 @@ function AiForm({ question, onQuestionChange, selectedType, onTypeChange, onSubm
                 ))}
             </div>
 
-            {/* 입력창 + 버튼 */}
+            {/* 질문 입력창 및 제출 버튼 */}
             <div className="w-full flex items-center bg-white border border-gray-300 rounded-full px-5 py-3 shadow-sm">
                 <textarea
                     rows="2"
