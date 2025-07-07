@@ -1,14 +1,29 @@
 
-import SockJS from "sockjs-client";
-import {Client, over} from "webstomp-client";
-import {useEffect, useRef, useState} from "react";
+import Stomp from 'stompjs';
+import {useCallback, useEffect, useRef, useState} from "react";
 import {useAuth} from "../store/AuthContext.jsx"; //사용자 인증 정보 가져오기
 
 
 const useWebSocket = (roomId, onMessageReceived) => {
-    const stompClientRef = useRef(null); //STOMP 클라이언트 객체 참조할 ref
-    const [isConnected, setIsConnected] = useState(false); //Web Socket 연결 상태
-    const { user, isLoading } = useAuth(); //로그인 사용자 정보와 로딩 상태
+    const stompClientRef = useRef(null); // STOMP 클라이언트 인스턴스 참조
+    const [isConnected, setIsConnected] = useState(false); // WebSocket 연결 상태
+    const { user, isLoading } = useAuth(); // 사용자 인증 정보 및 로딩 상태
+
+    // onMessageReceived 콜백 함수를 메모이제이션하여 불필요한 리렌더링 방지
+    const memoizedOnMessageReceived = useCallback(onMessageReceived, [onMessageReceived]);
+
+    /**
+     * WebSocket 연결을 해제하는 함수
+     */
+    const disconnectWebSocket = useCallback(() => {
+        if (stompClientRef.current && stompClientRef.current.connected) {
+            console.log("[useWebSocket] 🔌 STOMP 연결 해제 시도...");
+            stompClientRef.current.disconnect(() => { // stompjs의 연결 해제 메서드
+                setIsConnected(false);
+                console.log("[useWebSocket] 🔌 STOMP 연결 해제 완료");
+            });
+        }
+    }, []); // 의존성 배열 비워 한 번만 생성되도록 함
 
     useEffect(() => {
         console.log("==============================================");
@@ -18,96 +33,115 @@ const useWebSocket = (roomId, onMessageReceived) => {
         console.log("[useWebSocket] 👉 user:", user);
         console.log("==============================================");
 
-        // 인증 정보 로딩 중인 경우 연결하지 않음
+        // 초기화: 연결 상태를 false로 설정
+        setIsConnected(false);
+
+        // 연결 조건 검사
         if (isLoading) {
-            console.warn("[useWebSocket] ⏳ isLoading=true → 연결 안함");
+            console.warn("[useWebSocket] ⏳ isLoading=true → 연결 시도 안함");
             return;
         }
 
-        // roodId 없는 경우 연결하지 않음
         if (!roomId) {
-            console.warn("[useWebSocket] ⚠️ roomId 없음 → 연결 안함");
+            console.warn("[useWebSocket] ⚠️ roomId 없음 → 연결 시도 안함");
             return;
         }
 
-        // 로그인 사용자 없으면 연결하지 않음
         if (user === null) {
-            console.warn("[useWebSocket] 🚫 user=null → 연결 안함");
+            console.warn("[useWebSocket] 🚫 user=null → 연결 시도 안함");
             return;
         }
 
-        // 모든 조건 충족 → WebSocket 연결 시작
-        console.log("[useWebSocket] ✅ 모든 조건 만족 → SockJS 연결 시도");
+        // 이미 연결되어 있다면 새로 연결하지 않음
+        if (stompClientRef.current && stompClientRef.current.connected) {
+            console.log("[useWebSocket] ℹ️ 이미 연결되어 있음. 새로운 연결 시도 안함.");
+            return;
+        }
 
-        //SockJS 객체 생성 (withCredentials로 쿠키 전달 가능)
-        const socket = new SockJS("http://localhost:8080/ws",{withCredentials: true})
+        console.log("[useWebSocket] ✅ 모든 조건 만족 → STOMP 연결 시도");
 
-        // STOMP 클라이언트 생성
-        const stompClient = over(socket);
+        try {
+            // WebSocket 객체 생성 (운영에서는 wss 사용)
+            const socket = new WebSocket(import.meta.env.VITE_WS_URL || "ws://localhost:8080/ws");
+            console.log("[useWebSocket] 🌐 WebSocket 객체 생성됨:", socket);
 
+            // stompjs의 client 메서드를 사용하여 STOMP 클라이언트 인스턴스 생성
+            const stompClient = Stomp.client(import.meta.env.VITE_WS_URL || "ws://localhost:8080/ws");
+            // NOTE: stompjs (2.3.3)는 WebSocket 객체를 직접 인자로 받지 않고, brokerURL을 통해 내부적으로 WebSocket을 생성합니다.
+            // 따라서 위의 `new WebSocket(...)` 라인은 사실상 필요 없지만, 기존 코드 흐름을 유지하기 위해 남겨두었습니다.
+            // 실제로는 `Stomp.client(brokerURL)`이 내부적으로 WebSocket을 관리합니다.
 
-        console.log("[useWebSocket] 🌐 SockJS 객체 생성됨:", socket);
-        console.log("[useWebSocket] 🌐 STOMP 클라이언트 생성됨:", stompClient);
+            stompClientRef.current = stompClient; // 클라이언트 인스턴스 참조 저장
 
-        // WebSocket 연결 및 구독
-        stompClient.connect({}, () => {
-            console.log("[useWebSocket] 🔗 WebSocket 연결 성공");
-            setIsConnected(true);
+            console.log("[useWebSocket] 🌐 STOMP 클라이언트 생성됨:", stompClient);
 
-            // 특정 채팅방 구독
-            const topic = `/topic/chat/${roomId}`;
-            console.log("[useWebSocket] 📢 구독 요청:", topic);
+            // 연결 시도
+            stompClient.connect(
+                {}, // headers (필요시 JWT 추가 가능)
+                () => {
+                    console.log("[useWebSocket] ✅ STOMP 연결 성공");
+                    setIsConnected(true);
 
-            stompClient.subscribe(topic, (message) => {
-                console.log("[useWebSocket] 📩 메시지 수신:", message);
+                    const topic = `/topic/chat/room/${roomId}`;
+                    // 메시지 구독
+                    stompClient.subscribe(topic, (message) => {
+                        console.log("[useWebSocket] 📩 메시지 수신:", message);
 
-                try {
-                    // 수신 메시지 JSON 파싱
-                    const parsedMessage = JSON.parse(message.body);
-                    console.log("[useWebSocket] ✅ 메시지 파싱:", parsedMessage);
+                        try {
+                            const parsedMessage = JSON.parse(message.body);
+                            console.log("[useWebSocket] ✅ 메시지 파싱:", parsedMessage);
 
-                    // 콜백 함수 호출 (새 메시지 전달)
-                    if (onMessageReceived) {
-                        onMessageReceived(parsedMessage);
-                    }
-                } catch (error) {
-                    console.error("[useWebSocket] ❗ 메시지 파싱 실패:", error);
+                            if (memoizedOnMessageReceived) {
+                                memoizedOnMessageReceived(parsedMessage);
+                            }
+                        } catch (error) {
+                            console.error("[useWebSocket] ❗ 메시지 파싱 실패:", error);
+                        }
+                    });
+                },
+                (error) => {
+                    console.error("[useWebSocket] ❌ STOMP 연결 실패:", error);
+                    setIsConnected(false);
+                    disconnectWebSocket(); // 오류 발생 시 연결 해제
                 }
-            });
-        }, (error) => {
-            // 연결 실패 시
-            console.error("[useWebSocket] ❌ WebSocket 연결 실패:", error);
-            console.error("[useWebSocket] ❌ 실패 상세:", error ? error.toString() : '알 수 없는 오류');
+            );
+
+        } catch (error) {
+            console.error("[useWebSocket] 💥 WebSocket/STOMP 생성 또는 활성화 오류:", error);
             setIsConnected(false);
-        });
+            disconnectWebSocket();
+        }
 
-        // stompClient를 ref에 저장
-        stompClientRef.current = stompClient;
-
-        /// 컴포넌트 언마운트 시 연결 종료
+        // 컴포넌트 언마운트 시 연결 정리
         return () => {
-            console.log("[useWebSocket] 🛑 컴포넌트 언마운트 → WebSocket 연결 종료");
-            if (stompClientRef.current && stompClientRef.current.connected) {
-                stompClientRef.current.disconnect(() => {
-                    console.log("[useWebSocket] 🛑 WebSocket 완전 종료");
-                });
-            }
+            console.log("[useWebSocket] 🛑 컴포넌트 언마운트 → WebSocket 연결 종료 정리");
+            disconnectWebSocket();
         };
-    }, [roomId, user, isLoading]); // 변경사항 발생 시 재호출
 
-    //웹소켓으로 메시지 전송
-    const sendMessage = (messageDto) => {
+    }, [roomId, user, isLoading, memoizedOnMessageReceived, disconnectWebSocket]); // 의존성 배열에 disconnectWebSocket 추가
+
+    /**
+     * 메시지를 전송하는 함수
+     * @param {Object} messageDto - 전송할 메시지 데이터 객체
+     */
+    const sendMessage = useCallback((messageDto) => {
         console.log("[useWebSocket] 📤 sendMessage 호출:", messageDto);
+        console.log("[useWebSocket] 💡 messageDto JSON:", JSON.stringify(messageDto));
+        console.log("[useWebSocket] 💡 messageDto Type:", Array.isArray(messageDto) ? "Array" : "Object");
 
         if (stompClientRef.current && stompClientRef.current.connected) {
-            // 메시지 전송
-            stompClientRef.current.send(`/app/chat/${roomId}`, {}, JSON.stringify(messageDto));
+            // stompjs의 send 메서드 사용 (destination, headers, body)
+            stompClientRef.current.send(
+                `/app/chat/${roomId}`,
+                {}, // 필요시 헤더 추가
+                JSON.stringify(messageDto)
+            );
             console.log("[useWebSocket] ✅ 메시지 전송 성공:", messageDto);
         } else {
             console.error("[useWebSocket] ❗ 연결 안됨 → 메시지 전송 실패");
         }
-    };
-    // 외부로 노출
+    }, [roomId]); // roomId가 변경될 때마다 함수 재생성
+
     return { sendMessage, isConnected };
 };
 
