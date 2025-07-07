@@ -48,6 +48,7 @@ function ShopSelectionModal({ isOpen, onClose, onSelectShop, selectedShop, avail
                                         <strong style={{ fontSize: '1.2em', color: '#333' }}>{shop.shopName}</strong>
                                         <p style={{ fontSize: '0.9em', color: '#666', marginTop: '5px' }}>{shop.address}</p>
                                         <p style={{ fontSize: '0.8em', color: '#999' }}>
+                                            {/* 백엔드 LocalTime은 HH:MM:SS 형태로 올 수 있으므로, HH:MM만 표시하도록 수정 */}
                                             영업 시간: {shop.openTime?.substring(0, 5)} ~ {shop.closeTime?.substring(0, 5)}
                                         </p>
                                     </div>
@@ -64,7 +65,7 @@ function ShopSelectionModal({ isOpen, onClose, onSelectShop, selectedShop, avail
     );
 }
 
-// 모달 스타일은 DatePickerModal과 동일하게 사용
+// 모달 스타일은 DatePickerModal과 동일하게 사용 (ShopSelectionModal 외부에 정의되어야 합니다)
 const modalOverlayStyle = {
     position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
