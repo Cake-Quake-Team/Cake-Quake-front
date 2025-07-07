@@ -89,7 +89,7 @@ export default function DeletionRequestAdminPage() {
                             요청일
                         </th>
                         <th className="py-4 px-6 text-center text-base font-medium text-gray-600">
-                            액션
+
                         </th>
                     </tr>
                     </thead>

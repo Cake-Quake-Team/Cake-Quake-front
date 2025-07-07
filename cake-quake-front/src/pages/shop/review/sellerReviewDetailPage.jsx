@@ -2,72 +2,88 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import ReviewDetail from '../../../components/review/reviewDetail.jsx';
-import { getShopReviewDetail, requestDeleteShopReview } from '../../../api/reviewApi.jsx';
+
+import {
+    getShopReviewDetail,
+    replyToShopReview,
+    requestDeleteShopReview
+} from '../../../api/reviewApi.jsx';
+import ResultModal from "../../../components/common/resultModal.jsx";
 
 export default function SellerReviewDetailPage() {
     const { shopId, reviewId } = useParams();
-    const nav = useNavigate();
+    const navigate = useNavigate();
 
     const [review, setReview] = useState(null);
     const [alreadyRequested, setAlreadyRequested] = useState(false);
-
     const [showDeleteForm, setShowDeleteForm] = useState(false);
     const [deleteReason, setDeleteReason] = useState('');
     const [deleting, setDeleting] = useState(false);
 
+    // 모달 상태
+    const [modalMsg, setModalMsg] = useState('');
+    const [modalOpen, setModalOpen] = useState(false);
+    const closeResultModal = () => setModalOpen(false);
+
+    // 리뷰 불러오기
     useEffect(() => {
         (async () => {
             try {
                 const data = await getShopReviewDetail(shopId, reviewId);
-                console.log('🔍 getShopReviewDetail response →', data);
                 setReview(data);
-                // 백엔드에서 삭제 요청 ID나 플래그로 내려준 필드 이름에 맞춰서 변경하세요.
-                // e.g. data.requestId 또는 data.deletionRequested
                 setAlreadyRequested(!!data.requestId);
             } catch (e) {
                 console.error('리뷰 상세 로드 실패', e);
-                alert('리뷰를 불러올 수 없습니다.');
-                nav(`/shops/${shopId}/reviews`);
+                setModalMsg('리뷰를 불러올 수 없습니다.');
+                setModalOpen(true);
+                navigate(`/shops/${shopId}/reviews`);
             }
         })();
-    }, [shopId, reviewId, nav]);
+    }, [shopId, reviewId, navigate]);
 
-    const handleReplyEdit = () => {
-        // Edit-reply 로직: 모달 띄우거나, 인라인 폼 etc.
+    // 답글 생성/수정
+    const handleReplyEdit = async (_reviewId, newReply) => {
+        try {
+            await replyToShopReview(shopId, _reviewId, { reply: newReply });
+            setReview(prev => ({ ...prev, reply: newReply }));
+            setModalMsg('답글이 저장되었습니다.');
+            setModalOpen(true);
+        } catch (e) {
+            console.error('답글 저장 실패', e);
+            setModalMsg('답글을 저장하는 데 실패했습니다.');
+            setModalOpen(true);
+        }
     };
 
-    const openDeleteForm = () => {
-        setShowDeleteForm(true);
-    };
-
+    // 삭제 요청
+    const openDeleteForm = () => setShowDeleteForm(true);
     const cancelDelete = () => {
-        setShowDeleteForm(false);
         setDeleteReason('');
+        setShowDeleteForm(false);
     };
-
     const confirmDeleteRequest = async () => {
         if (!deleteReason.trim()) {
-            alert('삭제 사유를 입력해 주세요.');
+            setModalMsg('삭제 사유를 입력해 주세요.');
+            setModalOpen(true);
             return;
         }
         setDeleting(true);
         try {
             await requestDeleteShopReview(shopId, reviewId, deleteReason);
-            alert('삭제 요청이 전송되었습니다.');
-            nav(`/shops/${shopId}/reviews`);
+            setModalMsg('삭제 요청이 전송되었습니다.');
+            setModalOpen(true);
+            navigate(`/shops/${shopId}/reviews`);
         } catch (e) {
-            console.error(e);
-            // 에러 상태에 따라 다른 메시지
-                       const status = e.response?.status;
-                       let msg;
-                       if (status === 409) {
-                               msg = '이미 삭제 요청이 접수된 리뷰입니다.';
-                           } else if (status >= 500) {
-                               msg = '서버 오류로 삭제 요청에 실패했습니다. 잠시 후 다시 시도해주세요.';
-                           } else {
-                               msg = '삭제 요청에 실패했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.';
-                           }
-                       window.alert(msg);
+            console.error('삭제 요청 실패', e);
+            const status = e.response?.status;
+            const msg =
+                status === 409
+                    ? '이미 삭제 요청이 접수된 리뷰입니다.'
+                    : status >= 500
+                        ? '서버 오류로 삭제 요청에 실패했습니다.'
+                        : '삭제 요청에 실패했습니다.';
+            setModalMsg(msg);
+            setModalOpen(true);
         } finally {
             setDeleting(false);
         }
@@ -78,15 +94,15 @@ export default function SellerReviewDetailPage() {
     }
 
     return (
-        <div>
+        <>
             <ReviewDetail
                 review={review}
                 onEdit={null}
                 onDelete={openDeleteForm}
-                onBack={() => nav(-1)}
+                onBack={() => navigate(-1)}
                 onReplyEdit={handleReplyEdit}
                 showEdit={false}
-                showDeleteRequest={!alreadyRequested}
+                showReplyEdit={true}
             />
 
             {showDeleteForm && (
@@ -118,6 +134,8 @@ export default function SellerReviewDetailPage() {
                     </div>
                 </div>
             )}
-        </div>
+
+            <ResultModal show={modalOpen} closeResultModal={closeResultModal} msg={modalMsg} />
+        </>
     );
 }
