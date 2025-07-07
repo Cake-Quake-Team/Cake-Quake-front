@@ -19,14 +19,15 @@ export default defineConfig({
         secure: false,
       },
       '/upload': {
-        target: 'http://localhost',
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
       },
       '/ws': { // 백엔드의 SockJS/WebSocket 엔드포인트와 일치하도록 '/socket' 대신 '/ws'로 변경
         target: 'http://localhost:8080', // 백엔드 포트
         changeOrigin: true,
-        ws: true, // ⭐ WebSocket 프록시를 활성화합니다.
+        ws: true,
+        secure: false,// ⭐ WebSocket 프록시를 활성화합니다.
       },
       '/sockjs-node': {
         target: 'http://localhost:8080',
