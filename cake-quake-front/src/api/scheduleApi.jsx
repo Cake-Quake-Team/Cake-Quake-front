@@ -35,4 +35,37 @@ export const getAvailableShops=async (date, time = null, checkSlots = true) => {
 
 }
 
+/**
+ * 특정 매장의 특정 날짜에 대한 운영 시간 정보를 조회
+ * 백엔드: GET /api/v1/schedule/shops/{shopId}/operating-hours
+*/
+export const getShopOperatingHours = async (shopId, date) => {
+    try {
+        const response = await jwtAxios.get(`${prefix}/schedule/shops/${shopId}/operating-hours`, {
+            params: { date }
+        });
+        console.log(`API 응답 - 매장 ${shopId}, 날짜 ${date}의 운영 시간:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching operating hours for shop ${shopId} on ${date}:`, error);
+        throw error;
+    }
+};
+
+/**
+ * 특정 매장, 특정 날짜에 예약이 가득 찬 (더 이상 예약 불가능한) 시간 목록을 HH:MM 문자열 형식으로 조회합
+ * 백엔드: GET /api/v1/schedule/shops/{shopId}/occupied-time-slots
+*/
+export const getOccupiedTimeSlots = async (shopId, date) => {
+    try {
+        const response = await jwtAxios.get(`${prefix}/schedule/shops/${shopId}/occupied-time-slots`, {
+            params: { date }
+        });
+        console.log(`API 응답 - 매장 ${shopId}, 날짜 ${date}의 예약된 시간 슬롯:`, response.data);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching occupied time slots for shop ${shopId} on ${date}:`, error);
+        throw error;
+    }
+};
 //api 다시 확인

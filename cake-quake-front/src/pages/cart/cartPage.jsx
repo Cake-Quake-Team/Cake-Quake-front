@@ -7,19 +7,40 @@ import CartActions from "../../components/cart/cartActions.jsx";
 import DeleteModal from '../../components/cart/DeleteModal';
 import SelectDeleteModal from '../../components/cart/SelectDeleteModal';
 
-const SuccessMessageModal = ({ message, onConfirm }) => (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg text-center">
-            <p className="text-lg font-semibold mb-4">{message}</p>
-            <button
-                onClick={onConfirm}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-                확인
-            </button>
+const SuccessMessageModal = ({ message, onClose }) => { // onConfirm 대신 onClose로 변경
+    const navigate = useNavigate(); // useNavigate 훅 사용
+
+    const handleGoToCart = () => {
+        onClose(); // 모달 먼저 닫고
+        navigate("/buyer/cart"); // 장바구니 페이지로 이동 (자기 자신 페이지이므로, reload 효과가 있을 수 있습니다.)
+    };
+
+    const handleContinueShopping = () => {
+        onClose(); // 모달 닫기만 함
+    };
+
+    return (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center min-w-[300px]">
+                <p className="text-lg font-semibold mb-6">{message}</p>
+                <div className="flex flex-col sm:flex-row justify-center gap-3">
+                    <button
+                        onClick={handleGoToCart}
+                        className="bg-blue-500 text-white px-5 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200 w-full sm:w-auto"
+                    >
+                        장바구니 확인하기
+                    </button>
+                    <button
+                        onClick={handleContinueShopping}
+                        className="bg-gray-300 text-gray-700 px-5 py-2 rounded-md hover:bg-gray-400 transition-colors duration-200 w-full sm:w-auto"
+                    >
+                        쇼핑 계속하기
+                    </button>
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 export default function CartPage() {
     const navigate = useNavigate();

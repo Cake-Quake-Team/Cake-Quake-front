@@ -77,7 +77,7 @@ function PickupScheduler({ onComplete }) {
             if (onComplete) {
                 onComplete({
                     selectedDate,
-                    selectedShop,
+                    //selectedShop,
                     selectedTime
                 });
             }
@@ -88,6 +88,7 @@ function PickupScheduler({ onComplete }) {
 
         } else {
             alert("날짜, 매장, 시간을 모두 선택해주세요.");
+
         }
     };
 
@@ -208,6 +209,7 @@ function PickupScheduler({ onComplete }) {
                 onClose={() => setIsShopSelectorOpen(false)}
                 onSelectShop={handleShopSelectFromModal}
                 selectedShop={selectedShop}
+                selectedDate={selectedDate}
                 availableShops={availableShops}
                 loading={loadingShops}
                 error={shopError}
