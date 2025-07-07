@@ -1,42 +1,45 @@
-import React, { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import React from 'react';
+import { useSearchParams, useNavigate } from 'react-router';
+import { useMutation } from '@tanstack/react-query';
+import { approveKakaoPayment } from '../../api/paymentApi';
 
-const KakaoApprovePage = () => {
-    const [params] = useSearchParams();
+export default function KakaoApprovePage() {
+    const [qs] = useSearchParams();
+    const orderId = qs.get('partner_order_id');
+    const userId  = qs.get('partner_user_id');
+    const pgToken = qs.get('pg_token');
+    const navigate = useNavigate();
 
-    useEffect(() => {
-        const orderId = params.get('partner_order_id');
-        const userId = params.get('partner_user_id');
-        const pgToken = params.get('pg_token');
-
-        if (!orderId || !userId || !pgToken) {
-            alert('필수 파라미터 누락');
-            return;
+// ✅ v5에선 반드시 객체 한 개만 넘깁니다
+    const mutation = useMutation({
+        mutationFn: () =>
+            approveKakaoPayment({ orderId, userId, pgToken }),
+        onSuccess: (result) => {
+            console.log('✅ approve result:', result);
+            // 이제 result.paymentId 가 찍히는지 보시고…
+            const { paymentId } = result;
+            navigate(`/buyer/payments/${paymentId}`, { replace: true });
+        },
+        onError: () => {
+            alert('결제 승인 중 오류가 발생했습니다.');
+            navigate('/buyer/orders', { replace: true });
         }
+    });
 
-        const approve = async () => {
-            try {
-                const res = await axios.get('/api/payments/kakao/approve', {
-                    params: {
-                        partner_order_id: orderId,
-                        partner_user_id: userId,
-                        pg_token: pgToken,
-                    },
-                });
+    React.useEffect(() => {
+        if (orderId && userId && pgToken) {
+            mutation.mutate();
+        }
+    }, [orderId, userId, pgToken]);
 
-                alert('결제 완료!');
-                console.log('승인 성공:', res.data);
-            } catch (e) {
-                alert('승인 실패');
-                console.error(e);
+    return (
+        <div className="p-6 text-center">
+            {mutation.isLoading
+                ? '결제 승인 처리 중…'
+                : mutation.isError
+                    ? '오류가 발생했습니다.'
+                    : null
             }
-        };
-
-        approve();
-    }, [params]);
-
-    return <div>결제 승인 중입니다...</div>;
-};
-
-export default KakaoApprovePage;
+        </div>
+    );
+}

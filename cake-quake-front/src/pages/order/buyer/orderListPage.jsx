@@ -53,7 +53,7 @@ export default function OrderListPage() {
 
     return (
         <div className="p-6">
-            <h2 className="text-2xl font-bold mb-4">주문 내역</h2>
+            <h2 className="text-2xl font-bold mb-4 text-center">주문 내역</h2>
 
             {/* 주문 목록이 비어있을 때 */}
             {orders.length === 0 ? (
