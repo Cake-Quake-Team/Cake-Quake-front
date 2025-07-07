@@ -1,67 +1,212 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import AiForm from "../../components/ai/aiForm";
 import AiResultBox from "../../components/ai/aiResultBox";
+import ChatSidebar from "../../components/ai/ChatSidebar";
+import { Menu } from "lucide-react";
+import { v4 as uuidv4 } from "uuid";
+import { useAuth } from "../../store/AuthContext";
+
 import {
     generateAnswer,
     recommendCakeLettering,
     recommendCakeOptions,
     recommendCakeImage,
+    getChatHistory
 } from "../../api/aiApi";
 
 function AiRecommendPage() {
+    const { user } = useAuth();
+    const userId = user?.uid
+
+    // 사용자별 localStorage 키
+    const historyKey = `aiChatHistory_${userId}`;
+    const sessionKey = `aiSessionId_${userId}`;
+
     const [question, setQuestion] = useState("");
-    const [selectedType, setSelectedType] = useState("");
-    const [chatHistory, setChatHistory] = useState([]);
+    const [selectedType, setSelectedType] = useState("chat");
+    const [chatHistory, setChatHistory] = useState(() => {
+        try {
+            const saved = localStorage.getItem(historyKey);
+            return saved ? JSON.parse(saved) : [];
+        } catch {
+            return [];
+        }
+    });
     const [isLoading, setIsLoading] = useState(false);
+    const [currentSessionId, setCurrentSessionId] = useState(null);
+    const [selectedChatIndex, setSelectedChatIndex] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+    const startNewChat = useCallback(() => {
+        const newSessionId = uuidv4();
+        localStorage.setItem(sessionKey, newSessionId);
+        setCurrentSessionId(newSessionId);
+        setChatHistory(prev => {
+            const newChatEntry = { sessionId: newSessionId, title: "새로운 대화", messages: [] };
+            return [...prev, newChatEntry];
+        });
+        setSelectedChatIndex(prev => prev + 1);
+        setQuestion("");
+    }, [sessionKey]);
+
+    const handleSelectChat = useCallback((index) => {
+        if (!chatHistory[index] || index === selectedChatIndex) return;
+        setSelectedChatIndex(index);
+        setCurrentSessionId(chatHistory[index].sessionId);
+        setQuestion("");
+        setIsLoading(false);
+    }, [chatHistory, selectedChatIndex]);
+
+    const toggleSidebar = useCallback(() => {
+        setIsSidebarOpen(prev => !prev);
+    }, []);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem(historyKey, JSON.stringify(chatHistory));
+        } catch {}
+    }, [chatHistory, historyKey]);
+
+    useEffect(() => {
+        let storedSessionId = localStorage.getItem(sessionKey);
+        if (chatHistory.length === 0 && !storedSessionId) {
+            startNewChat();
+        } else if (storedSessionId) {
+            const existingIndex = chatHistory.findIndex(chat => chat.sessionId === storedSessionId);
+            if (existingIndex !== -1) {
+                setSelectedChatIndex(existingIndex);
+                setCurrentSessionId(storedSessionId);
+            } else {
+                setCurrentSessionId(storedSessionId);
+            }
+        }
+    }, [startNewChat, chatHistory, sessionKey]);
+
+    useEffect(() => {
+        if (!currentSessionId) return;
+
+        async function fetchChatLogsForSession() {
+            const currentChat = chatHistory[selectedChatIndex];
+
+            if (currentChat?.sessionId === currentSessionId && currentChat.messages?.length > 0) {
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const logs = await getChatHistory(currentSessionId);
+                const formattedMessages = logs.map(log => ({
+                    question: log.question,
+                    answer: log.answer
+                }));
+
+                setChatHistory(prev => {
+                    const existingIndex = prev.findIndex(chat => chat.sessionId === currentSessionId);
+                    const newChatEntry = {
+                        sessionId: currentSessionId,
+                        title: formattedMessages.length > 0
+                            ? formattedMessages[0].question.slice(0, 30) + (formattedMessages[0].question.length > 30 ? '...' : '')
+                            : "새로운 대화",
+                        messages: formattedMessages
+                    };
+
+                    if (existingIndex !== -1) {
+                        const updated = [...prev];
+                        updated[existingIndex] = newChatEntry;
+                        setSelectedChatIndex(existingIndex);
+                        return updated;
+                    } else {
+                        setSelectedChatIndex(prev.length);
+                        return [...prev, newChatEntry];
+                    }
+                });
+            } catch {
+                setChatHistory(prev => {
+                    const existingIndex = prev.findIndex(chat => chat.sessionId === currentSessionId);
+                    if (existingIndex !== -1) {
+                        const updated = [...prev];
+                        updated[existingIndex].messages = [];
+                        return updated;
+                    }
+                    return prev;
+                });
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchChatLogsForSession();
+    }, [currentSessionId, selectedChatIndex]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!question.trim()) {
-            alert("질문을 입력해주세요!");
+        if (!question.trim()) return alert("질문을 입력해주세요!");
+        if (!currentSessionId || selectedChatIndex === null || !chatHistory[selectedChatIndex]) {
+            startNewChat();
+            alert("새로운 대화 세션이 시작되었습니다. 다시 질문해주세요!");
             return;
         }
 
-        const userQuestion = question; // 현재 질문을 변수에 저장
+        const userQuestion = question;
         setQuestion("");
-
-        setChatHistory(prev => [...prev, { question: userQuestion, answer: null }]);
         setIsLoading(true);
 
-        setIsLoading(true);
+        setChatHistory(prev =>
+            prev.map((chat, idx) =>
+                idx === selectedChatIndex
+                    ? {
+                        ...chat,
+                        messages: [...chat.messages, { question: userQuestion, answer: null }],
+                        title: chat.messages.length === 0
+                            ? userQuestion.slice(0, 30) + (userQuestion.length > 30 ? '...' : '')
+                            : chat.title
+                    }
+                    : chat
+            )
+        );
+
         try {
-            let aiResponseData; // API 응답 데이터를 받을 변수
-            let aiAnswerContent = null; // chatHistory에 최종적으로 들어갈 AI 답변 내용
+            let aiAnswerContent = null;
+            const payload = { question: userQuestion, sessionId: currentSessionId };
 
             if (selectedType === "lettering") {
-                aiResponseData = await recommendCakeLettering({ question: userQuestion });
-                aiAnswerContent = aiResponseData; // 텍스트 답변은 바로 내용이 옴
+                aiAnswerContent = await recommendCakeLettering(payload);
             } else if (selectedType === "options") {
-                aiResponseData = await recommendCakeOptions({ question: userQuestion });
-                aiAnswerContent = aiResponseData; // 텍스트 답변은 바로 내용이 옴
+                aiAnswerContent = await recommendCakeOptions(payload);
             } else if (selectedType === "image") {
-                aiResponseData = await recommendCakeImage({ question: userQuestion });
-                // 이미지 응답일 경우 HTML img 태그 형태로 저장
-                aiAnswerContent = `<img src="${aiResponseData.imageUrl}" alt="AI 이미지" style="max-width:100%;" />`;
+                const imageData = await recommendCakeImage(payload);
+                aiAnswerContent = `<img src="${imageData}" alt="AI 이미지" class="max-w-full h-auto rounded-lg mt-2" />`;
             } else {
-                aiResponseData = await generateAnswer({ question: userQuestion }); // 일관성 있게 userQuestion 사용
-                aiAnswerContent = aiResponseData; // 일반 텍스트 답변은 바로 내용이 옴
+                aiAnswerContent = await generateAnswer(payload);
             }
 
-            // 모든 경우에 대해 AI 답변이 오면 해당 질문의 answer를 업데이트
             setChatHistory(prev =>
-                prev.map((item, index) =>
-                    index === prev.length - 1 // 가장 마지막에 추가된 질문을 찾아 업데이트
-                        ? { ...item, answer: aiAnswerContent }
-                        : item
+                prev.map((chat, idx) =>
+                    idx === selectedChatIndex
+                        ? {
+                            ...chat,
+                            messages: chat.messages.map((msg, msgIdx) =>
+                                msgIdx === chat.messages.length - 1
+                                    ? { ...msg, answer: aiAnswerContent }
+                                    : msg
+                            )
+                        }
+                        : chat
                 )
             );
-        } catch (error) {
-            console.error("AI 추천 실패", error);
+        } catch {
             setChatHistory(prev =>
-                prev.map((item, index) =>
-                    index === prev.length - 1
-                        ? { ...item, answer: "죄송합니다. 추천에 실패했습니다. 다시 시도해주세요." } // 사용자 친화적 메시지
-                        : item
+                prev.map((chat, idx) =>
+                    idx === selectedChatIndex
+                        ? {
+                            ...chat,
+                            messages: chat.messages.map((msg, msgIdx) =>
+                                msgIdx === chat.messages.length - 1
+                                    ? { ...msg, answer: "죄송합니다. 요청 처리에 실패했습니다. 다시 시도해주세요." }
+                                    : msg
+                            )
+                        }
+                        : chat
                 )
             );
         } finally {
@@ -69,22 +214,46 @@ function AiRecommendPage() {
         }
     };
 
+    const currentChatMessages =
+        selectedChatIndex !== null &&
+        chatHistory[selectedChatIndex] &&
+        Array.isArray(chatHistory[selectedChatIndex].messages)
+            ? chatHistory[selectedChatIndex].messages
+            : [];
+
     return (
-        <div className="flex flex-col h-screen pt-16">
-            {/* 채팅 영역 */}
-            <div className="flex-1 overflow-y-auto px-4 py-6">
-                <AiResultBox chatHistory={chatHistory} loading={isLoading} />
+        <div className="flex h-screen bg-white text-gray-900 font-sans -mb-10">
+            <div className="flex flex-1">
+                {isSidebarOpen ? (
+                    <ChatSidebar
+                        chatHistory={chatHistory}
+                        onSelectChat={handleSelectChat}
+                        selectedIndex={selectedChatIndex}
+                        onClose={toggleSidebar}
+                        onNewChat={startNewChat}
+                    />
+                ) : (
+                    <div className="w-12 flex flex-col items-center justify-start pt-4 bg-gray-200 border-r border-gray-300">
+                        <button onClick={toggleSidebar} className="text-gray-600 hover:text-gray-800 p-2 rounded-md">
+                            <Menu className="w-6 h-6" />
+                        </button>
+                    </div>
+                )}
+                <main className="flex flex-col flex-1 bg-white">
+                    <div className="flex-1 overflow-y-auto px-4 py-6">
+                        <AiResultBox chatHistory={currentChatMessages} loading={isLoading} />
+                    </div>
+                    <div className="py-4 px-4 bg-white border-t border-gray-200">
+                        <AiForm
+                            question={question}
+                            onQuestionChange={setQuestion}
+                            selectedType={selectedType}
+                            onTypeChange={setSelectedType}
+                            onSubmit={handleSubmit}
+                        />
+                    </div>
+                </main>
             </div>
-
-            {/* 입력창 */}
-            <AiForm
-                question={question}
-                onQuestionChange={setQuestion}
-                selectedType={selectedType}
-                onTypeChange={setSelectedType}
-                onSubmit={handleSubmit}
-            />
-
         </div>
     );
 }
