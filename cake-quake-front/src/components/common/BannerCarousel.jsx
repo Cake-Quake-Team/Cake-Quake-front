@@ -23,49 +23,49 @@ export default function BannerCarousel({ banners, interval = 5000 }) {
         setCurrent(prev => (prev + 1) % banners.length);
 
     return (
-        <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden mb-8">
-            {/* 슬라이드 */}
-            {banners.map((b, idx) => (
-                <a
-                    key={idx}
-                    href={b.link || '#'}
-                    className={`
-            absolute inset-0 transition-opacity duration-700
-            ${idx === current ? 'opacity-100' : 'opacity-0'}
-          `}
+        <div className="relative w-full overflow-hidden mb-8">
+            {/* 반응형 높이 지정 */}
+            <div className="w-full h-48 sm:h-64 md:h-80 lg:h-96 relative">
+                {banners.map((b, idx) => (
+                    <a
+                        key={idx}
+                        href={b.link || '#'}
+                        className={`
+              absolute inset-0 transition-opacity duration-700
+              ${idx === current ? 'opacity-100' : 'opacity-0'}
+            `}
+                    >
+                        <img
+                            src={b.imageUrl}
+                            alt={b.alt || `banner-${idx}`}
+                            className="w-full h-full object-cover"
+                        />
+                    </a>
+                ))}
+
+                {/* 좌/우 화살표 */}
+                <div
+                    onClick={prevSlide}
+                    className="absolute inset-y-0 left-0 w-1/2 cursor-pointer flex items-center pl-4"
                 >
-                    <img
-                        src={b.imageUrl}
-                        alt={b.alt || `banner-${idx}`}
-                        className="w-full h-full object-cover"
-                    />
-                </a>
-            ))}
-
-            {/* 좌/우 클릭 영역 */}
-            <div
-                onClick={prevSlide}
-                className="absolute inset-y-0 left-0 w-1/2 cursor-pointer flex items-center pl-4"
-            >
-                <ChevronLeftIcon className="h-12 w-12 text-gray-200" />
-            </div>
-            <div
-                onClick={nextSlide}
-                className="absolute inset-y-0 right-0 w-1/2 cursor-pointer flex items-center justify-end pr-4"
-            >
-                <ChevronRightIcon className="h-12 w-12 text-gray-200" />
+                    <ChevronLeftIcon className="h-12 w-12 text-gray-200" />
+                </div>
+                <div
+                    onClick={nextSlide}
+                    className="absolute inset-y-0 right-0 w-1/2 cursor-pointer flex items-center justify-end pr-4"
+                >
+                    <ChevronRightIcon className="h-12 w-12 text-gray-200" />
+                </div>
             </div>
 
-            {/* ─── 수정된 하단 네비게이션 ─────────────────────────────── */}
+            {/* 하단 네비게이션 */}
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
                 {banners.map((_, idx) => (
                     <button
                         key={idx}
                         onClick={() => setCurrent(idx)}
                         className={`
-              transition-colors duration-300
-              h-1      /* 선 높이: 4px */
-              w-8      /* 선 길이: 32px */
+              h-1 w-8 transition-colors duration-300
               ${idx === current ? 'bg-white' : 'bg-white/50'}
             `}
                     />

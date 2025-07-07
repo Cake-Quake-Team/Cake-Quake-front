@@ -22,7 +22,7 @@ export default function BestReviewsCarousel({ reviews, onCardClick }) {
     useEffect(() => {
         const intervalId = setInterval(() => {
             scroll(1);
-        }, 5000);
+        }, 3000);
         return () => clearInterval(intervalId);
     }, []); // 빈 배열: 마운트 시 한 번 설정, 언마운트 시 해제
 

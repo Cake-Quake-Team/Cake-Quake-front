@@ -9,7 +9,7 @@ import { getCakeReviews } from "../../../api/reviewApi.jsx";
 import { getShopDetail } from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
 import LikeButton from "../../../components/common/LikeButton.jsx";
-import AlertModal from "../../../components/common/AlertModal"; // 네가 준 AlertModal 임포트
+import AlertModal from "../../../components/common/AlertModal"; 
 
 function BuyerCakeReadPage() {
     const { shopId, cakeId } = useParams();

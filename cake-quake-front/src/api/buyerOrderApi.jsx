@@ -4,8 +4,9 @@ const API_SERVER_HOST = "http://localhost:8080";
 const prefix = `${API_SERVER_HOST}/api/v1/buyer`;
 
 // ✅ 주문 생성
-export const createOrder = (payload) => {
-    return jwtAxios.post(`${prefix}/orders/create`, payload);
+export const createOrder = async (payload) => { // async 키워드 추가
+    const response = await jwtAxios.post(`${prefix}/orders/create`, payload);
+    return response.data; // 이 부분을 추가!
 };
 
 // ✅ 주문 목록 조회
