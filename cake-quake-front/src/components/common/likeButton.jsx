@@ -1,103 +1,90 @@
-// src/components/common/LikeButton.jsx
-import React, { useState, useEffect, useRef } from 'react'; // useRef 추가
-import { toggleCakeLike, getCakeLikeStatus, toggleShopLike, getShopLikeStatus } from '../../api/likeApi';
+import React from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getCakeLikeStatus, toggleCakeLike, getShopLikeStatus, toggleShopLike } from '../../api/likeApi';
 import { useAuth } from '../../store/AuthContext';
 import { Heart } from 'lucide-react';
 
 const LikeButton = ({ type, itemId }) => {
     const { user } = useAuth();
-    const [isLiked, setIsLiked] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    //const [likeCount, setLikeCount] = useState(0);
-    const isOptimisticallyUpdated = useRef(false); // useRef를 사용하여 렌더링에 영향을 주지 않는 값 저장
+    const queryClient = useQueryClient();
 
-
-    // 컴포넌트 마운트 시 또는 user/itemId/type 변경 시 찜 상태 조회
-    useEffect(() => {
-        const fetchLikeStatus = async () => {
-            // ⭐ 1. 낙관적 업데이트가 진행 중이거나 방금 완료된 경우에는 서버 조회를 건너뜁니다. ⭐
-            if (isOptimisticallyUpdated.current) {
-                isOptimisticallyUpdated.current = false; // 한 번 건너뛰었으면 플래그 초기화
-                return;
-            }
-
+    const queryKey = ['likeStatus', type, itemId, user?.userId];
+    const { data: isLiked, isLoading: isFetchingStatus} = useQuery({
+        queryKey: queryKey,
+        queryFn: async () => {
             if (!user || !user.userId || !itemId) {
-                setIsLiked(false);
-                return;
+                return false;
             }
-            setIsLoading(true); // 로딩 시작
-            try {
-                let status;
-                if (type === 'cake') {
-                    status = await getCakeLikeStatus(itemId);
-                } else if (type === 'shop') {
-                    status = await getShopLikeStatus(itemId);
-                }
-                setIsLiked(status); // 실제 서버로부터의 찜 상태로 업데이트
-            } catch (error) {
-                console.error(`찜 상태 조회 실패 (${type} ${itemId}):`, error);
-                setIsLiked(false);
-            } finally {
-                setIsLoading(false); // 로딩 종료
+            if (type === 'cake') {
+                return await getCakeLikeStatus(itemId);
+            } else if (type === 'shop') {
+                return await getShopLikeStatus(itemId);
             }
-        };
-        fetchLikeStatus();
-    }, [user, itemId, type]); // user, itemId, type이 변경될 때마다 실행
+            return false;
+        },
+        enabled: !!user && !!user.userId && !!itemId,
+        staleTime: Infinity,
+        placeholderData: false,
+    });
 
-    const handleToggleLike = async () => {
+    const toggleLikeMutation = useMutation({
+        mutationFn: async () => {
+            if (type === 'cake') {
+                return await toggleCakeLike(itemId);
+            } else if (type === 'shop') {
+                return await toggleShopLike(itemId);
+            }
+            throw new Error('Invalid like type');
+        },
+        onMutate: async () => {
+            await queryClient.cancelQueries({ queryKey: queryKey });
+            const previousIsLiked = queryClient.getQueryData(queryKey);
+            queryClient.setQueryData(queryKey, (oldIsLiked) => !oldIsLiked);
+            return { previousIsLiked };
+        },
+        onError: (err, newVar, context) => {
+            console.error(`찜 토글 실패 (${type} ${itemId}):`, err);
+            if (context?.previousIsLiked !== undefined) {
+                queryClient.setQueryData(queryKey, context.previousIsLiked);
+            }
+            alert(`찜 토글 실패: ${err.response?.data?.message || '알 수 없는 오류가 발생했습니다.'}`);
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: queryKey });
+        },
+    });
+
+    const handleToggleLike = async (e) => {
+        e.stopPropagation();
+
         if (!user || !user.userId) {
             alert("로그인이 필요합니다.");
             return;
         }
-        if (isLoading) return;
 
-        // ⭐ 2. 낙관적 업데이트 시 플래그 설정 ⭐
-        isOptimisticallyUpdated.current = true; // 낙관적 업데이트가 시작됨을 표시
-
-        const prevIsLiked = isLiked; // 이전 상태 백업
-        setIsLiked(!prevIsLiked);   // UI 즉시 업데이트 (낙관적)
-        setIsLoading(true);         // 로딩 상태 시작
-
-        try {
-            let response;
-            if (type === 'cake') {
-                response = await toggleCakeLike(itemId);
-            } else if (type === 'shop') {
-                response = await toggleShopLike(itemId);
-            }
-
-            // ⭐ 3. 서버 응답으로 최종 상태 확정 (낙관적 업데이트와 다를 경우만 동기화) ⭐
-            if (response.isLiked !== !prevIsLiked) {
-                setIsLiked(response.isLiked); // 서버와 불일치 시 서버 상태로 재설정
-            }
-        } catch (error) {
-            console.error(`찜 토글 실패 (${type} ${itemId}):`, error);
-            alert(`찜 토글 실패: ${error.response?.data?.message || '알 수 없는 오류'}`);
-            setIsLiked(prevIsLiked); // ⭐ 4. API 호출 실패 시 이전 상태로 되돌리기 ⭐
-        } finally {
-            setIsLoading(false); // 로딩 상태 종료
+        if (toggleLikeMutation.isPending) {
+            return;
         }
+
+        toggleLikeMutation.mutate();
     };
 
+    const isLoading = isFetchingStatus || toggleLikeMutation.isPending;
+
     return (
-        <button
-            onClick={handleToggleLike}
-            disabled={isLoading}
-            className={`
-                flex items-center text-lg font-medium px-4 py-2 rounded-lg
-                bg-gray-50 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50
-                transition-colors duration-200
-                ${isLiked ? 'text-red-500' : 'text-gray-700'}
-                ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
+        <div className="mt-6 flex justify-center gap-3 flex-shrink-0">
+            <button
+                onClick={handleToggleLike}
+                disabled={isLoading}
+                className={`w-10 h-10 flex-shrink-0 flex items-center justify-center p-2 rounded-full border transition-colors duration-200
+               ${isLiked ? ' text-red-300' : 'border-gray-300 text-gray-600 hover:bg-gray-100'}
+               ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}
             `}
-            title={isLiked ? "찜 취소" : "찜하기"}
-        >
-            <Heart
-                className={`mr-2 w-6 h-6 ${isLiked ? 'fill-current' : ''}`}
-            />
-            {isLoading ? '' : ''}
-            {/*<span className="text-sm">{likeCount > 0 ? `(${likeCount})` : '(0)'}</span>*/}
-        </button>
+                title={isLiked ? '찜 취소' : '찜하기'}
+            >
+                <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
+            </button>
+        </div>
     );
 };
 

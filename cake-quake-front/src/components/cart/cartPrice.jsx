@@ -8,7 +8,8 @@ export default function CartPrice({ items = [], selectedIds = [] }) {
 
     // ✅ 선택된 상품의 총 가격 계산
     const selectedTotalPrice = selectedItems.reduce(
-        (sum, item) => sum + item.price * item.productCnt,
+        // ⭐ item.itemTotalPrice를 사용하여 옵션 가격까지 합산 ⭐
+        (sum, item) => sum + (item.itemTotalPrice || 0), // itemTotalPrice가 null일 경우 대비
         0
     );
 

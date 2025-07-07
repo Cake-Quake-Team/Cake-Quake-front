@@ -13,7 +13,6 @@ function MyPage() {
     const { user } = useAuth();
     const currentUserUid = user?.userId;
 
-    const [couponCount, setCouponCount] = useState(0);
     const [reviewCount, setReviewCount] = useState(0);
     const [orderCount, setOrderCount] = useState(0);
     const [pointBalance, setPointBalance] = useState(0);
@@ -34,9 +33,6 @@ function MyPage() {
         NO_SHOW: '노쇼',
     };
 
-    useEffect(() => {
-        setCouponCount(5);
-    }, []);
 
     useEffect(() => {
         if (!currentUserUid) return;
@@ -132,14 +128,6 @@ function MyPage() {
             {/* 2. 요약 정보 (쿠폰, 나의 리뷰, 전체 주문 내역, 찜) */}
             <section className="bg-white rounded-lg p-6 mb-6 border border-gray-300">
                 <div className="flex justify-around text-center divide-x divide-gray-200">
-                    {/* 쿠폰 */}
-                    <div
-                        className="flex-1 px-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                        onClick={() => navigate('/buyer/profile/points')}
-                    >
-                        <p className="text-lg font-semibold text-gray-700">쿠폰</p>
-                        <p className="text-gray-400 ">{couponCount} <span className="text-gray-400">장</span></p>
-                    </div>
                     {/* 나의 리뷰 */}
                     <div
                         className="flex-1 px-4 cursor-pointer hover:bg-gray-50 transition-colors"

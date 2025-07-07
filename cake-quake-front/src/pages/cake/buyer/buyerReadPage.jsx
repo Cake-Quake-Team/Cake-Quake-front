@@ -3,17 +3,16 @@ import {getCakeDetail, API_SERVER_HOST} from "../../../api/cakeApi.jsx";
 import { List } from "lucide-react";
 import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import {Link, useParams, useNavigate} from "react-router";
-import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
+import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx"; // CakeOptionForm 임포트 확인
 import { addCartItem } from "../../../api/cartApi.jsx";
 import {getCakeReviews} from "../../../api/reviewApi.jsx";
 import {getShopDetail} from "../../../api/shopApi.jsx";
 
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
 import LikeButton from "../../../components/common/LikeButton.jsx";
-import {ShoppingCart, Heart} from "lucide-react";
+import {ShoppingCart} from "lucide-react";
 
 
-// ⭐ 새로운 모달 컴포넌트 추가 ⭐
 const AddToCartSuccessModal = ({ message, onConfirm }) => {
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -35,14 +34,13 @@ function BuyerCakeReadPage() {
     const navigate = useNavigate();
     const [cake, setCake] = useState(null);
     const [shop, setShop] = useState(null);
-    const [optionTypes, setOptionTypes] = useState([]);
+    const [optionTypes, setOptionTypes] = useState([]); // 옵션 타입별로 그룹화된 옵션들
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [isLiked, setIsLiked] = useState(false); // 찜 상태 (true/false)
 
     const [reviews, setReviews] = useState([]);
     const [reviewPage, setReviewPage] = useState(1);
@@ -63,6 +61,7 @@ function BuyerCakeReadPage() {
                 setCake(data);
 
                 if (data && data.options) {
+                    // 서버에서 받은 옵션을 타입별로 그룹화하는 로직은 유지
                     const groupedOptions = data.options.reduce((acc, currentOption) => {
                         const typeId = currentOption.optionTypeId;
                         const typeName = currentOption.optionTypeName || `알 수 없는 옵션 타입 ${typeId}`;
@@ -114,15 +113,6 @@ function BuyerCakeReadPage() {
         })();
     }, [shopId]);
 
-
-    // 찜 버튼 클릭 핸들러
-    const handleToggleLike = () => {
-        setIsLiked(prev => !prev);
-    };
-
-
-    // 2) 리뷰 가져오기 (첫 페이지만 미리 불러옴, 더보기 버튼 클릭 시 page++)
-
     useEffect(() => {
         if (!cakeId) return;
         (async () => {
@@ -137,27 +127,43 @@ function BuyerCakeReadPage() {
     }, [cakeId, reviewPage]);
 
 
-    // 장바구니 담기 핸들러 수정
+    // 장바구니 담기 핸들러
     const handleAddToCart = async () => {
         if (!cake || !cake.cakeDetailDTO || !cake.cakeDetailDTO.cakeId) {
             alert("상품 정보가 불완전합니다. 다시 시도해주세요.");
             return;
         }
 
-        // ⭐ 선택된 옵션 데이터를 Map<Long, Integer> 형태로 변환 ⭐
-        const optionsDataMap = selectedOptions.reduce((acc, option) => {
-            acc[option.optionItemId] = 1; // 옵션 수량은 현재 UI에서 별도 입력이 없으므로 기본 1로 가정
-            return acc;
-        }, {});
+        // selectedOptions 상태 확인 및 옵션 선택 강제 (선택 사항)
+        if (optionTypes.some(type => type.isRequired) && selectedOptions.length === 0) {
+            // 필수 옵션이 있고 아무것도 선택되지 않았다면
+            alert("필수 옵션을 선택해주세요.");
+            return;
+        }
+
+        const formattedOptions = selectedOptions.map(option => ({
+            optionItemId: option.optionItemId,
+            optionName: option.optionName,
+            optionValue: option.optionValue || option.optionName,
+            // CakeOptionForm이 optionValue 제공
+            optionPrice: option.price || 0, // price가 null일 경우 0으로 처리
+            optionCnt: option.optionCnt || 1 // optionCnt가 있다면 사용, 없으면 기본 1로 고정
+        }));
+
+        console.log("DEBUG: 장바구니에 담을 데이터 (최종 전송 전):", JSON.stringify({
+            cakeItemId: cake.cakeDetailDTO.cakeId,
+            productCnt: 1,
+            cakeOptions: formattedOptions // 이 리스트에 실제 옵션 데이터가 담겨야 합니다.
+        }, null, 2));
+
 
         try {
             setIsAddingToCart(true);
             const cartItemData = {
                 cakeItemId: cake.cakeDetailDTO.cakeId,
-                productCnt: 1, // 케이크 수량은 현재 UI에서 별도 입력이 없으므로 기본 1로 가정
-                options: optionsDataMap // ✅ 변환된 Map 형태의 options 사용
+                productCnt: 1,
+                cakeOptions: formattedOptions // ✅ 올바르게 변환된 List<CartItemOption> 형태 사용
             };
-            console.log("장바구니에 담을 데이터 (MAP 형식):", cartItemData); // 로그 확인 용이하게 변경
 
             await addCartItem(cartItemData);
 
@@ -173,12 +179,11 @@ function BuyerCakeReadPage() {
         }
     };
 
-    // 모달의 '확인' 버튼 클릭 시 호출될 함수
     const handleModalConfirm = () => {
         setShowSuccessModal(false);
     };
 
-    // 바로 주문하기 핸들러 수정
+    // 바로 주문하기 핸들러
     const handleDirectOrder = () => {
         if (!cake || !cake.cakeDetailDTO || !cake.cakeDetailDTO.cakeId) {
             alert("상품 정보가 불완전하여 바로 주문할 수 없습니다. 다시 시도해주세요.");
@@ -186,19 +191,26 @@ function BuyerCakeReadPage() {
             return;
         }
 
-        // ⭐ 선택된 옵션 데이터를 Map<Long, Integer> 형태로 변환 ⭐
+        // 옵션 선택 강제 (선택 사항)
+        if (optionTypes.some(type => type.isRequired) && selectedOptions.length === 0) {
+            alert("필수 옵션을 선택해주세요.");
+            return;
+        }
+
+
         const optionsDataMap = selectedOptions.reduce((acc, option) => {
-            acc[option.optionItemId] = 1; // 옵션 수량은 현재 UI에서 별도 입력이 없으므로 기본 1로 가정
+
+            acc[option.optionItemId] = option.optionCnt || 1; // optionCnt가 있다면 사용, 없으면 기본 1
             return acc;
         }, {});
 
         const itemToOrder = {
-            shopId: parseInt(shopId),
+            shopId: parseInt(shopId), // 현재 URL에서 가져온 shopId
             cakeId: cake.cakeDetailDTO.cakeId,
-            cakeItemId: cake.cakeDetailDTO.cakeId,
+            cakeItemId: cake.cakeDetailDTO.cakeId, // CakeItem ID를 의미하는 필드
             cname: cake.cakeDetailDTO.cname,
             thumbnailImageUrl: cake.cakeDetailDTO.thumbnailImageUrl,
-            productCnt: 1, // 기본 수량 1개, 사용자가 변경할 수 있도록 UI에 추가 필요
+            productCnt: 1, // 기본 수량 1개
             price: cake.cakeDetailDTO.price, // 기본 가격
             options: optionsDataMap // ✅ 변환된 Map 형태의 options 사용
         };
@@ -240,34 +252,19 @@ function BuyerCakeReadPage() {
                 </div>
                 <hr className="mb-6 w-1/4 mx-auto"/>
 
-                {/* ⭐⭐ 찜 버튼을 cakeDetailComponent 위에 배치 ⭐⭐ */}
-                <div className="flex justify-end pr-4 -mt-4">
-                    {cake && cake.cakeDetailDTO && cake.cakeDetailDTO.cakeId && (
-                        <LikeButton type="cake" itemId={cake.cakeDetailDTO.cakeId} />
-                    )}
-                </div>
-
                 <CakeDetailComponent
                     cake={cake}
                     optionTypes={optionTypes}
-                    selectedOptions={selectedOptions}
-                    setSelectedOptions={setSelectedOptions}
+                    selectedOptions={selectedOptions} // CakeOptionForm에서 업데이트할 selectedOptions 상태
+                    setSelectedOptions={setSelectedOptions} // CakeOptionForm에서 selectedOptions를 업데이트할 함수
                     apiBaseUrl={thumbnailUrl}
                     OptionComponent={CakeOptionForm}
                     shop={shop}
                     actionButtons={
                         <div className="mt-6 flex justify-center gap-3 flex-shrink-0">
-                            {/* 1. 찜 버튼: 고정된 크기를 유지합니다. (flex-shrink-0 추가) */}
-                            <button
-                                onClick={handleToggleLike}
-                                className={`w-10 h-10 flex-shrink-0 flex items-center justify-center p-2 rounded-full border transition-colors duration-200
-                           ${isLiked ? ' text-red-300' : 'border-gray-300 text-gray-600 hover:bg-gray-100'}`}
-                                title={isLiked ? '찜 취소' : '찜하기'}
-                            >
-                                <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
-                            </button>
+                            <LikeButton type="cake" itemId={cakeId} />
 
-                            {/* 2. 장바구니 담기 버튼: flex-1을 추가하여 남은 공간을 채우도록 합니다. */}
+                            {/* 장바구니 담기 버튼 */}
                             <button
                                 onClick={handleAddToCart}
                                 disabled={isAddingToCart}
@@ -283,7 +280,7 @@ function BuyerCakeReadPage() {
                                 )}
                             </button>
 
-                            {/* 3. 바로 주문하기 버튼: flex-1을 추가하여 남은 공간을 채우도록 합니다. */}
+                            {/* 바로 주문하기 버튼 */}
                             <button
                                 onClick={handleDirectOrder}
                                 className="min-w-[120px] text-sm bg-black text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center justify-center gap-2 flex-1"
@@ -314,7 +311,7 @@ function BuyerCakeReadPage() {
                 )}
             </section>
 
-            {/* ⭐ 장바구니 추가 성공 모달 ⭐ */}
+            {/* 장바구니 추가 성공 모달 */}
             {showSuccessModal && (
                 <AddToCartSuccessModal
                     message={modalMessage}
