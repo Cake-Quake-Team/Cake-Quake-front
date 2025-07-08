@@ -10,8 +10,8 @@ import { getShopDetail } from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
 // ⭐ LikeButton 컴포넌트 임포트 확인 ⭐
 import LikeButton from "../../../components/common/LikeButton.jsx";
-import {ShoppingCart, Heart} from "lucide-react"; // Heart 아이콘도 필요하므로 임포트
-import AlertModal from "../../../components/common/AlertModal"; 
+import {Heart} from "lucide-react"; // Heart 아이콘도 필요하므로 임포트
+import AlertModal from "../../../components/common/AlertModal";
 
 
 function BuyerCakeReadPage() {
@@ -249,9 +249,9 @@ function BuyerCakeReadPage() {
                                 <LikeButton
                                     type="cake" // 케이크 찜하기
                                     itemId={cake.cakeDetailDTO.cakeId} // 케이크 ID 전달
-                                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center p-2 rounded-full border border-gray-300 bg-white
-                                                hover:border-red-500 hover:bg-red-50 text-red-500
-                                                focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center p-2 rounded-full border border-gray-300 bg-white mt-6
+                                hover:border-red-500 hover:bg-red-50 text-red-500
+                                focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
                                 >
                                     {/* children으로 Heart 아이콘만 전달. 텍스트 없음 */}
                                     {/* LikeButton 내부에서 isLiked 상태에 따라 fill, stroke를 'red'로 설정합니다. */}
@@ -262,8 +262,7 @@ function BuyerCakeReadPage() {
                             <button
                                 onClick={handleAddToCart}
                                 disabled={isAddingToCart}
-                                className="min-w-[120px] text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
-                            >
+                                className="mt-6 min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"                            >
                                 {isAddingToCart ? (
                                     "담는 중..."
                                 ) : (
