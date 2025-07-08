@@ -1,14 +1,57 @@
 import {Link, useNavigate} from "react-router";
 import {MessageCircle  , ShoppingCart, Menu, X, Bot} from "lucide-react";
 import { useAuth } from "../../store/AuthContext";
-import { useState } from "react";
+import {useEffect, useRef, useState} from "react";
 import NotificationBell from "./notificationBell.jsx";
+import ChatListModal from "../chatting/chatListModal.jsx";
+
 
 function BuyerHeader() {
     const {user, signOut} = useAuth()
     const navigate = useNavigate()
+    const headerRef = useRef(null);
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [isChatListModalOpen, setIsChatListModalOpen] = useState(false); // 채팅 목록 모달 상태
+
+    const chatIconRef = useRef(null);
+    const [chatModalPosition, setChatModalPosition] = useState({});
+
+    //채팅 아이콘 위치에 따라 모달 위치를 계산
+    useEffect(() => {
+        if (isChatListModalOpen && headerRef.current && chatIconRef.current) {
+            const headerRect = headerRef.current.getBoundingClientRect();
+            const iconRect = chatIconRef.current.getBoundingClientRect();
+
+            const modalWidth = 320;
+            const modalHeight = 500;
+
+            const padding = 10;
+
+            let calculatedTop = headerRect.bottom + padding;
+
+            let calculatedRight = window.innerWidth - (iconRect.left + iconRect.width / 2) - (modalWidth / 2) + padding;
+
+            calculatedRight = Math.max(calculatedRight, padding);
+
+            if (window.innerWidth - calculatedRight - modalWidth < padding) {
+                calculatedRight = window.innerWidth - modalWidth - padding;
+            }
+
+            calculatedTop = Math.max(calculatedTop, padding);
+
+            if (calculatedTop + modalHeight > window.innerHeight - padding) {
+                calculatedTop = window.innerHeight - modalHeight - padding;
+            }
+            calculatedTop = Math.max(calculatedTop, padding); // 다시 한번 최소 top 값 확인
+
+
+            setChatModalPosition({
+                top: `${calculatedTop}px`,
+                right: `${calculatedRight}px`,
+            });
+        }
+    }, [isChatListModalOpen]);
 
     // 로그아웃
     const handleSignOut = async () => {
@@ -16,8 +59,23 @@ function BuyerHeader() {
         navigate('/auth/signin')
     }
 
+
+    const handleOpenChatListModal = () => {
+        setIsChatListModalOpen(true);
+    };
+
+    const handleCloseChatListModal = () => {
+        setIsChatListModalOpen(false);
+    };
+
+    // ⭐ 추가된 채팅 관리 버튼 클릭 핸들러
+    const handleChatManagement = () => {
+        navigate(`/shops/${user.shopId}/chatting`);
+
+    };
+
     return (
-        <header className="w-full border-b border-gray-200 bg-white">
+        <header ref={headerRef} className="w-full border-b border-gray-200 bg-white">
             <div className="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
                 {/* Logo */}
                 <div className="flex items-center gap-2">
@@ -61,8 +119,32 @@ function BuyerHeader() {
                     {/* 🔔 알림 종 아이콘 추가 */}
                     <NotificationBell />
 
-                    {user?.role === "BUYER" && "SELLER" && (
-                    <MessageCircle   className="w-5 h-5 cursor-pointer" />
+                    {/*buyer인 경우 채팅 모달*/}
+                    {user?.role === "BUYER" && (
+                        <>
+                            <MessageCircle
+                                ref={chatIconRef}
+                                className="w-5 h-5 cursor-pointer text-gray-700 hover:text-blue-600"
+                                onClick={handleOpenChatListModal}
+                            />
+
+                            {isChatListModalOpen && (
+                                <ChatListModal
+                                    isOpen={isChatListModalOpen}
+                                    onClose={handleCloseChatListModal}
+                                    positionStyles={chatModalPosition}
+                                />
+                            )}
+                        </>
+                    )}
+
+                    {/*seller인 경우 채팅 목록 페이지 이동*/}
+                    {user?.role ==="SELLER" && (
+                        <MessageCircle
+                            className="w-5 h-5 cursor-pointer text-gray-700 hover:text-blue-600"
+                            onClick={handleChatManagement}
+                        />
+
                     )}
 
                     {/* 장바구니 - BUYER만 보임*/}
@@ -203,6 +285,7 @@ function BuyerHeader() {
         </header>
     );
 }
+
 
 
 export default BuyerHeader;

@@ -1,10 +1,10 @@
 import {useNavigate, useParams} from "react-router";
-import {useAuth} from "../store/AuthContext.jsx";
+import {useAuth} from "../../store/AuthContext.jsx";
 import {useEffect, useState} from "react";
-import jwtAxios from "../utils/jwtUtil.js";
+import {getSellerChatRooms} from "../../api/chatAPi.jsx";
 
 const SellerChatRoomsPage = () => {
-    const { shopId } = useParams(); // URL에서 shopId 가져오기 (예: /seller/shops/:shopId/chats)
+    const { shopId } = useParams();
     const { user, isLoading } = useAuth();
     const navigate = useNavigate();
     const [chatRooms, setChatRooms] = useState([]);
@@ -31,10 +31,8 @@ const SellerChatRoomsPage = () => {
             try {
                 setLoading(true);
                 setError(null);
-                // 백엔드 API 호출: /api/v1/chatting/seller/rooms/{shopId}
-                const response = await jwtAxios.get(`/api/v1/chatting/seller/rooms/${shopId}`);
-                setChatRooms(response.data);
-                console.log('판매자 채팅방 목록:', response.data);
+                const data = await getSellerChatRooms(shopId);
+                setChatRooms(data);
             } catch (err) {
                 console.error('채팅방 목록 불러오기 실패:', err);
                 setError('채팅방 목록을 불러오는 데 실패했습니다.');
@@ -47,7 +45,7 @@ const SellerChatRoomsPage = () => {
     }, [shopId, user, isLoading, navigate]); // 의존성 배열에 필요한 값 포함
 
     const handleChatRoomClick = (roomKey) => {
-        navigate(`/shops/chatting/${roomKey}`); // 해당 채팅방 페이지로 이동
+        navigate(`/shops/${shopId}/chatting/${roomKey}`); // 해당 채팅방 페이지로 이동
     };
 
     if (loading) {
@@ -76,24 +74,12 @@ const SellerChatRoomsPage = () => {
                             <span className="font-semibold text-lg text-gray-800">
                                 {room.buyerUsername} 님과의 채팅
                             </span>
-                            {/* 마지막 메시지 시간이나 내용 등 추가 정보 표시 가능 */}
-                            {/* {room.lastMessageTimestamp && (
-                                <span className="text-sm text-gray-500">
-                                    {new Date(room.lastMessageTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                            )} */}
+
                         </div>
                         <p className="text-sm text-gray-600 mt-1">
                             상점: {room.shopName}
                         </p>
-                        {/* {room.lastMessageContent && (
-                            <p className="text-sm text-gray-700 mt-1 truncate">
-                                마지막 메시지: {room.lastMessageContent}
-                            </p>
-                        )} */}
-                        <p className="text-xs text-gray-400 mt-2">
-                            채팅방 키: {room.roomKey.substring(0, 8)}...
-                        </p>
+
                     </div>
                 ))}
             </div>

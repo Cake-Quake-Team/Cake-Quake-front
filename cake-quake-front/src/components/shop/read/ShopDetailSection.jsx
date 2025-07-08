@@ -3,8 +3,6 @@ import { MapPin, Clock, Phone, Star, Heart, Share2 ,ArrowLeft,Pencil} from 'luci
 import {Navigate, useNavigate} from "react-router";
 import MapModal from "./mapModal.jsx";
 import {useAuth} from "../../../store/AuthContext.jsx";
-import jwtAxios from "../../../utils/jwtUtil.js";
-import useWebSocket from "../../../hooks/useWebSocket.jsx";
 
 
 
@@ -31,47 +29,14 @@ const renderStars=(rating)=> {
 const ShopDetailSection = ({ shop }) => {
     const numericRating = parseFloat(shop.rating);
     const navigate = useNavigate();
-    const { user, isLoading } = useAuth();
+    const { user } = useAuth();
 
-    const [roomId, setRoomId] = useState(null);
     const [showMap, setShowMap] = useState(false);
 
-    // const { sendMessage } = useWebSocket(roomId, (message) => {
-    //     console.log("💬 받은 메시지:", message);
-    // });
-
-    const handleChatWithShop = async () => {
-        if (isLoading) {
-            alert('사용자 정보를 불러오는 중입니다. 잠시 후 시도해주세요.');
-            return;
-        }
-
-        if (!user || !user.uid) {
-            alert('로그인이 필요합니다.');
-            navigate('/auth/signin');
-            return;
-        }
-
-        if (user.uid === shop.uid) {
-            alert('자신의 가게와 채팅할 수 없습니다.');
-            return;
-        }
-
-        try {
-            const response = await jwtAxios.post('/api/v1/chatting/rooms', {
-                sellerUid: shop.uid,
-                buyerUid: user.uid,
-                shopId: shop.shopId
-            });
-            const roomKey = response.data.roomKey;  // ✅ roomKey로 정확히 꺼내기
-            navigate(`/shops/chatting/${roomKey}`);
-        } catch (err) {
-            console.error('채팅방 생성 실패:', err);
-            alert('채팅방을 생성할 수 없습니다.');
-        }
+    //매장 수정
+    const handleEditShop = () => {
+        navigate(`/shops/update/${shop.shopId}`);
     };
-
-
 
     return(
 
@@ -119,7 +84,7 @@ const ShopDetailSection = ({ shop }) => {
                 <Phone className="mr-2 text-gray-500 w-5 h-5" />
                 <span>{shop.phone}</span>
             </p>
-            {/*액션 버튼*/}
+
             <div className="flex justify-center gap-6 mt-6 border-t pt-6 border-gray-100">
                 <button className="flex items-center text-gray-700 hover:text-red-500 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg bg-gray-50 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50">
                     <Heart className="mr-2 w-6 h-6" /> 찜하기
@@ -127,12 +92,18 @@ const ShopDetailSection = ({ shop }) => {
                 <button className="flex items-center text-gray-700 hover:text-blue-500 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg bg-gray-50 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50">
                     <Share2 className="mr-2 w-6 h-6" /> 공유하기
                 </button>
-                {/* ✨ 채팅하기 버튼 추가 */}
-                <button
-                    onClick={handleChatWithShop}
-                    className="flex items-center text-white bg-green-500 hover:bg-green-600 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-opacity-50"
-                >채팅하기
-                </button>
+
+                {user?.role === "SELLER" && user.uid === shop.uid && (
+                        <button
+                            onClick={handleEditShop}
+                            className="flex items-center text-white bg-blue-500 hover:bg-blue-600 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50"
+                        >
+                            <Pencil className="mr-2 w-6 h-6" /> 매장 수정
+                        </button>
+                )}
+
+
+
             </div>
 
             {/*추가 URL 정보*/}

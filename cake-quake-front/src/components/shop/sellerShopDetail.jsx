@@ -17,7 +17,7 @@ const SellerShopDetail = ({ className }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    const { user, setUser } = useAuth(); // AuthContext에서 user 정보 가져오기
+    const { user } = useAuth();
 
     console.log("user 상태 확인", user);
 
@@ -62,11 +62,10 @@ const SellerShopDetail = ({ className }) => {
         }
     };
 
-    const handleEditShop = () => {
-        if (shopDetail && shopDetail.shopId) {
-            navigate(`/shops/update/${shopDetail.shopId}`);
-        }
-    };
+
+
+
+
 
     if (loading) {
         return (
@@ -108,17 +107,7 @@ const SellerShopDetail = ({ className }) => {
     return (
         <div className={`w-full mx-auto px-4 py-8 md:px-0 ${className || ''}`}>
             {/* 매장 상세 정보 헤더 (수정 버튼 포함) */}
-            <ShopDetailSection shop={shopDetail} isSeller={true} onEdit={handleEditShop} /> {/* ShopDetailSection 내부의 수정 아이콘은 유지 */}
-
-            <div className="text-center mt-6 mb-8">
-                <button
-                    onClick={handleEditShop}
-                    className="px-8 py-4 bg-purple-600 text-white text-xl font-bold rounded-lg shadow-md
-                               hover:bg-purple-700 transition-colors duration-300 focus:outline-none focus:ring-4 focus:ring-purple-300"
-                >
-                    매장 정보 수정하기
-                </button>
-            </div>
+            <ShopDetailSection shop={shopDetail} isSeller={true}/> {/* ShopDetailSection 내부의 수정 아이콘은 유지 */}
 
 
             {shopImages.length > 0 && (

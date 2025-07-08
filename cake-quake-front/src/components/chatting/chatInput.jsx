@@ -6,22 +6,25 @@ const ChatInput = ({ message, setMessage, onSendMessage, onKeyPress, isConnected
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={onKeyPress} // onKeyPress는 여전히 받아서 ChatPage에서 제어하도록 함
+            onKeyDown={onKeyPress}
             placeholder={isConnected ? "메시지를 입력하세요" : "연결 중..."}
-            className="flex-1 p-2 outline-none"
-            disabled={!isConnected} // 연결 상태에 따라 비활성화
+            // ⭐ 파란색 계열 입력 필드 스타일
+            className="flex-1 p-3 outline-none border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            disabled={!isConnected}
         />
         <button
             onClick={onSendMessage}
+            // ⭐ 파란색 계열 보내기 버튼 스타일
             className={`px-4 py-2 text-white ${
-                isConnected ? "bg-orange-700 hover:bg-orange-800" : "bg-gray-400 cursor-not-allowed"
+                isConnected ? "bg-blue-700 hover:bg-blue-800" : "bg-gray-400 cursor-not-allowed"
             }`}
-            disabled={!isConnected} // 연결 상태에 따라 비활성화
+            disabled={!isConnected}
         >
-            <PaperAirplaneIcon className="h-5 w-5 rotate-90" /> {/* 아이콘 회전 추가 */}
+            <PaperAirplaneIcon className="h-5 w-5 rotate-90" />
         </button>
     </div>
 );
+
 
 
 export default ChatInput;
