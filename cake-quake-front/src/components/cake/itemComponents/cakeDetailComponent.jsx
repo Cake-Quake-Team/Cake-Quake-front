@@ -8,7 +8,8 @@ import 'slick-carousel/slick/slick-theme.css';
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
 const DEFAULT_SHOP_THUMBNAIL = '/shop_default_image.jpeg';
 
-const SampleNextArrow = (className, style, onClick) => {
+const SampleNextArrow = (props) => {
+    const { className, style, onClick } = props;
     return (
         <div
             className={`${className} before:text-[3rem] before:content-['>']`}
@@ -18,7 +19,8 @@ const SampleNextArrow = (className, style, onClick) => {
     );
 };
 
-const SamplePrevArrow = (className, style, onClick) => {
+const SamplePrevArrow = (props) => {
+    const { className, style, onClick } = props;
     return (
         <div
             className={`${className} before:text-[3rem] before:content-['<']`}

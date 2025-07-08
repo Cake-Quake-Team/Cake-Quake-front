@@ -90,12 +90,12 @@ function SellerCakeReadPage() {
         if (window.confirm("정말로 이 상품을 삭제하시겠습니까?")) {
             try {
                 await deleteCake(cakeId);
-                setFormError("상품이 삭제되었습니다.");
+                setFormError({message: "상품이 삭제되었습니다.", type: 'success' });
                 setShowError(true);
                 navigate(`/shops/${user.shopId}`);
             } catch (err) {
                 console.error("상품 삭제 실패:", err);
-                setFormError("상품 삭제에 실패했습니다.");
+                setFormError({message: "상품 삭제에 실패했습니다.", type: 'error' });
                 setShowError(true);
             }
         }

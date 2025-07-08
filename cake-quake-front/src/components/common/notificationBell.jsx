@@ -1,10 +1,11 @@
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {useNavigate} from "react-router";
 import {deleteNotification, getMyNotifications, markAsRead} from "../../api/notificationApi";
 import {useAuth} from "../../store/AuthContext.jsx";
 import {Bell, Trash2, Loader2} from "lucide-react";
 import { parseISO, formatDistanceToNow, differenceInSeconds } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import AlertModal from "./AlertModal.jsx";
 
 function NotificationBell() {
     const [notifications, setNotifications] = useState([]);
@@ -13,6 +14,8 @@ function NotificationBell() {
     const bellRef = useRef(null);
     const navigate = useNavigate();
     const {user} = useAuth();
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     const isAuthenticated = !!user;
 
@@ -103,7 +106,8 @@ function NotificationBell() {
             console.log(`알림 (ID: ${notificationId}) 삭제 성공`);
         } catch (error) {
             console.error(`알림 (ID: ${notificationId}) 삭제 실패`, error);
-            alert("알림 삭제에 실패했습니다.");
+            setFormError({message: "알림 삭제에 실패했습니다.", type: 'error'});
+            setShowError(true);
         }
     };
 
@@ -129,9 +133,22 @@ function NotificationBell() {
         }
     };
 
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     return (
         <div className="relative" ref={bellRef}>
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             {isAuthenticated && (
                 <button
                     onClick={() => setShowList(prev => !prev)}
