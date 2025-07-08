@@ -30,14 +30,14 @@ const KakaoRedirectPage = () => {
     const handleKakaoLogin = async (authCode) => {
         try {
             const kakaoAccessToken = await getKakaoAccessToken(authCode)
-            console.log("KakaoAccessToken:", kakaoAccessToken)
+            // console.log("KakaoAccessToken:", kakaoAccessToken)
 
             // 로그인이 필요한 경우 토큰이 포함된 응답, 회원가입이 필요한 경우 카카오 유저의 정보가 포함된 응답이 옴.
             const loginResult = await getMemberWithAccessToken(kakaoAccessToken)
             // const { exists, ...rest } = loginResult.data
             const { exists, email, nickname } = loginResult.data
-            console.log("loginResult.data:", loginResult.data)
-            console.log("email:", email)
+            // console.log("loginResult.data:", loginResult.data)
+            // console.log("email:", email)
 
             // exists가 true면 이미 가입된 유저.
             if (exists) {

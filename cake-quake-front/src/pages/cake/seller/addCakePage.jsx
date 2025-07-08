@@ -1,14 +1,14 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import CakeBasicInfoForm from "../../../components/cake/itemComponents/cakeBasicInfoForm.jsx";
 import CakeImageUploadForm from "../../../components/cake/itemComponents/cakeImageForm.jsx";
 import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
-import {getOptionTypes, getOptionItems, addCake} from "../../../api/cakeApi.jsx";
-import {Link, useNavigate} from "react-router";
-import {useAuth} from "../../../store/AuthContext.jsx";
+import { getOptionTypes, getOptionItems, addCake } from "../../../api/cakeApi.jsx";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../../../store/AuthContext.jsx";
+import AlertModal from "../../../components/common/AlertModal";
 
 function CakeAddPage() {
-
-    const {user} = useAuth()
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     const [addCakeDTO, setAddCakeDTO] = useState({
@@ -18,37 +18,39 @@ function CakeAddPage() {
         category: ""
     });
 
+    const [cakeImage, setCakeImage] = useState([]);
+
+    const [optionTypes, setOptionTypes] = useState([]);
+    const [selectedOptions, setSelectedOptions] = useState([]);
+
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setAddCakeDTO((prev) => ({ ...prev, [name]: value }));
     };
 
     // 이미지 추가
-    const [cakeImage, setCakeImage] = useState([]);
-
     const handleImageChange = (e) => {
         const selectedFiles = Array.from(e.target.files);
         const newFiles = selectedFiles.map((file) => ({
             file,
+            src: URL.createObjectURL(file),
             isThumbnail: false,
         }));
 
         setCakeImage(prev => {
             const updated = [...prev, ...newFiles];
-
-            // 썸네일 지정이 없다면 첫 번째 이미지 자동 지정
             const hasThumbnail = updated.some(img => img.isThumbnail);
             if (!hasThumbnail && updated.length > 0) {
                 updated[0].isThumbnail = true;
             }
-
             return updated;
         });
-
-        e.target.value = null; // input 초기화
     };
 
-    // 썸네일 선택 핸들러 추가
+    // 썸네일 선택
     const handleThumbnailSelect = (indexToSelect) => {
         setCakeImage((prev) =>
             prev.map((img, index) => ({
@@ -58,37 +60,41 @@ function CakeAddPage() {
         );
     };
 
-
-
     // 이미지 삭제
     const handleImageRemove = (indexToRemove) => {
         setCakeImage(prev => {
-            const updated = prev.filter((_, idx) => idx !== indexToRemove);
-
-            // 삭제 후 썸네일이 하나도 없다면 첫 번째 걸 썸네일로 지정
+            const updated = prev.filter((img, idx) => {
+                if (idx === indexToRemove && img.file) {
+                    URL.revokeObjectURL(img.src);
+                }
+                return idx !== indexToRemove;
+            });
             const hasThumbnail = updated.some(img => img.isThumbnail);
             if (!hasThumbnail && updated.length > 0) {
                 updated[0].isThumbnail = true;
             }
-
             return updated;
         });
     };
 
+    // 컴포넌트 언마운트 시 메모리 해제
+    useEffect(() => {
+        return () => {
+            cakeImage.forEach(img => {
+                if (img.file && img.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(img.src);
+                }
+            });
+        };
+    }, [cakeImage]);
 
-    // 옵션 상태 및 API 호출
-    const [optionTypes, setOptionTypes] = useState([]);
-    const [selectedOptions, setSelectedOptions] = useState([]);
-
+    // 옵션 타입 & 아이템 불러오기
     useEffect(() => {
         const fetchOptions = async () => {
             try {
-                // 모든 옵션 타입 가져오기
-                const fetchedOptionTypes = await getOptionTypes(user.shopId); // 변수명 충돌 피하기 위해 변경
-                // 모든 옵션 값 가져오기
+                const fetchedOptionTypes = await getOptionTypes(user.shopId);
                 const fetchedOptionItems = await getOptionItems(user.shopId);
 
-                // 타입과 아이템 매핑
                 const mergedOptionTypes = fetchedOptionTypes.map(type => {
                     const relevantItems = fetchedOptionItems.filter(item =>
                         item.optionTypeId === type.optionTypeId
@@ -102,21 +108,37 @@ function CakeAddPage() {
                             optionName: item.optionName,
                             price: item.price
                         }))
-                    }
-                })
-                setOptionTypes(mergedOptionTypes); // 병합된 데이터를 상태에 저장
+                    };
+                });
+
+                setOptionTypes(mergedOptionTypes);
             } catch (err) {
                 console.error("옵션 데이터 불러오기 실패", err);
+                setFormError({ message: "옵션 데이터를 불러오는 데 실패했습니다.", type: "error" });
+                setShowError(true);
             }
         };
 
         fetchOptions();
     }, [user.shopId]);
 
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     const handleSubmit = async () => {
         try {
             const thumbnailImage = cakeImage.find(img => img.isThumbnail);
             const optionItemIds = selectedOptions.map(option => option.optionItemId);
+
+            if (!addCakeDTO.cname || !addCakeDTO.price) {
+                setFormError({ message: "상품명과 가격은 필수 입력 사항입니다.", type: "error" });
+                setShowError(true);
+                return;
+            }
 
             const addCakeDTOWithAll = {
                 ...addCakeDTO,
@@ -137,52 +159,56 @@ function CakeAddPage() {
                 cakeImage.forEach((img) => {
                     if (img.file instanceof File) {
                         formData.append("cakeImages", img.file);
-                        console.log(`[프론트] FormData에 파일 추가: ${img.file.name}, 크기: ${img.file.size} bytes`);
-                    } else {
-                        console.warn("[프론트] images 배열에 File 객체가 아닌 요소 발견:", img);
                     }
                 });
-            } else {
-                console.log("[프론트] 선택된 이미지가 없어 'cakeImages' 파트를 전송하지 않습니다.");
             }
 
-            // 여기서 API 호출
-            const result = await addCake(formData);
-            console.log("저장 성공!", result);
+            await addCake(formData);
+
             alert("상품이 성공적으로 등록되었습니다!");
+            navigate(`/shops/${user.shopId}`);
+
         } catch (error) {
             console.error("상품 등록 실패", error);
-            alert("등록 중 오류 발생");
+            const errorMessage = error.response?.data?.message || error.message || "알 수 없는 오류";
+            setFormError({ message: `등록 중 오류 발생: ${errorMessage}`, type: "error" });
+            setShowError(true);
         }
-        navigate(`/shops/${user.shopId}`);
     };
 
     return (
         <div>
             <div className="container mx-auto px-6 py-10">
                 <h1 className="text-2xl font-semibold mb-6 text-center">새 상품 등록</h1>
-                <hr/>
+                <hr />
+                {showError && formError && (
+                    <AlertModal
+                        message={formError.message}
+                        type={formError.type || "error"}
+                        show={showError}
+                    />
+                )}
                 <CakeImageUploadForm
                     images={cakeImage}
                     onImageChange={handleImageChange}
                     onImageRemove={handleImageRemove}
                     onThumbnailSelect={handleThumbnailSelect}
                 />
-                <CakeBasicInfoForm formData={addCakeDTO} onChange={handleChange}/>
-                <CakeOptionForm optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions}/>
+                <CakeBasicInfoForm formData={addCakeDTO} onChange={handleChange} />
+                <CakeOptionForm optionTypes={optionTypes} selectedOptions={selectedOptions} setSelectedOptions={setSelectedOptions} />
                 <div className="mt-6 flex justify-center">
-                <Link
-                    to={`/shops/${user.shopId}`}
-                    className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
-                >
-                    취소
-                </Link>
-                <button
-                    onClick={handleSubmit}
-                    className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
-                >
-                    등록
-                </button>
+                    <Link
+                        to={`/shops/${user.shopId}`}
+                        className="mt-6 border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100"
+                    >
+                        취소
+                    </Link>
+                    <button
+                        onClick={handleSubmit}
+                        className="mt-6 ml-2 bg-black text-white px-4 py-2 rounded hover:bg-gray-500"
+                    >
+                        등록
+                    </button>
                 </div>
             </div>
         </div>

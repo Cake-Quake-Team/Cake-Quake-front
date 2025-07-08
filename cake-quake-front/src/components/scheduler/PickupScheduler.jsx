@@ -1,17 +1,20 @@
-
 import 'react-calendar/dist/Calendar.css';
-import {useEffect, useState} from "react";
-import{getAvailableShops} from "../../api/scheduleApi.jsx";
+import { useEffect, useState } from "react";
+import { getAvailableShops } from "../../api/scheduleApi.jsx";
 import DatePickerModal from "./datePickerModal.jsx";
 import ShopSelectionModal from "./ShopSelectionModal.jsx";
 import TimeSelectionModal from "./timeSelectionModal.jsx";
-import {useNavigate} from "react-router";
+import { useNavigate } from "react-router";
+// 아이콘 추가 (선택 사항: lucide-react 또는 react-icons에서 필요한 아이콘 import)
+import { Calendar as CalendarIcon, MapPin, Clock, ArrowRight } from 'lucide-react';
+
 
 function PickupScheduler({ onComplete }) {
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedShop, setSelectedShop] = useState(null);
     const [selectedTime, setSelectedTime] = useState(null);
+
 
     const [availableShops, setAvailableShops] = useState([]);
     const [page, setPage] = useState(0);
@@ -67,6 +70,7 @@ function PickupScheduler({ onComplete }) {
 
     }, [selectedDate]);
 
+
     // 매장 선택 모달에서 스크롤 이벤트 발생 시 다음 페이지 데이터를 불러오는 함수
     const loadMoreShops = () => {
         if (!loadingShops && hasMore) {
@@ -97,6 +101,7 @@ function PickupScheduler({ onComplete }) {
         setIsDatePickerOpen(false);
         setPage(0);
         setHasMore(true);
+
     };
 
     const handleShopSelectFromModal = (shop) => {
@@ -115,91 +120,79 @@ function PickupScheduler({ onComplete }) {
             if (onComplete) {
                 onComplete({ selectedDate, selectedTime });
             }
-            navigate(`/buyer/shops/${selectedShop.shopId}`);
+            navigate(`/buyer/shops/${selectedShop.shopId}`); // 매장 상세 조회 화면으로 이동
+
         } else {
             alert("날짜, 매장, 시간을 모두 선택해주세요.");
         }
     };
 
     const formatDateDisplay = (date) => {
-        if (!date) return '날짜 선택';
+
+        if (!date) return '픽업 날짜를 선택하세요.';
+
         return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
     };
 
     const formatShopDisplay = (shop) => {
-        if (!shop) return '매장 선택';
+        if (!shop) return '매장을 선택하세요.';
         return shop.shopName;
     };
 
     const formatTimeDisplay = (time) => {
-        if (!time) return '시간 선택';
+
+        if (!time) return '픽업 시간을 선택하세요.';
         return time.substring(0, 5);
     };
 
     const isProceedButtonDisabled = !selectedDate || !selectedShop || !selectedTime;
 
     return (
-        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif', maxWidth: '1200px', margin: 'auto' }}>
-            <div style={{
-                marginBottom: '30px',
-                padding: '20px',
-                border: '1px solid #ddd',
-                borderRadius: '10px',
-                backgroundColor: '#f9f9f9',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '15px'
-            }}>
-                <h2 style={{ marginBottom: '15px', color: '#333' }}>픽업 스케줄 조회</h2>
-                <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-                    <div style={{ flex: '1 1 28%', minWidth: '180px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>1. 픽업 날짜</label>
+        // max-w-4xl -> max-w-6xl 로 변경하여 가로 폭을 넓힙니다.
+        <div className="p-5 font-pretendard max-w-6xl mx-auto my-2">
+            <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200 flex flex-col gap-6">
+                <h2 className="font-semibold text-gray-800 mb-2">픽업 스케줄 조회</h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* 1. 픽업 날짜 */}
+                    <div className="flex flex-col">
+
                         <button
                             onClick={() => setIsDatePickerOpen(true)}
-                            style={{
-                                width: '100%', padding: '12px 15px', border: '1px solid #ccc', borderRadius: '8px',
-                                backgroundColor: 'white', textAlign: 'left', cursor: 'pointer', fontSize: '1em',
-                                color: selectedDate ? '#333' : '#999', display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                            }}
+                            className="w-full flex items-center justify-between px-3 py-3 border border-gray-300 rounded-lg bg-white text-gray-800 text-base font-medium
+                                    hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200
+                                    disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed text-sm"
                         >
-                            <span>{formatDateDisplay(selectedDate)}</span>
-                            <span style={{ fontSize: '1.2em' }}>📅</span>
+                            <span className="text-gray-500">{formatDateDisplay(selectedDate)}</span>
+                            <CalendarIcon size={20} className="text-gray-500" />
                         </button>
                     </div>
 
-                    <div style={{ flex: '1 1 28%', minWidth: '180px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>2. 매장 선택</label>
+                    {/* 2. 매장 선택 */}
+                    <div className="flex flex-col">
                         <button
                             onClick={() => selectedDate && setIsShopSelectorOpen(true)}
                             disabled={!selectedDate}
-                            style={{
-                                width: '100%', padding: '12px 15px', border: '1px solid #ccc', borderRadius: '8px',
-                                backgroundColor: !selectedDate ? '#eee' : 'white', textAlign: 'left',
-                                cursor: !selectedDate ? 'not-allowed' : 'pointer', fontSize: '1em',
-                                color: selectedShop ? '#333' : '#999', display: 'flex', justifyContent: 'space-between',
-                                alignItems: 'center', opacity: !selectedDate ? 0.7 : 1
-                            }}
+                            className="w-full flex items-center justify-between px-3 py-3 text-sm border border-gray-300 rounded-lg text-base font-medium
+                                    hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200
+                                    disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
                         >
-                            <span>{formatShopDisplay(selectedShop)}</span>
-                            <span style={{ fontSize: '1.2em' }}>📍</span>
+                            <span className={selectedShop ? "text-gray-500" : "text-gray-400"}>{formatShopDisplay(selectedShop)}</span>
+                            <MapPin size={20} className="text-gray-500" />
                         </button>
                     </div>
 
-                    <div style={{ flex: '1 1 28%', minWidth: '180px' }}>
-                        <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>3. 픽업 시간</label>
+                    {/* 3. 픽업 시간 */}
+                    <div className="flex flex-col">
                         <button
                             onClick={() => selectedShop && setIsTimeSelectorOpen(true)}
                             disabled={!selectedShop}
-                            style={{
-                                width: '100%', padding: '12px 15px', border: '1px solid #ccc', borderRadius: '8px',
-                                backgroundColor: !selectedShop ? '#eee' : 'white', textAlign: 'left',
-                                cursor: !selectedShop ? 'not-allowed' : 'pointer', fontSize: '1em',
-                                color: selectedTime ? '#333' : '#999', display: 'flex', justifyContent: 'space-between',
-                                alignItems: 'center', opacity: !selectedShop ? 0.7 : 1
-                            }}
+                            className="w-full flex items-center justify-between px-3 py-3 text-sm border border-gray-300 rounded-lg text-base font-medium
+                                    hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 transition-all duration-200
+                                    disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
                         >
-                            <span>{formatTimeDisplay(selectedTime)}</span>
-                            <span style={{ fontSize: '1.2em' }}>⏰</span>
+                            <span className={selectedTime ? "text-gray-500" : "text-gray-400"}>{formatTimeDisplay(selectedTime)}</span>
+                            <Clock size={20} className="text-gray-500" />
                         </button>
                     </div>
                 </div>
@@ -207,18 +200,18 @@ function PickupScheduler({ onComplete }) {
                 <button
                     onClick={handleProceedToOrder}
                     disabled={isProceedButtonDisabled}
-                    style={{
-                        marginTop: '20px', padding: '15px 30px',
-                        backgroundColor: isProceedButtonDisabled ? '#cccccc' : '#28a745',
-                        color: 'white', border: 'none', borderRadius: '8px',
-                        cursor: isProceedButtonDisabled ? 'not-allowed' : 'pointer',
-                        fontSize: '1.2em', fontWeight: 'bold', transition: 'background-color 0.2s',
-                        alignSelf: 'flex-end'
-                    }}>
-                    예약 확정 및 다음 단계로 이동
+                    className="mt-4 w-full md:w-auto px-4 py-2 bg-[--color-primary] text-white rounded-full
+                                hover:bg-opacity-90 hover:scale-[1.01] transition-all duration-300
+                                disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none
+                                md:self-end"
+                >
+                    예약하러가기
+                    <ArrowRight size={20} className="inline-block ml-2 -mr-1" />
                 </button>
             </div>
 
+
+            {/* 모달들 (기존과 동일) */}
             <DatePickerModal
                 isOpen={isDatePickerOpen}
                 onClose={() => setIsDatePickerOpen(false)}
@@ -252,6 +245,5 @@ function PickupScheduler({ onComplete }) {
         </div>
     );
 }
-
 
 export default PickupScheduler;

@@ -5,6 +5,7 @@ import ChatSidebar from "../../components/ai/ChatSidebar";
 import { Menu } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "../../store/AuthContext";
+import AlertModal from "../../components/common/AlertModal.jsx";
 
 import {
     generateAnswer,
@@ -16,9 +17,8 @@ import {
 
 function AiRecommendPage() {
     const { user } = useAuth();
-    const userId = user?.uid
+    const userId = user?.uid;
 
-    // 사용자별 localStorage 키
     const historyKey = `aiChatHistory_${userId}`;
     const sessionKey = `aiSessionId_${userId}`;
 
@@ -37,6 +37,10 @@ function AiRecommendPage() {
     const [selectedChatIndex, setSelectedChatIndex] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
+    // 새롭게 추가된 상태 - formError 메시지와 노출 제어용
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
     const startNewChat = useCallback(() => {
         const newSessionId = uuidv4();
         localStorage.setItem(sessionKey, newSessionId);
@@ -45,8 +49,10 @@ function AiRecommendPage() {
             const newChatEntry = { sessionId: newSessionId, title: "새로운 대화", messages: [] };
             return [...prev, newChatEntry];
         });
-        setSelectedChatIndex(prev => prev + 1);
+        setSelectedChatIndex(prev => (prev === null ? 0 : prev + 1));
         setQuestion("");
+        setFormError(null);
+        setShowError(false);
     }, [sessionKey]);
 
     const handleSelectChat = useCallback((index) => {
@@ -55,6 +61,8 @@ function AiRecommendPage() {
         setCurrentSessionId(chatHistory[index].sessionId);
         setQuestion("");
         setIsLoading(false);
+        setFormError(null);
+        setShowError(false);
     }, [chatHistory, selectedChatIndex]);
 
     const toggleSidebar = useCallback(() => {
@@ -140,10 +148,15 @@ function AiRecommendPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!question.trim()) return alert("질문을 입력해주세요!");
+        if (!question.trim()) {
+            setFormError("질문을 입력해주세요!");
+            setShowError(true);
+            return;
+        }
         if (!currentSessionId || selectedChatIndex === null || !chatHistory[selectedChatIndex]) {
             startNewChat();
-            alert("새로운 대화 세션이 시작되었습니다. 다시 질문해주세요!");
+            setFormError("새로운 대화 세션이 시작되었습니다. 다시 질문해주세요!");
+            setShowError(true);
             return;
         }
 
@@ -214,6 +227,13 @@ function AiRecommendPage() {
         }
     };
 
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     const currentChatMessages =
         selectedChatIndex !== null &&
         chatHistory[selectedChatIndex] &&
@@ -254,6 +274,14 @@ function AiRecommendPage() {
                     </div>
                 </main>
             </div>
+
+            {showError && formError && (
+                <AlertModal
+                    message={formError}
+                    type="error"
+                    show={showError}
+                />
+            )}
         </div>
     );
 }
