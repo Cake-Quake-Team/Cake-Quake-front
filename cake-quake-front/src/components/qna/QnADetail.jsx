@@ -1,3 +1,4 @@
+// src/components/qna/QnADetail.jsx
 import React from 'react';
 
 // — 문의 & 상태 라벨 매핑 —
@@ -67,11 +68,17 @@ export function QnADetail({ qna, onEdit, onDelete }) {
                 <button
                     onClick={onEdit}
                     className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 focus:outline-none transition"
-                >수정</button>
-                <button
-                    onClick={onDelete}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 focus:outline-none transition"
-                >삭제</button>
+                >
+                    수정
+                </button>
+                {qna.status !== 'CLOSED' && (
+                    <button
+                        onClick={onDelete}
+                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 focus:outline-none transition"
+                    >
+                        삭제
+                    </button>
+                )}
             </div>
         </div>
     );

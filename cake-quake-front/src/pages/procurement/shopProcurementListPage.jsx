@@ -9,7 +9,7 @@ import { ProcurementListComponent } from '../../components/procurement/procureme
 const STATUS_OPTIONS = [
     { value: '', label: '전체' },
     { value: 'REQUESTED', label: '요청됨' },
-    { value: 'SCHEDULED', label: '일정지정' },
+    { value: 'COMPLETED', label: '주문 완료' },
     { value: 'SHIPPED', label: '발송됨' },
     { value: 'DELIVERED', label: '도착완료' },
     { value: 'CANCELLED', label: '취소됨' },
