@@ -8,7 +8,7 @@ const TokenTestPage = () => {
     const fetchData = async () => {
       try {
         const res = await testToken() // Axios 요청
-        console.log(res.data)
+        // console.log(res.data)
         setMessage(res.data.message)
       } catch (err) {
         console.error(err)

@@ -96,7 +96,7 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL
                     const res = await axios.post(`${baseUrl}/auth/refresh`, {}, {
                         withCredentials: true
                     })
-                    console.log("리프레시토큰 요청 후: ", res)
+                    // console.log("리프레시토큰 요청 후: ", res)
 
                 } catch (refreshError) {
                     console.log("Token refresh failed", refreshError)
@@ -118,8 +118,8 @@ const baseUrl = import.meta.env.VITE_API_BASE_URL
                             window.location.replace("/auth/signin")
                         }
                         return;
-                    }
-                }
+                    }// end if
+                } // try~catch
             }// end if
             
         }// end if

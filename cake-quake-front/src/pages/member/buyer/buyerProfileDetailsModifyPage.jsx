@@ -144,7 +144,7 @@ const BuyerProfileDetailsModifyPage = () => {
             return
         }
 
-        console.log(form)
+        // console.log(form)
         try {
             setButtonLoading(true)
             
