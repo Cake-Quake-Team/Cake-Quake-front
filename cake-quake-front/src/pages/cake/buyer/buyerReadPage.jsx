@@ -13,6 +13,7 @@ import LikeButton from "../../../components/common/LikeButton.jsx";
 import AlertModal from "../../../components/common/AlertModal"; 
 
 
+
 function BuyerCakeReadPage() {
     const { shopId, cakeId } = useParams();
     const navigate = useNavigate();
