@@ -179,7 +179,7 @@ const SignupSellersStep1Page = () => {
         try {
             setIsLoading(true)
             const res = await verifyBusiness(businessData)
-            console.log("businessData: ", businessData)
+            // console.log("businessData: ", businessData)
 
             if (res.success) {
                 // 진위여부 확인 성공

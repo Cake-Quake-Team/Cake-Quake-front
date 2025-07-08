@@ -6,6 +6,7 @@ import {
 } from "../../../api/badgeApi";
 import BadgeCard from "../../../components/badge/BadgeCard";
 import { useAuth } from "../../../store/AuthContext.jsx";
+import AlertModal from "../../../components/common/AlertModal.jsx";
 
 function BadgesPage() {
     const [viewMode, setViewMode] = useState("acquired");
@@ -14,6 +15,10 @@ function BadgesPage() {
     const [error, setError] = useState(null);
     const { user } = useAuth();
     const uid = user?.uid;
+
+    // formError 메시지 + showError 표시 상태 분리
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         if (!user || !uid) return;
@@ -42,14 +47,16 @@ function BadgesPage() {
 
     const handleSetProfileBadge = async (badgeId) => {
         if (!user || !uid) {
-            alert("사용자 정보가 없어 대표 뱃지를 설정할 수 없습니다.");
+            setFormError("사용자 정보가 없어 대표 뱃지를 설정할 수 없습니다.");
+            setShowError(true);
             return;
         }
         try {
             await setProfileBadge(uid, badgeId);
-            alert("대표 뱃지가 성공적으로 설정되었습니다!");
+            setFormError("대표 뱃지가 성공적으로 설정되었습니다!");
+            setShowError(true);
+
             // 변경 후 다시 데이터 가져오기
-            // (대표 뱃지 상태가 바뀔 수 있으므로)
             let data;
             if (viewMode === "acquired") {
                 data = await getMemberBadges(uid);
@@ -59,22 +66,28 @@ function BadgesPage() {
             setBadges(data);
         } catch (err) {
             console.error("대표 뱃지 설정 실패:", err);
-            alert("대표 뱃지 설정에 실패했습니다.");
+            setFormError("대표 뱃지 설정에 실패했습니다.");
+            setShowError(true);
         }
     };
 
+    // showError가 true가 되면 3초 후 자동 닫기 처리
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     if (!user) {
-        // user 정보가 없으면 아예 페이지 보여주지 않거나, 다른 UI 보여주기 가능
         return <div className="text-center mt-20 text-gray-500">사용자 정보를 불러오는 중...</div>;
     }
 
     return (
         <div className="max-w-5xl mx-auto px-4 py-8">
-            {/* 항상 보이는 타이틀과 버튼 */}
             <h1 className="text-3xl font-bold text-center text-gray-800">나의 대표 뱃지</h1>
             <p className="text-center text-gray-400 mb-8">나의 대표 뱃지를 선택하세요</p>
 
-            {/* 뷰 모드 토글 버튼 */}
             <div className="flex justify-center mb-8 space-x-4">
                 <button
                     onClick={() => setViewMode("acquired")}
@@ -96,7 +109,6 @@ function BadgesPage() {
                 </button>
             </div>
 
-            {/* 여기부터 뱃지 목록 영역 */}
             <div className="min-h-[300px]">
                 {loading && (
                     <p className="text-center text-gray-500 text-lg">뱃지 목록을 불러오는 중...</p>
@@ -125,9 +137,16 @@ function BadgesPage() {
                     </div>
                 )}
             </div>
+
+            {showError && formError && (
+                <AlertModal
+                    message={formError}
+                    type={formError.includes("성공") ? "success" : "error"}
+                    show={showError}
+                />
+            )}
         </div>
     );
 }
-
 
 export default BadgesPage;

@@ -62,3 +62,9 @@ export const refundPayment = async (paymentId, { refundAmount }) => {
     const res = await jwtAxios.post(`${prefix}/${paymentId}/refund`, { refundAmount });
     return res.data; // PaymentResponseDTO
 };
+
+/** 주문별 결제 내역 조회 */
+export const getOrderPayments = async (orderId) => {
+    const res = await jwtAxios.get(`${prefix}/order/${orderId}`)
+    return res.data  // PaymentResponseDTO[]
+}

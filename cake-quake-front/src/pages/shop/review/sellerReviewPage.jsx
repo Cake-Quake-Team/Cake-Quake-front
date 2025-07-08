@@ -70,8 +70,6 @@ export default function SellerReviewsPage() {
                     loading={loading}
                     hasNext={hasNext}
                     onLoadMore={handleLoadMore}
-                    // showEdit=false → 수정 버튼 숨김
-                    // showReply=true → 답글 달기 버튼 표시
                     showEdit={false}
                     showReply={true}
                     onEdit={handleReply}

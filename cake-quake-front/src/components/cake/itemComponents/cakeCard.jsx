@@ -1,11 +1,15 @@
 import React from 'react';
 
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 
 function CakeCard({ cake,onClick }) {
 
-    const {cakeId, cname, price, thumbnailImageUrl, isOnsale} = cake;
-    const imgSrc = thumbnailImageUrl ? thumbnailImageUrl : DEFAULT_IMAGE;
+    const {cname, price, thumbnailImageUrl, isOnsale} = cake;
+    const imgSrc = thumbnailImageUrl
+        ? `${S3_BASE_URL}${thumbnailImageUrl}`
+        : DEFAULT_IMAGE;
 
     if (!cake) return null;
 

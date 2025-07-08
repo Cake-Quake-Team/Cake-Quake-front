@@ -110,7 +110,7 @@ const SignupBuyerPage = () => {
             setIsLoading(true)
             const signupData = createBuyerSignupDTO(form) // form → DTO 변환
 
-            console.log("signupData: ", signupData)
+            // console.log("signupData: ", signupData)
             const res = await singup(signupData)
             // 회원가입 성공 시 모달 표시
             setModalMsg(res.message)

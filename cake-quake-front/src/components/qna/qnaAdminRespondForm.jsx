@@ -25,7 +25,7 @@ export function QnAAdminRespondForm({
                         답변 내용
                     </label>
                     <textarea
-                        className="w-full border border-gray-300 rounded-md p-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                        className="w-full border border-gray-300 rounded-md p-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                         rows={6}
                         placeholder="답변하실 내용을 입력해주세요."
                         value={response}
@@ -45,12 +45,15 @@ export function QnAAdminRespondForm({
                             취소
                         </button>
                     )}
-                    <button
-                        type="submit"
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
-                    >
-                        답변 등록
-                    </button>
+                    {/* initialResponse가 없을 때만 등록 버튼 노출 */}
+                    {!initialResponse && (
+                        <button
+                            type="submit"
+                            className="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+                        >
+                            답변 등록
+                        </button>
+                    )}
                 </div>
             </form>
         </div>

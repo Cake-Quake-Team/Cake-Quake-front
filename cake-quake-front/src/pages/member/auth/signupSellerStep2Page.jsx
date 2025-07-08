@@ -46,7 +46,7 @@ const SignupSellersStep2Page = () => {
             setShowModal(true)
             navigate("/auth/signup/seller-step1")
         }else {
-            console.log("tempSellerId: ", tempSellerId)
+            // console.log("tempSellerId: ", tempSellerId)
             setTempSellerId(tempSellerId)
         }
     }, []);
@@ -96,7 +96,7 @@ const SignupSellersStep2Page = () => {
     useEffect(() => {
         return () => {
             if (previewUrl) {
-                console.log("미리보기 URL 해제", previewUrl)
+                // console.log("미리보기 URL 해제", previewUrl)
                 URL.revokeObjectURL(previewUrl)
             }
         }
@@ -147,10 +147,10 @@ const SignupSellersStep2Page = () => {
 
         try {
             setIsLoading(true)
-            console.log("FormData 내부 확인:")
-            formData.forEach((value, key) => {
-                console.log(`${key}:`, value)
-            })
+            // console.log("FormData 내부 확인:")
+            // formData.forEach((value, key) => {
+            //     console.log(`${key}:`, value)
+            // })
             const res = await postSellerSignupStep2(formData)
 
             // 회원가입 성공 시 모달 표시

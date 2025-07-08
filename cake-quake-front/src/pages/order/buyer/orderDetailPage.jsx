@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; // ⭐ useQuery, useMutation, useQueryClient 임포트 ⭐
 import { getOrderDetail, cancelMyOrder } from '../../../api/buyerOrderApi';
 import OrderDetailComponent from '../../../components/order/buyer/OrderDetail';
+import {getOrderPayments} from "../../../api/paymentApi.jsx";
 
 // 로딩 및 에러 컴포넌트 분리 (재사용성 목적)
 const PageLoading = () => (
@@ -47,6 +48,16 @@ export default function OrderDetailPageWrapper() {
             console.error("❌ useQuery: 주문 상세 정보 불러오기 실패:", err);
         }
     });
+
+    // ① 주문별 결제 내역 조회
+    const { data: payments = [] } = useQuery({
+        queryKey: ['orderPayments', orderId],
+        queryFn: () => getOrderPayments(orderId),
+        enabled: !!orderId,
+    });
+
+    // ② 승인된 결제 찾기
+    const approvedPayment = payments.find(p => p.status === 'APPROVED');
 
     // useMutation 훅을 사용하여 주문 취소 로직 관리
     const cancelOrderMutation = useMutation({
@@ -101,12 +112,13 @@ export default function OrderDetailPageWrapper() {
         return <div className="p-4 text-center text-gray-500">주문 정보를 찾을 수 없습니다.</div>;
     }
 
-    // ✅ 결제하기 버튼 클릭 시 호출할 핸들러
-    const handlePay = () => {
-        // order.finalPaymentAmount 필드가 백엔드가 보내주는 최종 결제 금액
-        navigate(
-            `/buyer/payments/start?orderId=${order.orderId}&amount=${order.finalPaymentAmount}`
-        );
+    // ③ 결제하기 or 결제내역 보기 핸들러
+    const handlePayOrView = () => {
+        if (approvedPayment) {
+            navigate(`/buyer/payments/${approvedPayment.paymentId}`);
+        } else {
+            navigate(`/buyer/payments/start?orderId=${order.orderId}&amount=${order.finalPaymentAmount}`);
+        }
     };
 
 
@@ -116,7 +128,8 @@ export default function OrderDetailPageWrapper() {
             order={order}
             onCancel={handleCancelOrder}
             onBack={handleBack}
-            onPay={handlePay}
+            onPay={handlePayOrView}                // 변경된 onPay
+            hasApprovedPayment={!!approvedPayment} // 승인 여부 prop 추가
             isPaying={false}
             isCancelling={cancelOrderMutation.isPending} // 취소 요청 중인지 상태 전달
         />

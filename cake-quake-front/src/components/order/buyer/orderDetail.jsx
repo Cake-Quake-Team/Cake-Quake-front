@@ -6,6 +6,7 @@ export default function OrderDetail({
                                         onCancel,
                                         onBack,
                                         onPay,
+                                        hasApprovedPayment, // 승인 여부
                                         isPaying
                                     }) {
     const [isCancelling, setIsCancelling] = useState(false);
@@ -70,13 +71,12 @@ export default function OrderDetail({
     if (!order) return <div className="p-4 text-center">로딩 중…</div>;
 
     // 주문 상태에 따른 버튼 가시성 로직 재조정
-    let showPaymentButton = false;
     let showCancelButton = false;
     let showReviewButton = false;
 
     switch (order.status) {
         case 'RESERVATION_PENDING': // 예약 확인 중
-            showPaymentButton = true; // "결제하기" 버튼 다시 보이도록 (사용자 요청)
+
             showCancelButton = true;  // 주문 취소하기 버튼 보임
             break;
         case 'RESERVATION_CONFIRMED': // 예약 확정
@@ -198,19 +198,25 @@ export default function OrderDetail({
 
             {/* 버튼 영역: 재조정된 로직에 따라 동적으로 렌더링 */}
             <div className="mt-6 flex justify-end gap-4">
-                {showPaymentButton && ( // 조건부 렌더링
-                    <button
-                        onClick={onPay}
-                        disabled={isPaying} // 결제 진행 중일 때 비활성화
-                        className={`px-4 py-2 rounded-md text-white font-semibold transition-colors
-                            ${!isPaying
+                {/* ④ 결제내역 보기 or 결제하기 버튼 */}
+                <button
+                    onClick={onPay}
+                    disabled={isPaying}
+                    className={`px-4 py-2 rounded-md text-white font-semibold transition-colors
+            ${hasApprovedPayment
+                        ? 'bg-gray-600 hover:bg-gray-700'
+                        : !isPaying
                             ? 'bg-blue-600 hover:bg-blue-700'
-                            : 'bg-gray-400 text-gray-700 cursor-not-allowed'
-                        }`}
-                    >
-                        {isPaying ? '결제 진행 중...' : '결제하기'}
-                    </button>
-                )}
+                            : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                >
+                    {hasApprovedPayment
+                        ? '결제 내역 보기'
+                        : isPaying
+                            ? '결제 진행 중...'
+                            : '결제하기'
+                    }
+                </button>
 
                 {showCancelButton && ( // 조건부 렌더링
                     <button

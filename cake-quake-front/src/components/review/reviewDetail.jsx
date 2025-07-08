@@ -1,19 +1,17 @@
 // src/components/review/reviewDetail.jsx
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
 export default function ReviewDetail({
                                          review,
-                                         onEdit,         // 리뷰 자체 수정
-                                         onDelete,       // 리뷰 삭제
-                                         onBack,         // 뒤로가기
-                                         onReplyEdit,     // 답글 수정 (판매자 전용)
-                                        showEdit = true // 수정 버튼 여부
-
+                                         onEdit,          // 리뷰 자체 수정
+                                         onDelete,        // 리뷰 삭제
+                                         onBack,          // 뒤로가기
+                                         onReplyEdit,     // 답글 수정 handler
+                                         showEdit = true, // 리뷰 수정 버튼 여부
+                                         showReplyEdit = false // 답글 수정 버튼 노출 여부
                                      }) {
-    // 답글 수정 모드 상태
     const [isEditingReply, setIsEditingReply] = useState(false);
     const [editedReply, setEditedReply] = useState(review.reply || '');
-
 
     const startEditReply = () => {
         setEditedReply(review.reply || '');
@@ -28,28 +26,20 @@ export default function ReviewDetail({
         setIsEditingReply(false);
     };
 
-
-
-
     return (
         <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow">
-                 {review.reviewPictureUrl && (
-                     <div className="w-full flex justify-center mb-6">
-                        <img
-                           src={`http://localhost${review.reviewPictureUrl}`}
-                           alt={`리뷰 이미지 ${review.reviewId}`}
-                           loading="lazy"
-                           className="
-                             rounded
-                             object-contain
-                             max-w-full        /* 가로로 가능한 만큼 꽉 채우되 */
-                             max-h-96          /* 세로 최대 24rem(384px)로 제한 */
-                           "
-                         />
-                       </div>
-                 )}
+            {review.reviewPictureUrl && (
+                <div className="w-full flex justify-center mb-6">
+                    <img
+                        src={`http://localhost${review.reviewPictureUrl}`}
+                        alt={`리뷰 이미지 ${review.reviewId}`}
+                        loading="lazy"
+                        className="rounded object-contain max-w-full max-h-96"
+                    />
+                </div>
+            )}
 
-            {/* 2. 별점 */}
+            {/* 별점 */}
             <div className="flex items-center text-yellow-500 mb-4">
                 {Array.from({ length: 5 }, (_, i) => (
                     <svg
@@ -62,17 +52,15 @@ export default function ReviewDetail({
                 ))}
             </div>
 
-            {/* 3. 상세 내용 */}
-            <p className="text-gray-700 mb-6">
-                {review.content}
-            </p>
+            {/* 내용 */}
+            <p className="text-gray-700 mb-6">{review.content}</p>
 
-            {/* 4. 작성일 */}
+            {/* 작성일 */}
             <div className="text-xs text-gray-500 mb-6">
                 작성일: {new Date(review.regDate).toLocaleString()}
             </div>
 
-            {/* 5. 버튼 그룹 (리뷰 수정/삭제/뒤로가기) */}
+            {/* 버튼 그룹 */}
             <div className="flex space-x-4 mb-6">
                 {showEdit && (
                     <button
@@ -95,10 +83,11 @@ export default function ReviewDetail({
                     뒤로가기
                 </button>
             </div>
-            {/* 6. 답글 섹션 */}
+
+            {/* 답글 섹션 */}
             <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500 space-y-4">
                 <h4 className="font-semibold">답글</h4>
-                {/* 수정 모드 */}
+
                 {isEditingReply ? (
                     <div className="space-y-2">
             <textarea
@@ -110,8 +99,8 @@ export default function ReviewDetail({
                         <div className="flex space-x-2">
                             <button
                                 onClick={saveReply}
-                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                                 disabled={!editedReply.trim()}
+                                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                             >
                                 저장
                             </button>
@@ -126,7 +115,7 @@ export default function ReviewDetail({
                 ) : (
                     <div className="flex justify-between items-start">
                         <p className="text-gray-700 flex-1">{review.reply}</p>
-                        {onReplyEdit && (
+                        {showReplyEdit && onReplyEdit && (
                             <button
                                 onClick={startEditReply}
                                 className="text-sm text-blue-600 hover:underline ml-4"
@@ -137,7 +126,6 @@ export default function ReviewDetail({
                     </div>
                 )}
             </div>
-
         </div>
     );
 }

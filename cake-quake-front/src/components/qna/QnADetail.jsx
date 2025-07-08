@@ -37,7 +37,7 @@ export function QnADetail({ qna, onEdit, onDelete }) {
             <div className="p-6 border-b border-gray-200">
                 <h2 className="text-2xl font-bold text-gray-800 mb-2">{qna.title}</h2>
                 <div className="text-sm text-gray-500 space-x-6">
-                    <span>아이디: {qna.userId}</span>
+                    <span>아이디: {qna.memberId}</span>
                     <span>유형: {QnATypesLabel[qna.qnAType]}</span>
                     <span>상태: {statusLabels[qna.status] || qna.status}</span>
                     <span>작성: {formattedQnADate}</span>
