@@ -5,6 +5,8 @@ import { getRequestDetail, cancelRequestBySeller } from '../../api/procurementAp
 import { getAllIngredients } from '../../api/ingredientApi.jsx';
 import { ProcurementDetailComponent } from '../../components/procurement/procurementDetail.jsx';
 import { CancelProcurementComponent } from '../../components/procurement/CancelProcurementComponent.jsx';
+import AlertModal from '../../components/common/AlertModal';
+import ConfirmModal from '../../components/common/ConfirmModal';
 
 export default function ShopProcurementDetailPage() {
     const { shopId, procurementId } = useParams();
@@ -15,6 +17,23 @@ export default function ShopProcurementDetailPage() {
     const [loading,     setLoading]         = useState(true);
     const [error,       setError]           = useState(null);
     const [cancelLoading, setCancelLoading] = useState(false);
+
+    // AlertModal state
+    const [alertProps, setAlertProps] = useState({
+        show: false,
+        message: '',
+        type: 'success'
+    });
+    const showAlert = (message, type = 'success') => {
+        setAlertProps({ show: true, message, type });
+        setTimeout(() => setAlertProps(a => ({ ...a, show: false })), 3000);
+    };
+
+    // confirm modal for cancellation
+    const [confirmProps, setConfirmProps] = useState({
+        show: false,
+        reason: null
+    });
 
     // 취소 폼 토글
     const [showCancelForm, setShowCancelForm] = useState(false);
@@ -52,19 +71,30 @@ export default function ShopProcurementDetailPage() {
         );
     }, [data]);
 
-    const handleCancel = async reason => {
-        if (!window.confirm('정말 이 발주를 취소하시겠습니까?')) return;
+    // invoked by CancelProcurementComponent
+    const handleCancelRequest = reason => {
+        setConfirmProps({ show: true, reason });
+    };
+
+    // when user confirms in ConfirmModal
+    const handleConfirmCancel = async () => {
+        const reason = confirmProps.reason;
+        setConfirmProps({ show: false, reason: null });
         setCancelLoading(true);
         try {
             await cancelRequestBySeller(shopId, procurementId, { reason });
-            alert('발주가 취소되었습니다.');
+            showAlert('발주가 취소되었습니다.', 'success');
             navigate(`/seller/${shopId}/procurements`);
         } catch (err) {
             console.error('취소 실패', err);
-            alert('발주 취소에 실패했습니다.');
+            showAlert('발주 취소에 실패했습니다.', 'error');
         } finally {
             setCancelLoading(false);
         }
+    };
+
+    const handleCancelAbort = () => {
+        setConfirmProps({ show: false, reason: null });
     };
 
     if (loading) {
@@ -92,36 +122,45 @@ export default function ShopProcurementDetailPage() {
     }
 
     return (
-        <div className="container mx-auto p-4 space-y-6">
-            <button
-                onClick={() => navigate(-1)}
-                className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-            >
-                ← 뒤로
-            </button>
+        <>
+            <AlertModal {...alertProps} />
 
-            <ProcurementDetailComponent
-                data={data}
-                totalPrice={totalPrice}
+            <ConfirmModal
+                show={confirmProps.show}
+                message="정말 이 발주를 취소하시겠습니까?"
+                onConfirm={handleConfirmCancel}
+                onCancel={handleCancelAbort}
             />
 
-            {/* 취소 토글 버튼 */}
-            {!showCancelForm && (
+            <div className="container mx-auto p-4 space-y-6">
                 <button
-                    onClick={() => setShowCancelForm(true)}
-                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    onClick={() => navigate(-1)}
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
                 >
-                    발주 취소하기
+                    ← 뒤로
                 </button>
-            )}
 
-            {/* 취소 폼 */}
-            {showCancelForm && (
-                <CancelProcurementComponent
-                    onCancel={handleCancel}
-                    loading={cancelLoading}
+                <ProcurementDetailComponent
+                    data={data}
+                    totalPrice={totalPrice}
                 />
-            )}
-        </div>
+
+                {!showCancelForm && (
+                    <button
+                        onClick={() => setShowCancelForm(true)}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                        발주 취소하기
+                    </button>
+                )}
+
+                {showCancelForm && (
+                    <CancelProcurementComponent
+                        onCancel={handleCancelRequest}
+                        loading={cancelLoading}
+                    />
+                )}
+            </div>
+        </>
     );
 }

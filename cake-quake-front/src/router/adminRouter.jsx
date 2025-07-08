@@ -35,12 +35,6 @@ const adminRouter = () => ({
             element: <AdminLayout />,
             children: [
                 {
-                    // index 미정. 없으면 레이아웃이 안 보여서 일단 이렇게 설정함.
-                    index: true,
-                    // element: <Shops />,
-                },
-                { path: "shops", element: <Shops /> },
-                {
                     path: "review-deletion-requests",
                     element: (
                         <Suspense fallback={Loading}>
@@ -78,7 +72,7 @@ const adminRouter = () => ({
                     ],
                 },
                 {
-                    path: "sellers/pending",
+                   index: true,
                     element: (
                         <Suspense fallback={Loading}>
                             <PendingSellerListPage />

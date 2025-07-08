@@ -3,10 +3,22 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import ReviewForm from '../../../components/review/reviewForm.jsx';
 import { getMyReviewDetail, updateMyReview } from '../../../api/reviewApi.jsx';
+import AlertModal from '../../../components/common/AlertModal';
 
 export default function ReviewEditPage() {
     const { reviewId } = useParams();
     const nav = useNavigate();
+
+    // AlertModal 상태 & helper
+    const [alertProps, setAlertProps] = useState({
+        show: false,
+        message: '',
+        type: 'success'
+    });
+    const showAlert = (message, type = 'success') => {
+        setAlertProps({ show: true, message, type });
+        setTimeout(() => setAlertProps(a => ({ ...a, show: false })), 3000);
+    };
 
     // 1) form 값
     const [values, setValues] = useState({
@@ -49,7 +61,7 @@ export default function ReviewEditPage() {
                 });
             } catch (e) {
                 console.error('리뷰 불러오기 실패', e);
-                alert('리뷰를 불러올 수 없습니다.');
+                showAlert('리뷰를 불러올 수 없습니다.', 'error');
                 nav(-1);
             } finally {
                 setLoading(false);
@@ -71,11 +83,11 @@ export default function ReviewEditPage() {
                 fd.append('reviewPictureUrl', values.reviewPictureUrl);
             }
             await updateMyReview(reviewId, fd);
-            alert('리뷰가 수정되었습니다.');
+            showAlert('리뷰가 수정되었습니다.', 'success');
             nav('/buyer/reviews');
         } catch (e) {
             console.error('리뷰 수정 실패', e);
-            alert('수정에 실패했습니다.');
+            showAlert('수정에 실패했습니다.', 'error');
         } finally {
             setSubmitting(false);
         }
@@ -86,24 +98,31 @@ export default function ReviewEditPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-10">
-            {/* 제목 */}
-            <h2 className="text-xl font-bold text-center relative mb-6">
-                리뷰 수정
-                <span  className="absolute bottom-0 left-1/2 w-[100px] h-0.5 bg-black -translate-x-1/2"></span>
-            </h2>
-
-            <ReviewForm
-                product={product}
-                points={points}
-                temperature={temperature}
-
-                values={values}
-                onChange={handleChange}
-                submitting={submitting}
-                onSubmit={handleSubmit}
-                submitLabel="수정하기"
+        <>
+            <AlertModal
+                message={alertProps.message}
+                type={alertProps.type}
+                show={alertProps.show}
             />
-        </div>
+
+            <div className="min-h-screen bg-gray-50 py-10">
+                {/* 제목 */}
+                <h2 className="text-xl font-bold text-center relative mb-6">
+                    리뷰 수정
+                    <span className="absolute bottom-0 left-1/2 w-[100px] h-0.5 bg-black -translate-x-1/2"></span>
+                </h2>
+
+                <ReviewForm
+                    product={product}
+                    points={points}
+                    temperature={temperature}
+                    values={values}
+                    onChange={handleChange}
+                    submitting={submitting}
+                    onSubmit={handleSubmit}
+                    submitLabel="수정하기"
+                />
+            </div>
+        </>
     );
 }
