@@ -96,8 +96,8 @@ const ProcurementSection = () =>{
                             const createdDate   = order.regDate
                                 ? new Date(order.regDate).toLocaleDateString('ko-KR')
                                 : '–';
-                            const scheduledDate = order.scheduleDate
-                                ? new Date(order.scheduleDate).toLocaleDateString('ko-KR')
+                            const estimatedDate = order.estimatedArrivalDate
+                                ? new Date(order.estimatedArrivalDate).toLocaleDateString('ko-KR')
                                 : '미정';
                             const badgeClass = statusClasses[order.status] || 'bg-gray-100 text-gray-800';
 
@@ -116,7 +116,7 @@ const ProcurementSection = () =>{
                                                 생성일: {createdDate}
                                             </p>
                                             <p className="text-sm text-gray-600">
-                                                스케줄일: {scheduledDate}
+                                                도착 예정일: {estimatedDate}
                                             </p>
                                         </div>
                                         <span
