@@ -19,19 +19,24 @@ export const getAvailableTimes = async (shopId, date) =>{
 }
 
 // 2. 날짜 (예: 2025-06-25)와 시간 (예: 14:00) 선택 후, 가능한 매장 조회 (모달에 표시)
-export const getAvailableShops=async (date, time = null, checkSlots = true) => {
+export const getAvailableShops=async (date, time = null, checkSlots = true, page = 0, size = 10) => {
 
     const response = await jwtAxios.get(`${prefix}/schedule/available-shops-by-date`, {
         params: {
             date: date,
             // time 값이 null이 아닐 때만 'time' 파라미터를 추가
             ...(time && {time: time}),
-            checkSlots: checkSlots
+            checkSlots: checkSlots,
+            page: page,
+            size: size
         }
     });
-    const shops = response.data;
-    console.log(`API 응답 - 날짜 ${date}, 시간 ${time}, 슬롯 체크 ${checkSlots}의 예약 가능한 매장:`, shops);
-    return shops;
+    console.log(`API 응답 - 날짜 ${date}, 시간 ${time}, 슬롯 체크 ${checkSlots}, 페이지 ${page}, 사이즈 ${size}의 예약 가능한 매장:`, response.data);
+
+    return {
+        content: response.data.content, // 실제 매장 데이터 배열
+        last: response.data.last       // 마지막 페이지인지 여부
+    };
 
 }
 

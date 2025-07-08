@@ -62,6 +62,9 @@ const QnAListPage = lazy(() => import("../pages/qna/qnaListPage"));
 const QnADetailPage = lazy(()=> import("../pages/qna/qnaDetailPage"));
 const QnAFormPage = lazy (() => import("../pages/qna/QnAFormPage"));
 
+//채팅
+const ChattingPage = lazy (() => import("../pages/buyer/shop/buyerChatPage.jsx"));
+
 
 const Loading = <div>Loading...</div>;
 
@@ -349,7 +352,17 @@ const buyerRouter = () => ({
                     )
                 }
             ]
-        }
+        },
+        //------------------------채팅
+        {
+            path: "shops/:shopId/chatting/:roomId",
+            element:(
+                <Suspense fallback={Loading}>
+                    <ChattingPage/>
+                </Suspense>
+            )
+        },
+
     ]
 });
 

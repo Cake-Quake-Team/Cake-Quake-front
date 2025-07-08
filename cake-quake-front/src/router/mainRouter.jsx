@@ -8,7 +8,6 @@ import adminRouter from "./adminRouter.jsx";
 import authRouter from "./authRouter.jsx";
 import memberRouter from "./memberRouter.jsx";
 import shopRouter from "./shopRouter.jsx";
-import scheduleRouter from "./scheduleRouter.jsx";
 
 const Loading = <div>Loading...</div>; // 로딩 스피너 등 실제 컴포넌트로 대체 가능
 
@@ -24,7 +23,6 @@ const mainRouter = createBrowserRouter([
             authRouter(),
             memberRouter(),
             shopRouter(),
-            scheduleRouter()
 
         ]
     },
