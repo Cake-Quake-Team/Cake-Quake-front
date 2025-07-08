@@ -30,7 +30,7 @@ export default function AdminLayout() {
                     <button onClick={() => setSidebarOpen(!sidebarOpen)} className="text-gray-600 text-2xl hover:text-gray-300 transition-colors duration-200">
                         ☰
                     </button>
-                    <Link to="/admin">
+                    <Link to="/admin?page=1$size=10">
                         <h1 className="text-2xl font-bold">Cake Quake</h1>
                     </Link>
                 </div>
@@ -71,16 +71,6 @@ export default function AdminLayout() {
                                 <span>승인 관리</span>
                                 {isActive("/admin/sellers/pending")}
                             </Link>
-                            <Link
-                                to="/admin/shops/description" // Assuming a description page
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/shops/description") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>Description</span>
-                                {isActive("/admin/shops/description")}
-                            </Link>
-
 
                             <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">리뷰 관리</div>
                             <Link
@@ -122,77 +112,6 @@ export default function AdminLayout() {
                                 }`}
                             >
                                 <span>문의 목록</span>
-                            </Link>
-
-                            <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">회원 관리</div>
-                            <Link
-                                to="/admin/users/list" // Assuming a list page for "회원 목록/등급"
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/users/list") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>회원 목록/등급</span>
-                                {isActive("/admin/users/list")}
-                            </Link>
-                            <Link
-                                to="/admin/users/points" // Assuming points management related to users
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/users/points") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>회원 리스트</span> {/* Adjusted text based on typical admin panel structure */}
-                                {isActive("/admin/users/points")}
-                            </Link>
-
-                            <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">쿠폰 관리</div>
-                            <Link
-                                to="/admin/coupons/register" // Assuming a coupon registration page
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/coupons/register") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>쿠폰 등록</span>
-                                {isActive("/admin/coupons/register")}
-                            </Link>
-                            <Link
-                                to="/admin/coupons/modify" // Assuming a coupon modification page
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/coupons/modify") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>쿠폰 수정</span>
-                                {isActive("/admin/coupons/modify")}
-                            </Link>
-
-                            <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">이벤트 관리</div>
-                            <Link
-                                to="/admin/events/register" // Assuming event registration
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/events/register") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>이벤트 등록</span>
-                                {isActive("/admin/events/register")}
-                            </Link>
-                            <Link
-                                to="/admin/events/modify" // Assuming event modification
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/events/modify") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>이벤트 수정</span>
-                                {isActive("/admin/events/modify")}
-                            </Link>
-
-                            <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">포인트 관리</div>
-                            <Link
-                                to="/admin/points"
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg text-gray-800 hover:bg-gray-100 ${
-                                    isActive("/admin/points") ? "bg-blue-50 text-blue-700 font-medium" : ""
-                                }`}
-                            >
-                                <span>포인트 관리</span>
-                                {isActive("/admin/points")}
                             </Link>
 
                             {/* 로그아웃 버튼 */}

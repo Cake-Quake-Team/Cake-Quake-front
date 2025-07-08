@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { createRequest, getStoreRequests } from '../../api/procurementApi.jsx';
+import { createRequest } from '../../api/procurementApi.jsx';
 import { getAllIngredients } from '../../api/ingredientApi.jsx';
 import { ProcurementCreateComponent } from '../../components/procurement/procurementCreate.jsx';
 
