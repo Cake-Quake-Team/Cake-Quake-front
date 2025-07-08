@@ -67,12 +67,12 @@ function OptionReadPage() {
             if (window.confirm("정말로 이 옵션을 삭제하시겠습니까?")) {
                 try {
                     await deleteOptionType(Number(user.shopId), Number(optionId));
-                    setFormError("옵션이 삭제되었습니다.");
+                    setFormError({message: "옵션이 삭제되었습니다.", type: 'success' });
                     setShowError(true);
                     navigate(`/shops/${user.shopId}`);
                 } catch (err) {
                     console.error("옵션 삭제 실패:", err);
-                    setFormError("옵션 삭제에 실패했습니다.");
+                    setFormError({message: "옵션 삭제에 실패했습니다.", type: 'error' });
                     setShowError(true);
                 }
             }
@@ -116,7 +116,7 @@ function OptionReadPage() {
                     }
                 }
 
-                setFormError('옵션이 성공적으로 수정되었습니다.');
+                setFormError({message: '옵션이 성공적으로 수정되었습니다.', type: 'success' });
                 setShowError(true);
                 await fetchOptionDetail();
                 setIsEditMode(false);
@@ -127,7 +127,7 @@ function OptionReadPage() {
                 } else if (err.message) {
                     errorMessage = err.message;
                 }
-                setFormError(errorMessage);
+                setFormError({message: errorMessage, type: 'error' });
                 setShowError(true);
             }
         } else {

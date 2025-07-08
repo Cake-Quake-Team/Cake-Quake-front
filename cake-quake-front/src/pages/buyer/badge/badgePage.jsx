@@ -47,13 +47,13 @@ function BadgesPage() {
 
     const handleSetProfileBadge = async (badgeId) => {
         if (!user || !uid) {
-            setFormError("사용자 정보가 없어 대표 뱃지를 설정할 수 없습니다.");
+            setFormError({message: "사용자 정보가 없어 대표 뱃지를 설정할 수 없습니다.", type: 'error'});
             setShowError(true);
             return;
         }
         try {
             await setProfileBadge(uid, badgeId);
-            setFormError("대표 뱃지가 성공적으로 설정되었습니다!");
+            setFormError({message: "대표 뱃지가 성공적으로 설정되었습니다!", type: 'error'});
             setShowError(true);
 
             // 변경 후 다시 데이터 가져오기
@@ -66,7 +66,7 @@ function BadgesPage() {
             setBadges(data);
         } catch (err) {
             console.error("대표 뱃지 설정 실패:", err);
-            setFormError("대표 뱃지 설정에 실패했습니다.");
+            setFormError({message: "대표 뱃지 설정에 실패했습니다.", type: 'error'});
             setShowError(true);
         }
     };

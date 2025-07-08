@@ -1,8 +1,7 @@
 // aiApi.js
 import jwtAxios from "../utils/jwtUtil.js";
 
-export const API_SERVER_HOST = "http://localhost:8080";
-const prefix = `${API_SERVER_HOST}/api/ai`;
+const prefix = import.meta.env.VITE_API_BASE_URL
 
 // 간단한 질의응답
 export const generateAnswer = async (data) => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getCakeDetail } from "../../../api/cakeApi.jsx";
-import { List, ShoppingCart } from "lucide-react";
+import { List, ShoppingCart, Heart } from "lucide-react";
 import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import { Link, useParams, useNavigate } from "react-router";
 import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
@@ -10,7 +10,6 @@ import { getShopDetail } from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
 // ⭐ LikeButton 컴포넌트 임포트 확인 ⭐
 import LikeButton from "../../../components/common/LikeButton.jsx";
-import {ShoppingCart, Heart} from "lucide-react"; // Heart 아이콘도 필요하므로 임포트
 import AlertModal from "../../../components/common/AlertModal"; 
 
 
@@ -22,7 +21,6 @@ function BuyerCakeReadPage() {
     const [shop, setShop] = useState(null);
     const [optionTypes, setOptionTypes] = useState([]);
     const [loading, setLoading] = useState(true);
-    // error 상태는 {message, type: "success"|"error"} 또는 null
     const [error, setError] = useState(null);
     const [showError, setShowError] = useState(false);
 
@@ -207,11 +205,6 @@ function BuyerCakeReadPage() {
         return <div className="text-center py-8 text-gray-500">상품 정보를 불러오는 중...</div>;
     }
 
-    if (error && error.type === "error" && !showError) {
-        // error.type이 error인데 showError false면 에러 UI는 안보임 (토스트로 대체)
-        // 필요시 여기에 에러 UI 직접 렌더 가능
-    }
-
     const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
     const thumbnailUrl =
         cake && cake.cakeDetailDTO && cake.cakeDetailDTO.thumbnailImageUrl
@@ -249,7 +242,7 @@ function BuyerCakeReadPage() {
                                 <LikeButton
                                     type="cake" // 케이크 찜하기
                                     itemId={cake.cakeDetailDTO.cakeId} // 케이크 ID 전달
-                                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center p-2 rounded-full border border-gray-300 bg-white
+                                    className="mt-6 w-12 h-12 flex-shrink-0 flex items-center justify-center p-2 rounded-full border border-gray-300 bg-white
                                                 hover:border-red-500 hover:bg-red-50 text-red-500
                                                 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
                                 >
@@ -262,8 +255,7 @@ function BuyerCakeReadPage() {
                             <button
                                 onClick={handleAddToCart}
                                 disabled={isAddingToCart}
-                                className="min-w-[120px] text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
-                            >
+                                className="mt-6 min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"                            >
                                 {isAddingToCart ? (
                                     "담는 중..."
                                 ) : (

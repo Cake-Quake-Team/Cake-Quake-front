@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types'; // PropTypes를 사용하여 props 유효성 검사
+import PropTypes from 'prop-types';
+import AlertModal from "../../common/AlertModal.jsx"; // PropTypes를 사용하여 props 유효성 검사
 
 function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEditMode = false }) {
 
@@ -12,6 +13,8 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
 
     // 경고 메시지 상태 추가
     const [warningMessage, setWarningMessage] = useState('');
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     // initialOptionTypeData prop이 변경될 때마다 내부 상태를 업데이트
     useEffect(() => {
@@ -148,7 +151,8 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
         if (isEditMode) {
             if (optionTypeData.minSelection >= 1 && !optionTypeData.isRequired) {
                 // 이 경우 handleIsRequiredChange에서 이미 경고를 띄웠지만, 혹시 모를 상황에 대비
-                alert('최소 선택 개수가 1 이상이면 "필수 선택"은 항상 활성화되어야 합니다. 설정을 확인해주세요.');
+                setFormError({message: '최소 선택 개수가 1 이상이면 "필수 선택"은 항상 활성화되어야 합니다. 설정을 확인해주세요.', type: 'error'});
+                setShowError(true);
                 return; // 저장 막기
             }
         }
@@ -156,8 +160,22 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
         onEditClick(isEditMode ? optionTypeData : undefined);
     };
 
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     return (
         <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto my-8">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-300 pb-2 w-full text-center">
                 옵션 {isEditMode ? '수정' : '상세 조회'}
             </h2>
@@ -248,10 +266,21 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                                                 placeholder="옵션명"
                                             />
                                             <input
-                                                type="number"
-                                                value={item.price}
-                                                onChange={(e) => handleOptionItemChange(index, 'price', e.target.value)}
-                                                className="w-28 p-1 border border-gray-300 rounded-md text-lg text-gray-600 text-right focus:border-blue-400 focus:ring-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                type="text"
+                                                value={item.price === 0 && isEditMode ? '' : item.price.toLocaleString()}
+                                                onFocus={(e) => {
+                                                    if (item.price === 0) {
+                                                        e.target.select(); // 포커스 시 전체 선택
+                                                    }
+                                                }}
+                                                onChange={(e) => {
+                                                    const raw = e.target.value.replace(/,/g, ''); // 콤마 제거
+                                                    if (/^\d*$/.test(raw)) {
+                                                        const numeric = Number(raw || 0);
+                                                        handleOptionItemChange(index, 'price', numeric);
+                                                    }
+                                                }}
+                                                className="w-28 p-1 border border-gray-300 rounded-md text-lg text-gray-600 text-right focus:border-blue-400 focus:ring-1"
                                                 placeholder="가격"
                                             />
                                             <span className="ml-1 text-lg text-gray-600 min-w-[25px]">원</span>

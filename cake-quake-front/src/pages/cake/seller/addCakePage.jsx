@@ -114,8 +114,6 @@ function CakeAddPage() {
                 setOptionTypes(mergedOptionTypes);
             } catch (err) {
                 console.error("옵션 데이터 불러오기 실패", err);
-                setFormError({ message: "옵션 데이터를 불러오는 데 실패했습니다.", type: "error" });
-                setShowError(true);
             }
         };
 

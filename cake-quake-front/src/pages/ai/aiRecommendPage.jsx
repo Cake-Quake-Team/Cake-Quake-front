@@ -149,13 +149,13 @@ function AiRecommendPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!question.trim()) {
-            setFormError("질문을 입력해주세요!");
+            setFormError({message:"질문을 입력해주세요!", type: 'error'});
             setShowError(true);
             return;
         }
         if (!currentSessionId || selectedChatIndex === null || !chatHistory[selectedChatIndex]) {
             startNewChat();
-            setFormError("새로운 대화 세션이 시작되었습니다. 다시 질문해주세요!");
+            setFormError({message:"새로운 대화 세션이 시작되었습니다. 다시 질문해주세요!", type: 'success'});
             setShowError(true);
             return;
         }
