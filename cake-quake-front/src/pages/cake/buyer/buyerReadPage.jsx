@@ -3,16 +3,16 @@ import {getCakeDetail, API_SERVER_HOST} from "../../../api/cakeApi.jsx";
 import { List } from "lucide-react";
 import CakeDetailComponent from "../../../components/cake/itemComponents/cakeDetailComponent.jsx";
 import {Link, useParams, useNavigate} from "react-router";
-import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx"; // CakeOptionForm 임포트 확인
+import CakeOptionForm from "../../../components/cake/itemComponents/cakeOptionForm.jsx";
 import { addCartItem } from "../../../api/cartApi.jsx";
 import {getCakeReviews} from "../../../api/reviewApi.jsx";
 import {getShopDetail} from "../../../api/shopApi.jsx";
 
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
+// ⭐ LikeButton 컴포넌트 임포트 확인 ⭐
 import LikeButton from "../../../components/common/LikeButton.jsx";
-import {ShoppingCart} from "lucide-react";
+import {ShoppingCart, Heart} from "lucide-react"; // Heart 아이콘도 필요하므로 임포트
 import AddToCartSuccessModal from "../../../components/common/AddToCartSuccessModal";
-
 
 
 function BuyerCakeReadPage() {
@@ -20,7 +20,7 @@ function BuyerCakeReadPage() {
     const navigate = useNavigate();
     const [cake, setCake] = useState(null);
     const [shop, setShop] = useState(null);
-    const [optionTypes, setOptionTypes] = useState([]); // 옵션 타입별로 그룹화된 옵션들
+    const [optionTypes, setOptionTypes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [selectedOptions, setSelectedOptions] = useState([]);
@@ -47,7 +47,6 @@ function BuyerCakeReadPage() {
                 setCake(data);
 
                 if (data && data.options) {
-                    // 서버에서 받은 옵션을 타입별로 그룹화하는 로직은 유지
                     const groupedOptions = data.options.reduce((acc, currentOption) => {
                         const typeId = currentOption.optionTypeId;
                         const typeName = currentOption.optionTypeName || `알 수 없는 옵션 타입 ${typeId}`;
@@ -120,7 +119,6 @@ function BuyerCakeReadPage() {
             return;
         }
 
-        // selectedOptions 상태 확인 및 옵션 선택 강제 (선택 사항)
         if (optionTypes.some(type => type.isRequired) && selectedOptions.length === 0) {
             // 필수 옵션이 있고 아무것도 선택되지 않았다면
             alert("필수 옵션을 선택해주세요.");
@@ -131,15 +129,14 @@ function BuyerCakeReadPage() {
             optionItemId: option.optionItemId,
             optionName: option.optionName,
             optionValue: option.optionValue || option.optionName,
-            // CakeOptionForm이 optionValue 제공
-            optionPrice: option.price || 0, // price가 null일 경우 0으로 처리
-            optionCnt: option.optionCnt || 1 // optionCnt가 있다면 사용, 없으면 기본 1로 고정
+            optionPrice: option.price || 0,
+            optionCnt: option.optionCnt || 1
         }));
 
         console.log("DEBUG: 장바구니에 담을 데이터 (최종 전송 전):", JSON.stringify({
             cakeItemId: cake.cakeDetailDTO.cakeId,
             productCnt: 1,
-            cakeOptions: formattedOptions // 이 리스트에 실제 옵션 데이터가 담겨야 합니다.
+            cakeOptions: formattedOptions
         }, null, 2));
 
 
@@ -148,7 +145,7 @@ function BuyerCakeReadPage() {
             const cartItemData = {
                 cakeItemId: cake.cakeDetailDTO.cakeId,
                 productCnt: 1,
-                cakeOptions: formattedOptions // ✅ 올바르게 변환된 List<CartItemOption> 형태 사용
+                cakeOptions: formattedOptions
             };
 
             await addCartItem(cartItemData);
@@ -177,7 +174,6 @@ function BuyerCakeReadPage() {
             return;
         }
 
-        // 옵션 선택 강제 (선택 사항)
         if (optionTypes.some(type => type.isRequired) && selectedOptions.length === 0) {
             alert("필수 옵션을 선택해주세요.");
             return;
@@ -185,20 +181,19 @@ function BuyerCakeReadPage() {
 
 
         const optionsDataMap = selectedOptions.reduce((acc, option) => {
-
-            acc[option.optionItemId] = option.optionCnt || 1; // optionCnt가 있다면 사용, 없으면 기본 1
+            acc[option.optionItemId] = option.optionCnt || 1;
             return acc;
         }, {});
 
         const itemToOrder = {
-            shopId: parseInt(shopId), // 현재 URL에서 가져온 shopId
+            shopId: parseInt(shopId),
             cakeId: cake.cakeDetailDTO.cakeId,
-            cakeItemId: cake.cakeDetailDTO.cakeId, // CakeItem ID를 의미하는 필드
+            cakeItemId: cake.cakeDetailDTO.cakeId,
             cname: cake.cakeDetailDTO.cname,
             thumbnailImageUrl: cake.cakeDetailDTO.thumbnailImageUrl,
-            productCnt: 1, // 기본 수량 1개
-            price: cake.cakeDetailDTO.price, // 기본 가격
-            options: optionsDataMap // ✅ 변환된 Map 형태의 options 사용
+            productCnt: 1,
+            price: cake.cakeDetailDTO.price,
+            options: optionsDataMap
         };
 
         navigate('/buyer/orders/create', { state: { selectedItems: [itemToOrder], shopId: parseInt(shopId) } });
@@ -241,20 +236,33 @@ function BuyerCakeReadPage() {
                 <CakeDetailComponent
                     cake={cake}
                     optionTypes={optionTypes}
-                    selectedOptions={selectedOptions} // CakeOptionForm에서 업데이트할 selectedOptions 상태
-                    setSelectedOptions={setSelectedOptions} // CakeOptionForm에서 selectedOptions를 업데이트할 함수
+                    selectedOptions={selectedOptions}
+                    setSelectedOptions={setSelectedOptions}
                     apiBaseUrl={thumbnailUrl}
                     OptionComponent={CakeOptionForm}
                     shop={shop}
                     actionButtons={
-                        <div className="mt-6 flex justify-center gap-3 flex-shrink-0">
-                            <LikeButton type="cake" itemId={cakeId} />
+                        <div className="mt-6 flex justify-center gap-4 flex-shrink-0">
+                            {/* ⭐⭐⭐ 케이크 찜하기 버튼 (하트만 있는 원형) 스타일 수정 ⭐⭐⭐ */}
+                            {cake?.cakeDetailDTO?.cakeId && (
+                                <LikeButton
+                                    type="cake" // 케이크 찜하기
+                                    itemId={cake.cakeDetailDTO.cakeId} // 케이크 ID 전달
+                                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center p-2 rounded-full border border-gray-300 bg-white
+                                                hover:border-red-500 hover:bg-red-50 text-red-500
+                                                focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                                >
+                                    {/* children으로 Heart 아이콘만 전달. 텍스트 없음 */}
+                                    {/* LikeButton 내부에서 isLiked 상태에 따라 fill, stroke를 'red'로 설정합니다. */}
+                                    <Heart size={20} />
+                                </LikeButton>
+                            )}
 
                             {/* 장바구니 담기 버튼 */}
                             <button
                                 onClick={handleAddToCart}
                                 disabled={isAddingToCart}
-                                className="min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
+                                className="min-w-[120px] text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
                             >
                                 {isAddingToCart ? (
                                     '담는 중...'
@@ -269,7 +277,7 @@ function BuyerCakeReadPage() {
                             {/* 바로 주문하기 버튼 */}
                             <button
                                 onClick={handleDirectOrder}
-                                className="min-w-[120px] text-sm bg-black text-white px-4 py-2 rounded hover:bg-gray-500 flex items-center justify-center gap-2 flex-1"
+                                className="min-w-[120px] text-sm bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 flex-1"
                             >
                                 <span className="mr-1">₩</span>
                                 <span style={{ transform: 'none', fontStretch: '100%', letterSpacing: 'normal' }}>바로 주문하기</span>

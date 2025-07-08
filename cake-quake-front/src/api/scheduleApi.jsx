@@ -68,4 +68,22 @@ export const getOccupiedTimeSlots = async (shopId, date) => {
         throw error;
     }
 };
+// ⭐⭐⭐ 이 부분을 파일의 맨 아래에 추가하거나, 다른 export 함수들 사이에 추가해주세요! ⭐⭐⭐
+/**
+ * 특정 매장의 상세 정보를 조회합니다.
+ * 백엔드: GET /api/v1/shops/{shopId}
+ */
+export const getShopDetails = async (shopId) => {
+    try {
+        // 실제 백엔드 API 엔드포인트에 맞게 수정해주세요.
+        // 예를 들어, 매장 상세 정보를 제공하는 API가 /api/v1/shops/{shopId} 라고 가정합니다.
+        const response = await jwtAxios.get(`${API_SERVER_HOST}/api/v1/shops/${shopId}`); // prefix 대신 API_SERVER_HOST를 사용하거나, 새 prefix 변수 필요.
+        console.log(`API 응답 - 매장 ${shopId}의 상세 정보:`, response.data);
+        return response.data; // 매장 상세 정보 객체 반환 (shopName, address 등 포함)
+    } catch (error) {
+        console.error(`Error fetching shop details for shopId ${shopId}:`, error);
+        throw error;
+    }
+};
+
 //api 다시 확인
