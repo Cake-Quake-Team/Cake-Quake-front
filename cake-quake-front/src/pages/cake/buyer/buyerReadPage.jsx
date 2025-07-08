@@ -8,8 +8,11 @@ import { addCartItem } from "../../../api/cartApi.jsx";
 import { getCakeReviews } from "../../../api/reviewApi.jsx";
 import { getShopDetail } from "../../../api/shopApi.jsx";
 import BestReviewsCarousel from "../../../components/review/ReviewCarouserl.jsx";
+// ⭐ LikeButton 컴포넌트 임포트 확인 ⭐
 import LikeButton from "../../../components/common/LikeButton.jsx";
+import {ShoppingCart, Heart} from "lucide-react"; // Heart 아이콘도 필요하므로 임포트
 import AlertModal from "../../../components/common/AlertModal"; 
+
 
 function BuyerCakeReadPage() {
     const { shopId, cakeId } = useParams();
@@ -139,6 +142,12 @@ function BuyerCakeReadPage() {
             optionCnt: option.optionCnt || 1,
         }));
 
+        console.log("DEBUG: 장바구니에 담을 데이터 (최종 전송 전):", JSON.stringify({
+            cakeItemId: cake.cakeDetailDTO.cakeId,
+            productCnt: 1,
+            cakeOptions: formattedOptions
+        }, null, 2));
+
         try {
             setIsAddingToCart(true);
 
@@ -147,6 +156,7 @@ function BuyerCakeReadPage() {
                 productCnt: 1,
                 cakeOptions: formattedOptions,
             });
+
 
             setError({ message: "상품이 장바구니에 담겼습니다!", type: "success" });
             setShowError(true);
@@ -233,13 +243,26 @@ function BuyerCakeReadPage() {
                     OptionComponent={CakeOptionForm}
                     shop={shop}
                     actionButtons={
-                        <div className="mt-6 flex justify-center gap-4 items-center">
-                            <LikeButton type="cake" itemId={cakeId} />
+                        <div className="mt-6 flex justify-center gap-4 flex-shrink-0">
+                            {/* ⭐⭐⭐ 케이크 찜하기 버튼 (하트만 있는 원형) 스타일 수정 ⭐⭐⭐ */}
+                            {cake?.cakeDetailDTO?.cakeId && (
+                                <LikeButton
+                                    type="cake" // 케이크 찜하기
+                                    itemId={cake.cakeDetailDTO.cakeId} // 케이크 ID 전달
+                                    className="w-12 h-12 flex-shrink-0 flex items-center justify-center p-2 rounded-full border border-gray-300 bg-white
+                                                hover:border-red-500 hover:bg-red-50 text-red-500
+                                                focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
+                                >
+                                    {/* children으로 Heart 아이콘만 전달. 텍스트 없음 */}
+                                    {/* LikeButton 내부에서 isLiked 상태에 따라 fill, stroke를 'red'로 설정합니다. */}
+                                    <Heart size={20} />
+                                </LikeButton>
+                            )}
 
                             <button
                                 onClick={handleAddToCart}
                                 disabled={isAddingToCart}
-                                className="mt-6 min-w-[120px] text-sm border border-gray-400 text-gray-700 px-4 py-2 rounded hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
+                                className="min-w-[120px] text-sm border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100 flex items-center justify-center gap-2 flex-1"
                             >
                                 {isAddingToCart ? (
                                     "담는 중..."

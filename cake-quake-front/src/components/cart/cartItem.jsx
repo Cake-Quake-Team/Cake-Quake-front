@@ -16,26 +16,38 @@ export default function CartItem({
         price, // 기존 케이크 단가
         customOptions,
         thumbnailImageUrl,
-        selectedOptions, // JSON 문자열
+        selectedOptions, // API 응답에 따라 이제 '배열' 형태입니다.
     } = item;
 
-    let parsedOptions = []; // 파싱 실패 시 빈 배열로 초기화하여 map 오류 방지
+    // ⭐ [수정된 부분 시작] selectedOptions 처리 로직 변경 ⭐
+    let parsedOptions = [];
     if (selectedOptions) {
-        try {
-            parsedOptions = JSON.parse(selectedOptions);
-            if (!Array.isArray(parsedOptions)) { // JSON이 배열이 아닌 경우 대비
-                console.warn("selectedOptions JSON is not an array:", parsedOptions);
-                parsedOptions = [];
+        if (Array.isArray(selectedOptions)) {
+            // selectedOptions가 이미 배열인 경우, 그대로 사용
+            parsedOptions = selectedOptions;
+        } else if (typeof selectedOptions === 'string') {
+            // 혹시 모를 JSON 문자열 형태에 대비 (백엔드가 변경될 경우를 위해 유지)
+            try {
+                const tempParsed = JSON.parse(selectedOptions);
+                if (Array.isArray(tempParsed)) {
+                    parsedOptions = tempParsed;
+                } else {
+                    console.warn("selectedOptions JSON parsed but not an array:", tempParsed);
+                }
+            } catch (e) {
+                console.error("Failed to parse selectedOptions JSON (received as string but invalid):", e);
             }
-        } catch (e) {
-            console.error("Failed to parse selectedOptions JSON:", e);
-            parsedOptions = [];
+        } else {
+            console.warn("selectedOptions is neither an array nor a string, type:", typeof selectedOptions);
         }
     }
+    // ⭐ [수정된 부분 끝] ⭐
 
-    // ⭐ [사용] 옵션들의 총 가격을 계산 (화면에 표시하기 위함) ⭐
+
+    // ⭐ [수정] 옵션들의 총 가격을 계산 (API 응답의 'price'와 'count' 속성 사용) ⭐
     const optionsDisplayPrice = parsedOptions.reduce((sum, option) => {
-        return sum + (option.optionPrice || 0) * (option.optionCnt || 1);
+        // API 응답 데이터에 'price'와 'count'가 있다고 하셨으니 이를 사용합니다.
+        return sum + (option.price || 0) * (option.count || 1);
     }, 0);
 
 
@@ -69,9 +81,13 @@ export default function CartItem({
                     <div className="text-sm text-gray-500 mt-1">
                         {parsedOptions.map((option, index) => (
                             <p key={index}>
-                                {option.optionName}: {option.optionValue}
-                                {option.optionCnt > 1 && ` (${option.optionCnt}개)`}
-                                {option.optionPrice > 0 && ` (+${option.optionPrice.toLocaleString()}원)`}
+                                {/* ⭐ [수정] optionName만 표시 (optionValue가 API 응답에 없으므로) ⭐ */}
+                                {/* API 응답 예시에 'optionName: 딸기' 가 있으므로, 딸기가 옵션의 이름이자 값으로 간주됩니다. */}
+                                {option.optionName}
+                                {/* ⭐ [수정] optionCnt 대신 option.count 사용 ⭐ */}
+                                {option.count > 1 && ` (${option.count}개)`}
+                                {/* ⭐ [수정] optionPrice 대신 option.price 사용 ⭐ */}
+                                {option.price > 0 && ` (+${option.price.toLocaleString()}원)`}
                             </p>
                         ))}
                         {/* ⭐ [추가] 옵션 가격 총합을 별도로 표시 (optionsDisplayPrice 사용) ⭐ */}

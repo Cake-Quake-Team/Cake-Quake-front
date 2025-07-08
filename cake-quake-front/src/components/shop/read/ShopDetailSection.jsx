@@ -4,7 +4,7 @@ import {Navigate, useNavigate} from "react-router";
 import MapModal from "./mapModal.jsx";
 import {useAuth} from "../../../store/AuthContext.jsx";
 
-
+import ShopLikeButton from '../../../components/shop/ShopLikeButton.jsx';
 
 //평점 별 채우기
 const renderStars=(rating)=> {
@@ -86,9 +86,8 @@ const ShopDetailSection = ({ shop }) => {
             </p>
 
             <div className="flex justify-center gap-6 mt-6 border-t pt-6 border-gray-100">
-                <button className="flex items-center text-gray-700 hover:text-red-500 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg bg-gray-50 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-opacity-50">
-                    <Heart className="mr-2 w-6 h-6" /> 찜하기
-                </button>
+                {shop?.shopId && <ShopLikeButton shopId={shop.shopId} />}
+
                 <button className="flex items-center text-gray-700 hover:text-blue-500 transition-colors duration-200 text-lg font-medium px-4 py-2 rounded-lg bg-gray-50 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-opacity-50">
                     <Share2 className="mr-2 w-6 h-6" /> 공유하기
                 </button>

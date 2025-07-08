@@ -137,8 +137,41 @@ export default function OrderDetail({
                                     <span className="font-semibold text-lg">{item.cname}</span>
                                     <span className="text-gray-600 sm:ml-auto">{item.productCnt}개</span>
                                 </div>
+                                {/* ⭐⭐ 옵션 정보 표시 추가 (여기서 옵션이 보이도록 수정합니다) ⭐⭐ */}
+                                {item.selectedOptions && item.selectedOptions.length > 0 && (
+                                    <div className="text-sm text-gray-500 mt-1 pl-2 border-l border-gray-200">
+                                        {/* 옵션들의 총 가격을 계산 (화면 표시용) */}
+                                        {(() => {
+                                            let totalOptionsPrice = 0;
+                                            const optionDetails = item.selectedOptions.map((option, idx) => {
+                                                totalOptionsPrice += (option.price || 0) * (option.count || 1);
+                                                return (
+                                                    <p key={idx} className="m-0">
+                                                        {/* optionGroup 필드는 OptionType의 typeName에서 왔다고 가정 */}
+                                                        {option.optionGroup && `${option.optionGroup}: `}
+                                                        {option.optionName}
+                                                        {option.count > 1 && ` (${option.count}개)`}
+                                                        {option.price > 0 && ` (+${option.price.toLocaleString()}원)`}
+                                                    </p>
+                                                );
+                                            });
+                                            return (
+                                                <>
+                                                    {optionDetails}
+                                                    {totalOptionsPrice > 0 && (
+                                                        <p className="m-0 font-semibold mt-1">
+                                                            옵션 추가 금액: +{totalOptionsPrice.toLocaleString()}원
+                                                        </p>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                )}
+                                {/* ⭐⭐ 옵션 정보 표시 끝 ⭐⭐ */}
                                 <div className="text-right mt-1">
-                                    <span className="text-lg font-bold">₩{((item.price ?? 0) * (item.productCnt ?? 0)).toLocaleString()}원</span>
+                                    {/* 이 price는 itemSubTotalPrice가 아니라 단가이므로, itemSubTotalPrice를 표시하는 것이 맞습니다. */}
+                                    <span className="text-lg font-bold">₩{(item.itemSubTotalPrice ?? 0).toLocaleString()}원</span>
                                 </div>
                             </div>
                         </div>

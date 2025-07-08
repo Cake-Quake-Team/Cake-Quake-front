@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import OrderListPage from "../../../pages/order/buyer/orderListPage.jsx";
+// import OrderListPage from "../../../pages/order/buyer/orderListPage.jsx";
 
 export default function OrderListItem({ order }) {
     // 날짜 및 가격 형식화 (OrderList 컴포넌트나 공통 유틸에서 가져올 수 있음)
@@ -38,7 +38,6 @@ export default function OrderListItem({ order }) {
     return (
         <div className="bg-white border rounded-lg shadow-sm mb-4 p-4">
             {/* 주문일시 - order.regDate나 order.createdAt 필드가 OrderListItem에 있어야 함 */}
-            {/* 현재 DTO에는 없으므로 백엔드 DTO에 추가하거나, 임시로 "주문 상세" 페이지에서 가져온 `reservedAt` 사용 고려 */}
             {/* <p className="text-sm text-gray-500 mb-2">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ''}</p> */}
 
             <h3 className="text-xl font-bold mb-2">주문번호: {order.orderNumber}</h3>
@@ -70,16 +69,37 @@ export default function OrderListItem({ order }) {
                                 <p className="font-medium">{item.cname}</p>
                                 <p className="text-sm text-gray-600">수량: {item.productCnt}개</p>
 
-                                {/* 옵션 표시 (Map<String, String> options 사용) */}
-                                {item.options && Object.keys(item.options).length > 0 && (
-                                    <p className="text-sm text-gray-600">
-                                        옵션: {Object.entries(item.options).map(([key, value]) => `${key}: ${value}`).join(', ')}
-                                    </p>
+                                {/* ⭐⭐ [수정] 옵션 표시 (List<CreateOrder.SelectedOptionDetail> selectedOptions 사용) ⭐⭐ */}
+                                {item.selectedOptions && item.selectedOptions.length > 0 && (
+                                    <div className="text-sm text-gray-600 pl-2 border-l border-gray-300 mt-1">
+                                        {/* 옵션들의 총 가격을 계산하여 표시하기 위함 (여기서는 디스플레이용으로만 계산) */}
+                                        {(() => {
+                                            let totalOptionsPrice = 0;
+                                            const optionDetails = item.selectedOptions.map((option, optIdx) => {
+                                                totalOptionsPrice += (option.price || 0) * (option.count || 1);
+                                                return (
+                                                    <p key={optIdx} className="m-0">
+                                                        {option.optionGroup && `${option.optionGroup}: `}
+                                                        {option.optionName}
+                                                        {option.count > 1 && ` (${option.count}개)`}
+                                                        {option.price > 0 && ` (+${option.price.toLocaleString()}원)`}
+                                                    </p>
+                                                );
+                                            });
+                                            return (
+                                                <>
+                                                    {optionDetails}
+                                                    {totalOptionsPrice > 0 && (
+                                                        <p className="m-0 font-semibold mt-1">
+                                                            옵션 추가 금액: +{totalOptionsPrice.toLocaleString()}원
+                                                        </p>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
                                 )}
-                                {/* 만약 Map이 아니라 List<OrderItemOption>에서 각각의 optionName을 받아야 한다면, 이 부분 재작성 필요 */}
-                                {/* {item.optionName && (
-                                    <p className="text-sm text-gray-600">옵션명: {item.optionName}</p>
-                                )} */}
+                                {/* ⭐⭐ 옵션 표시 끝 ⭐⭐ */}
 
                                 <p className="text-right font-bold">{formatPrice(item.price * item.productCnt)}</p>
                             </div>
@@ -90,7 +110,7 @@ export default function OrderListItem({ order }) {
                 )}
             </div>
 
-            {/* ⭐⭐ 최종 가격 정보 표시 섹션 추가 ⭐⭐ */}
+            {/* ⭐⭐ 최종 가격 정보 표시 섹션 ⭐⭐ */}
             <div className="text-right mt-4 space-y-1">
                 <p className="text-lg text-gray-700">
                     총 주문 금액: {formatPrice(order.orderTotalPrice)}
