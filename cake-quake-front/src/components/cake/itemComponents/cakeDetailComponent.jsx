@@ -82,8 +82,8 @@ function CakeDetailComponent({
 
     const currentShopName = shop?.shopName || '매장 정보 없음';
     const shopAddress = shop?.address || '주소 정보 없음';
-    const shopThumbnail = shop?.responseDTO?.thumbnailUrl
-        ? `${S3_BASE_URL}${shop.responseDTO.thumbnailUrl}`
+    const shopThumbnail = shop.thumbnailUrl
+        ? `${S3_BASE_URL}${shop.thumbnailUrl}`
         : DEFAULT_SHOP_THUMBNAIL;
 
     return (
