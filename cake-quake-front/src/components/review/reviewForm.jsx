@@ -32,7 +32,7 @@ export default function ReviewForm({ product, points,  temperatureIncrement, val
         }
         // 문자열(URL)이면 그대로
         if (typeof v === 'string' && v) {
-            setPreviewSrc(v);
+            setPreviewSrc(`${S3_BASE_URL}${v}`);
         }
         // null 또는 빈값인 경우
         if (!v) {

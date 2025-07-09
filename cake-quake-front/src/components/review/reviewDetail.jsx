@@ -1,6 +1,8 @@
 // src/components/review/reviewDetail.jsx
 import React, { useState } from 'react';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 export default function ReviewDetail({
                                          review,
                                          onEdit,          // 리뷰 자체 수정
@@ -31,7 +33,7 @@ export default function ReviewDetail({
             {review.reviewPictureUrl && (
                 <div className="w-full flex justify-center mb-6">
                     <img
-                        src={review.reviewPictureUrl ?? '/cakeImage/default-cake.png'}
+                        src={review.reviewPictureUrl ? `${S3_BASE_URL}${review.reviewPictureUrl}` : '/cakeImage/default-cake.png'}
                         alt={`리뷰 이미지 ${review.reviewId}`}
                         loading="lazy"
                         className="rounded object-contain max-w-full max-h-96"
