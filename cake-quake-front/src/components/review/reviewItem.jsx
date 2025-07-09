@@ -63,7 +63,7 @@ export default function ReviewItem({
                     <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-md border">
                         {review.reviewPictureUrl ? (
                             <img
-                                src={review.reviewPictureUrl ?? '/cakeImage/default-cake.png'}
+                                src={review.reviewPictureUrl ? `${S3_BASE_URL}${review.reviewPictureUrl}` : '/cakeImage/default-cake.png'}
                                 alt="리뷰이미지"
                                 className="object-cover w-full h-full"
                             />

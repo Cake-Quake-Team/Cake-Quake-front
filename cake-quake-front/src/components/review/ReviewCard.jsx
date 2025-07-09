@@ -23,9 +23,6 @@ export default function ReviewCard({ review, onClick }) {
         if (!isNaN(d)) dateText = format(d, 'yyyy.MM.dd');
     }
 
-    // 이미지 URL (절대경로/상대경로 모두 대응), 없으면 public/cakeImage/default-cake.png 사용
-    const imgSrc = reviewPictureUrl ?? '/cakeImage/default-cake.png';
-
 
     return (
         <div
@@ -34,7 +31,7 @@ export default function ReviewCard({ review, onClick }) {
         >
             <div className="w-full h-48 flex items-center justify-center bg-gray-50 rounded-t-lg overflow-hidden">
                 <img
-                    src={imgSrc}
+                    src={reviewPictureUrl ? `${S3_BASE_URL}${reviewPictureUrl}` : '/cakeImage/default-cake.png'}
                     alt="리뷰 이미지"
                     // 이미지가 컨테이너 안에 꽉 차지만 잘리진 않도록
                     className="max-w-full max-h-full object-contain"
