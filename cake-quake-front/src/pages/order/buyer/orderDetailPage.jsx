@@ -1,10 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useParams } from 'react-router';
 import { useNavigate } from 'react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'; // ⭐ useQuery, useMutation, useQueryClient 임포트 ⭐
 import { getOrderDetail, cancelMyOrder } from '../../../api/buyerOrderApi';
 import OrderDetailComponent from '../../../components/order/buyer/OrderDetail';
 import {getOrderPayments} from "../../../api/paymentApi.jsx";
+import AlertModal from "../../../components/common/AlertModal.jsx";
 
 // 로딩 및 에러 컴포넌트 분리 (재사용성 목적)
 const PageLoading = () => (
@@ -23,6 +24,15 @@ export default function OrderDetailPageWrapper() {
     const { orderId } = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient(); // queryClient 훅 초기화
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     // useQuery 훅을 사용하여 데이터 로딩 관리
     const {
@@ -71,7 +81,8 @@ export default function OrderDetailPageWrapper() {
             if (refundedPoints > 0) {
                 successMessage += `\n사용하신 포인트 ${refundedPoints.toLocaleString()}P가 반환되었습니다.`;
             }
-            alert(successMessage);
+            setFormError(successMessage);
+            setShowError(true);
             // ⭐⭐⭐ 포인트 반환 메시지 추가 끝 ⭐⭐⭐
 
             queryClient.invalidateQueries(['orderDetail', orderId]);
@@ -80,7 +91,8 @@ export default function OrderDetailPageWrapper() {
         },
         onError: (err) => {
             console.error('❌ 주문 취소 실패 (mutation):', err);
-            alert(`주문 취소 중 오류가 발생했습니다: ${err.response?.data?.message || err.message || '알 수 없는 오류'}`);
+            setFormError({message: `주문 취소 중 오류가 발생했습니다: ${err.response?.data?.message || err.message || '알 수 없는 오류'}`,type: 'error'});
+            setShowError(true);
         }
     });
 
@@ -124,6 +136,14 @@ export default function OrderDetailPageWrapper() {
 
     // 모든 준비가 되면 OrderDetailComponent에 데이터 및 핸들러 전달
     return (
+        <>
+        {showError && formError && (
+            <AlertModal
+                message={formError.message}
+                type={formError.type || "error"}
+                show={showError}
+            />
+        )}
         <OrderDetailComponent
             order={order}
             onCancel={handleCancelOrder}
@@ -133,5 +153,6 @@ export default function OrderDetailPageWrapper() {
             isPaying={false}
             isCancelling={cancelOrderMutation.isPending} // 취소 요청 중인지 상태 전달
         />
+        </>
     );
 }

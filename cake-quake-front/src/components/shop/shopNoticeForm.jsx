@@ -1,6 +1,7 @@
 import {useNavigate} from "react-router";
 import {useEffect, useState} from "react";
 import {createShopNotice, updateShopNotice} from "../../api/shopApi.jsx";
+import AlertModal from "../common/AlertModal.jsx";
 
 const ShopNoticeForm = ({ shopId, noticeId, initialData }) => {
     const navigate = useNavigate();
@@ -8,6 +9,15 @@ const ShopNoticeForm = ({ shopId, noticeId, initialData }) => {
     const [title, setTitle] = useState(initialData?.title || '');
     const [content, setContent] = useState(initialData?.content || '');
     const [isLoading, setIsLoading] = useState(false); // 로딩 상태
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     // initialData가 변경될 때마다 폼 필드를 업데이트 -> 수정모드에서 데이터 처음 호출 시 폼 채우는데 유용
     useEffect(() => {
@@ -27,11 +37,13 @@ const ShopNoticeForm = ({ shopId, noticeId, initialData }) => {
         if (noticeId) {
             // noticeId가 존재하면 수정 모드
             await updateShopNotice(shopId, noticeId, noticeData);
-            alert("공지사항이 성공적으로 수정되었습니다.");
+            setFormError({message: "공지사항이 성공적으로 수정되었습니다.", type: "success"});
+            setShowError(true);
         } else {
             // noticeId가 없으면 생성 모드
             const createdNoticeId = await createShopNotice(shopId, noticeData);
-            alert("공지사항이 성공적으로 생성되었습니다.");
+            setFormError({message: "공지사항이 성공적으로 생성되었습니다.", type: "success"});
+            setShowError(true);
             navigate(`/shops/read/${shopId}/notices/${createdNoticeId}`);
             setIsLoading(false);
             return;
@@ -55,6 +67,13 @@ const ShopNoticeForm = ({ shopId, noticeId, initialData }) => {
         <main className="flex-grow max-w-4xl w-full mx-auto px-4 py-12 md:px-0">
             <div
                 className="p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+                {showError && formError && (
+                    <AlertModal
+                        message={formError.message}
+                        type={formError.type || "error"}
+                        show={showError}
+                    />
+                )}
                 <h1 className="text-4xl font-extrabold mb-8 text-gray-900 border-b-2 pb-6 border-blue-100 text-center">
                     {noticeId ? '공지사항 수정' : '새 공지사항 작성'}
                 </h1>

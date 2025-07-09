@@ -5,8 +5,10 @@ import ShopChatPage from "../../pages/shop/shopChatPage.jsx";
 import {getShopListInfinity} from "../../api/shopApi.jsx";
 import {useNavigate} from "react-router";
 import {createOrGetChatRoom} from "../../api/chatAPi.jsx";
+import AlertModal from "../common/AlertModal.jsx";
 
 const CHAT_LIST_PAGE_SIZE = 15; // 한 번에 불러올 매장 수
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
 const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
     const [shops, setShops] = useState([]);
@@ -22,7 +24,7 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
     const [isChatRoomModalOpen, setIsChatRoomModalOpen] = useState(false);
     const [selectedRoomKey, setSelectedRoomKey] = useState(null);
 
-
+    const [showError, setShowError] = useState(false);
     const [chatRoomModalPosition, setChatRoomModalPosition] = useState({});
 
     const scrollRef = useRef(null);
@@ -36,6 +38,13 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
             loadMoreShops();
         }
     };
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     useEffect(() => {
         const currentRef = scrollRef.current;
@@ -74,13 +83,15 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
                 setPage(pageToFetch + 1);
             } else {
                 console.error("[ChatListModal] getShopListInfinity 반환 데이터 형식이 예상과 다름:", responseData);
-                setError('매장 목록 데이터 형식이 올바르지 않습니다.');
+                setError({message: '매장 목록 데이터 형식이 올바르지 않습니다.', type: 'error'});
+                setShowError(true);
                 if (reset) setShops([]);
             }
 
         } catch (err) {
             console.error("[ChatListModal] 매장 목록 조회 실패:", err);
-            setError('매장 목록을 불러오는 데 실패했습니다.');
+            setError({message: '매장 목록을 불러오는 데 실패했습니다.', type: 'error'});
+            setShowError(true);
             if (reset) setShops([]);
         } finally {
             setLoading(false);
@@ -114,7 +125,8 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
 
     const handleShopClick = async (shop) => {
         if (isAuthLoading || !user || !user.uid) {
-            alert('로그인 정보가 없거나 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+            setError({message: '로그인 정보가 없거나 로딩 중입니다. 잠시 후 다시 시도해주세요.', type: 'error'});
+            setShowError(true);
             return;
         }
 
@@ -160,7 +172,8 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
             setIsChatRoomModalOpen(true);
         } catch (err) {
             console.error("[ChatListModal] 채팅방 생성/조회 실패:", err);
-            alert('채팅방을 여는 데 실패했습니다.');
+            setError({message: '채팅방을 여는 데 실패했습니다.', type: 'error'});
+            setShowError(true);
         }
     };
 
@@ -185,6 +198,13 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
                 modalRefProp={chatListModalRef}
             >
                 <div className="flex-1 overflow-y-auto" ref={scrollRef}>
+                    {showError && error && (
+                        <AlertModal
+                            message={error.message}
+                            type={error.type || "error"}
+                            show={showError}
+                        />
+                    )}
                     {loading && shops.length === 0 && (
                         <div className="text-center text-gray-500">매장 목록을 불러오는 중...</div>
                     )}
@@ -202,7 +222,7 @@ const ChatListModal = ({ isOpen, onClose, positionStyles = {} }) => {
                                     onClick={() => handleShopClick(shop)}
                                 >
                                     <img
-                                        src={shop.thumbnailUrl || 'https://placehold.co/60x60/black/white?text=Shop'}
+                                        src={shop.thumbnailUrl ? `${S3_BASE_URL}${shop.thumbnailUrl}` : 'https://placehold.co/60x60/black/white?text=Shop'}
                                         alt={shop.shopName}
                                         className="w-12 h-12 object-cover rounded-md mr-3"
                                     />

@@ -18,7 +18,6 @@ function BuyerProfile({ representativeBadge }) {
             try{
                 // 사용자 프로필 가지고 옴
                 const profileApiResponse =await getBuyerProfile();
-                console.log("getBuyerProfile 응답 : ", profileApiResponse);
 
                 if (profileApiResponse.success && profileApiResponse.data) {
                     const fetchedProfileData = profileApiResponse.data;
@@ -26,12 +25,10 @@ function BuyerProfile({ representativeBadge }) {
 
                     // profileData에서 uid를 추출하여 온도 정보를 가져오는 데 사용합니다.
                     const userUid = fetchedProfileData.uid;
-                    console.log("프로필에서 추출된 UID:", userUid);
 
                     // 2. 추출된 UID를 사용하여 온도 정보를 가져옵니다.
                     if (userUid) {
                         const tempApiResponse = await getTemperature(userUid); // 추출된 UID 사용
-                        console.log("getTemperature 응답:", tempApiResponse);
 
                         // API 응답의 temperature가 유효한 숫자인지 확인하고 설정합니다.
                         if (typeof tempApiResponse?.temperature === 'number') {

@@ -2,6 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateSellerOrderStatus } from "../../../api/sellerOrderApi";
 import { Link } from "react-router";
 import { useParams } from "react-router";
+import {useEffect, useState} from "react";
+import AlertModal from "../../common/AlertModal.jsx";
+
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
 // 주문 상태 옵션 상수 (label을 한국어로 변경)
 const ORDER_STATUS_OPTIONS = [
@@ -20,13 +24,24 @@ const SellerOrderItem = ({ order }) => {
     const queryClient = useQueryClient();
     const { shopId } = useParams(); // shopId를 URL 파라미터에서 가져옵니다.
 
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     const updateStatusMutation = useMutation({
         mutationFn: ({ orderId, status }) => updateSellerOrderStatus(shopId, orderId, status),
         onSuccess: () => {
             queryClient.invalidateQueries(["sellerOrders", shopId]);
         },
         onError: (error) => {
-            alert(`상태 변경 실패: ${error.response?.data?.message || "오류 발생"}`);
+            setFormError({message: `상태 변경 실패: ${error.response?.data?.message || "오류 발생"}`, type: 'error'});
+            setShowError(true);
         }
     });
 
@@ -49,6 +64,13 @@ const SellerOrderItem = ({ order }) => {
 
     return (
         <div className="p-4 border rounded-lg shadow-sm bg-white mb-4">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <div className="flex justify-between items-start">
                 <div>
                     <p className="text-sm text-gray-500">주문 번호: {order.orderNumber}</p>
@@ -100,7 +122,10 @@ const SellerOrderItem = ({ order }) => {
                 <div className="flex items-center mt-2">
                     {order.thumbnailImageUrl && (
                         <div className="w-16 h-16 mr-3 flex-shrink-0">
-                            <img src={order.thumbnailImageUrl} alt={order.cname}
+                            <img src={order.thumbnailImageUrl
+                                ? `${S3_BASE_URL}${order.thumbnailImageUrl}`
+                                : '/cakeImage/default-cake.png'}
+                                 alt={order.cname}
                                  className="w-full h-full object-cover rounded-full"/>
                         </div>
                     )}

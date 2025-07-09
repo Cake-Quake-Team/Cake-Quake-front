@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import AlertModal from "../../common/AlertModal.jsx";
 
 function useKakaoMapScript(appKey) {
     const [scriptReady, setScriptReady] = useState(false);
@@ -17,7 +18,6 @@ function useKakaoMapScript(appKey) {
         }
 
         if (!script) {
-            console.log("스크립트 태그 추가 시작");
             script = document.createElement("script");
             script.id = SCRIPT_ID;
             script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&libraries=services&autoload=false`;
@@ -28,9 +28,7 @@ function useKakaoMapScript(appKey) {
 
         // 카카오맵 SDK와 라이브러리 로드 완료를 보장하는 콜백 함수
         const handleLoad = () => {
-            console.log("kakao.maps.load()를 통해 라이브러리 로드 대기");
             window.kakao.maps.load(() => {
-                console.log("Kakao Maps API 및 Services 라이브러리 로드 완료");
                 setScriptReady(true);
             });
         };
@@ -56,11 +54,20 @@ function MapModal({ address, onClose }) {
     const mapRef = useRef(null);
     const markerRef = useRef(null);
 
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     // 2) scriptReady가 true 이고 address가 있을 때 지도 렌더링
     useEffect(() => {
         // scriptReady 상태가 true가 될 때까지 기다림
         if (!scriptReady || !address) {
-            console.log("지도 렌더링 조건 불충족:", { scriptReady, address });
             return;
         }
 
@@ -81,10 +88,8 @@ function MapModal({ address, onClose }) {
                 if (!mapRef.current) {
                     const options = { center: coords, level: 3 };
                     mapRef.current = new window.kakao.maps.Map(container, options);
-                    console.log("🗺️ 새로운 지도 객체 생성");
                 } else {
                     mapRef.current.setCenter(coords);
-                    console.log("🗺️ 기존 지도 중심 좌표 이동");
                 }
 
                 // 기존 마커 객체가 없으면 새로 생성, 있으면 위치만 변경
@@ -93,15 +98,14 @@ function MapModal({ address, onClose }) {
                         map: mapRef.current,
                         position: coords,
                     });
-                    console.log("📍 새로운 마커 생성");
                 } else {
                     markerRef.current.setPosition(coords);
-                    console.log("📍 기존 마커 위치 변경");
                 }
 
             } else {
                 console.error("주소 검색 실패:", status);
-                alert(`주소 '${address}'에 대한 위치 정보를 찾을 수 없습니다.`);
+                setFormError({message: `주소 '${address}'에 대한 위치 정보를 찾을 수 없습니다.`, type: 'error'});
+                setShowError(true);
             }
         });
 
@@ -116,6 +120,13 @@ function MapModal({ address, onClose }) {
 
     return (
         <div className="fixed top-30 right-8 z-50 w-[95%] max-w-lg">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <div className="bg-white rounded-2xl shadow-2xl p-6">
                 <div
                     id="map"

@@ -6,6 +6,8 @@ import {useAuth} from "../../../store/AuthContext.jsx";
 
 import ShopLikeButton from '../../../components/shop/ShopLikeButton.jsx';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 //평점 별 채우기
 const renderStars=(rating)=> {
     const fullStars = Math.floor(rating);
@@ -44,7 +46,7 @@ const ShopDetailSection = ({ shop }) => {
             {/* 프로필 이미지 (원형) */}
             <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden mx-auto mb-5 border-4 border-blue-200 shadow-xl">
                 <img
-                    src={shop.thumbnailUrl ? `http://localhost/${shop.thumbnailUrl}` : '/shop_default_image.png]'}
+                    src={shop.thumbnailUrl ? `${S3_BASE_URL}${shop.thumbnailUrl}` : '/shop_default_image.png'}
                     alt={shop.shopName}
                     className="w-full h-full object-cover"
                 />

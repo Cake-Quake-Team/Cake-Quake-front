@@ -1,5 +1,7 @@
 import React from "react";
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 const ORDER_STATUS_OPTIONS = [
     { value: "RESERVATION_PENDING", label: "예약 확인 중" },
     { value: "RESERVATION_CONFIRMED", label: "예약 확정" },
@@ -77,7 +79,10 @@ const SellerOrderDetail = ({ order, onStatusChange, isUpdating }) => {
                                 {/* 썸네일 이미지 */}
                                 {product.thumbnailImageUrl && (
                                     <div className="w-20 h-20 flex-shrink-0">
-                                        <img src={product.thumbnailImageUrl} alt={product.name} className="w-full h-full object-cover rounded-md" />
+                                        <img src={product.thumbnailImageUrl
+                                            ? `${S3_BASE_URL}${product.thumbnailImageUrl}`
+                                            : '/cakeImage/default-cake.png'}
+                                             alt={product.name} className="w-full h-full object-cover rounded-md" />
                                     </div>
                                 )}
                                 <div>

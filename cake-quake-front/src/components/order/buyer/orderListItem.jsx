@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router';
 // import OrderListPage from "../../../pages/order/buyer/orderListPage.jsx";
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 export default function OrderListItem({ order }) {
     // 날짜 및 가격 형식화 (OrderList 컴포넌트나 공통 유틸에서 가져올 수 있음)
     const formatPrice = (price) => `${price?.toLocaleString()}원`;
@@ -57,7 +59,9 @@ export default function OrderListItem({ order }) {
                             {item.thumbnailImageUrl && (
                                 <div className="w-16 h-16 mr-4 flex-shrink-0">
                                     <img
-                                        src={item.thumbnailImageUrl}
+                                        src={item.thumbnailImageUrl
+                                            ? `${S3_BASE_URL}${item.thumbnailImageUrl}`
+                                            : '/cakeImage/default-cake.png'}
                                         alt={item.cname || "상품 이미지"}
                                         className="w-full h-full object-cover rounded-md"
                                         onError={(e) => { e.target.onerror = null; e.target.src="/default-cake-image.jpg"; }}

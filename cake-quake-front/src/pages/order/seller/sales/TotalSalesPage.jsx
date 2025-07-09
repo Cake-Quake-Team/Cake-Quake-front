@@ -10,6 +10,7 @@ import ProductSalesTable from '../../../../components/order/seller/sales/Product
 import ProductRankingCards from '../../../../components/order/seller/sales/ProductRankingCards';
 
 import { getSellerStatisticsPdfUrl } from '../../../../api/sellerorderApi';
+import AlertModal from "../../../../components/common/AlertModal.jsx";
 
 function TotalSalesPage() {
     const { shopId } = useParams();
@@ -25,6 +26,16 @@ function TotalSalesPage() {
     const [salesStats, setSalesStats] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     const fetchSalesStatistics = useCallback(async () => {
         if (!shopId) {
@@ -61,7 +72,8 @@ function TotalSalesPage() {
     // ⭐ PDF 다운로드 핸들러 구현 ⭐
     const handleDownload = async () => { // async 키워드 추가
         if (!shopId || !startDate || !endDate) {
-            alert("상점 ID와 조회 기간을 설정해야 보고서를 다운로드할 수 있습니다.");
+            setFormError({message: "상점 ID와 조회 기간을 설정해야 보고서를 다운로드할 수 있습니다.", type: 'error'});
+            setShowError(true);
             return;
         }
 
@@ -87,16 +99,20 @@ function TotalSalesPage() {
             link.parentNode.removeChild(link);
             window.URL.revokeObjectURL(url); // 임시 URL 해제
 
-            alert('PDF 보고서 다운로드를 시작합니다.');
+            setFormError({message: 'PDF 보고서 다운로드를 시작합니다.', type: 'success'});
+            setShowError(true);
         } catch (error) {
             console.error('PDF 다운로드 실패:', error);
             if (error.response && error.response.status === 401) {
-                alert('인증이 필요합니다. 로그인 후 다시 시도해주세요.');
+                setFormError({message: '인증이 필요합니다. 로그인 후 다시 시도해주세요.', type: 'error'});
+                setShowError(true);
                 // navigate('/login'); // 필요하다면 로그인 페이지로 리디렉션
             } else if (error.response && error.response.data && error.response.data.message) {
-                alert(`PDF 다운로드 실패: ${error.response.data.message}`);
+                setFormError({message: `PDF 다운로드 실패: ${error.response.data.message}`, type: 'error'});
+                setShowError(true);
             } else {
-                alert('PDF 다운로드 중 알 수 없는 오류가 발생했습니다.');
+                setFormError({message: 'PDF 다운로드 중 알 수 없는 오류가 발생했습니다.', type: 'error'});
+                setShowError(true);
             }
         }
     };
@@ -104,6 +120,13 @@ function TotalSalesPage() {
 
     return (
         <div className="total-sales-page-container" style={pageContainerStyle}>
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <h1 style={pageTitleStyle}>총 판매량</h1>
 
             <DateRangeSelector

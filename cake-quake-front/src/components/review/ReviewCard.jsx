@@ -3,6 +3,8 @@ import React from 'react';
 import { format } from 'date-fns';
 import { StarIcon } from '@heroicons/react/24/solid';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 export default function ReviewCard({ review, onClick }) {
     const {
         reviewId,
@@ -23,10 +25,8 @@ export default function ReviewCard({ review, onClick }) {
 
     // 이미지 URL (절대경로/상대경로 모두 대응), 없으면 public/cakeImage/default-cake.png 사용
     const imgSrc = reviewPictureUrl
-        ? (reviewPictureUrl.startsWith('http')
-            ? reviewPictureUrl
-            : `http://localhost${reviewPictureUrl}`)
-        : '/cakeImage/default-cake.png';  // public/cakeImage/default-cake.png
+        ? `${S3_BASE_URL}${reviewPictureUrl}`
+        : '/cakeImage/default-cake.png';
 
 
     return (

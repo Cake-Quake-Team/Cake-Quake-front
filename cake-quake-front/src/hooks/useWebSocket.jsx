@@ -62,11 +62,11 @@ const useWebSocket = (roomId, onMessageReceived) => {
 
         try {
             // WebSocket 객체 생성 (운영에서는 wss 사용)
-            const socket = new WebSocket(import.meta.env.VITE_WS_URL || "ws://localhost:8080/ws");
+            const socket = new WebSocket(import.meta.env.VITE_WS_URL || "wss://cakequake.cakequake.click/ws");
             console.log("[useWebSocket] 🌐 WebSocket 객체 생성됨:", socket);
 
             // stompjs의 client 메서드를 사용하여 STOMP 클라이언트 인스턴스 생성
-            const stompClient = Stomp.client(import.meta.env.VITE_WS_URL || "ws://localhost:8080/ws");
+            const stompClient = Stomp.client(import.meta.env.VITE_WS_URL || "wss://cakequake.cakequake.click/ws");
             // NOTE: stompjs (2.3.3)는 WebSocket 객체를 직접 인자로 받지 않고, brokerURL을 통해 내부적으로 WebSocket을 생성합니다.
             // 따라서 위의 `new WebSocket(...)` 라인은 사실상 필요 없지만, 기존 코드 흐름을 유지하기 위해 남겨두었습니다.
             // 실제로는 `Stomp.client(brokerURL)`이 내부적으로 WebSocket을 관리합니다.

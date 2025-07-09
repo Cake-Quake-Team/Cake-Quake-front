@@ -2,6 +2,8 @@
 
 import React from 'react';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 export default function CartItem({
                                      item,
                                      isSelected,
@@ -66,7 +68,7 @@ export default function CartItem({
             <div className="flex-shrink-0 w-20 h-20 mr-4">
                 {thumbnailImageUrl && (
                     <img
-                        src={thumbnailImageUrl}
+                        src={thumbnailImageUrl ? `${S3_BASE_URL}${thumbnailImageUrl}` : '/cakeImage/default-cake.png'}
                         alt={cname}
                         className="w-full h-full object-cover rounded"
                     />

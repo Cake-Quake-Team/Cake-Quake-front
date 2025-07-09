@@ -2,11 +2,23 @@ import { useParams } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSellerOrderDetail, updateSellerOrderStatus } from "../../../api/sellerOrderApi.jsx";
 import SellerOrderDetail from "../../../components/order/seller/sellerOrderDetail.jsx";
+import {useEffect, useState} from "react";
+import AlertModal from "../../../components/common/AlertModal.jsx";
 
 const SellerOrderDetailPage = () => {
     // ✅ shopId와 orderId를 모두 useParams로 가져옴
     const { shopId, orderId } = useParams();
     const queryClient = useQueryClient();
+
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     const { data: order, isLoading, error } = useQuery({ // ✅ error 상태 추가
         queryKey: ["sellerOrderDetail", shopId, orderId], // ✅ queryKey에 shopId 포함
@@ -30,7 +42,8 @@ const SellerOrderDetailPage = () => {
         },
         onError: (mutationError) => { // ✅ 에러 객체 이름을 명확히
             console.error("❌ 주문 상태 변경 실패:", mutationError);
-            alert(`상태 변경 중 오류가 발생했습니다: ${mutationError.response?.data?.message || mutationError.message}`);
+            setFormError({message: `상태 변경 중 오류가 발생했습니다: ${mutationError.response?.data?.message || mutationError.message}`, type: 'error'});
+            setShowError(true);
         }
     });
 
@@ -52,6 +65,14 @@ const SellerOrderDetailPage = () => {
 
     return (
         <div className="max-w-3xl mx-auto p-4">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
+
             <SellerOrderDetail
                 order={order}
                 onStatusChange={handleStatusChange}

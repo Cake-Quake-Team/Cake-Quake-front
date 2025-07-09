@@ -28,7 +28,6 @@ const RequireAuth = ({ allowedRoles }) => {
 //   return <Outlet />;
     const { user } = useAuth()
 
-    console.log("---RequireAuth---user: ", user)
     // 아직 사용자 정보 로딩 중일 수 있으므로 null 체크
     if (user === null) {
         return <Navigate to="/auth/signin" replace />

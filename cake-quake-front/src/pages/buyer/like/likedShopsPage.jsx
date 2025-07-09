@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { getLikedShops } from '../../../api/likeApi'; // 찜한 매장 API
 import { useAuth } from '../../../store/AuthContext'; // 사용자 인증 정보 훅
-import { useNavigate } from 'react-router'; // 페이지 이동 훅
+import { useNavigate } from 'react-router';
+import AlertModal from "../../../components/common/AlertModal.jsx"; // 페이지 이동 훅
 
 const LikedShopsPage = () => {
     const { user } = useAuth();
@@ -10,11 +11,13 @@ const LikedShopsPage = () => {
     const [likedShops, setLikedShops] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         const fetchLikedShops = async () => {
             if (!user || !user.userId) {
-                alert("로그인이 필요합니다.");
+                setFormError({message: "로그인이 필요합니다.", type: 'error'});
                 navigate('/login');
                 return;
             }
@@ -25,6 +28,7 @@ const LikedShopsPage = () => {
             } catch (err) {
                 console.error("찜한 매장 목록 불러오기 실패:", err);
                 setError("찜한 매장 목록을 불러오는 데 실패했습니다.");
+                setShowError(true);
             } finally {
                 setIsLoading(false);
             }
@@ -37,7 +41,8 @@ const LikedShopsPage = () => {
         if (shopId) {
             navigate(`/buyer/shops/${shopId}`); // 매장 상세 페이지로 이동
         } else {
-            alert("매장 정보를 불러올 수 없습니다. 다시 시도해주세요.");
+            setFormError({message: "매장 정보를 불러올 수 없습니다. 다시 시도해주세요.", type: 'error'});
+            setShowError(true);
             console.error("Missing shopId for navigation:", shopId);
         }
     };
@@ -48,6 +53,13 @@ const LikedShopsPage = () => {
 
     return (
         <div className="container mx-auto p-4">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <h1 className="text-2xl font-bold mb-4">찜한 매장</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {likedShops.map(shop => (

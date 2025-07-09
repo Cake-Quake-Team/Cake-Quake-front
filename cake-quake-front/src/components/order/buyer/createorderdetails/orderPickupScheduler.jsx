@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from "react"; // useCallback 
 import Calendar from "react-calendar";
 import 'react-calendar/dist/Calendar.css';
 // API 임포트 경로 수정 및 getShopDetails 추가
-import { getAvailableShops, getShopOperatingHours, getOccupiedTimeSlots, getShopDetails } from "../../../../api/scheduleApi"; // getShopDetails를 임포트합니다.
+import { getAvailableShops, getShopOperatingHours, getOccupiedTimeSlots, getShopDetails } from "../../../../api/scheduleApi";
+import AlertModal from "../../../common/AlertModal.jsx"; // getShopDetails를 임포트합니다.
 
 const OrderPickupScheduler = ({
                                   initialPickupDateFromState,
@@ -18,6 +19,15 @@ const OrderPickupScheduler = ({
     const [selectedShop, setSelectedShop] = useState(initialSelectedShopFromState); // 사용자가 선택하거나 초기 고정된 매장의 상세 정보
     const [shopOperatingHours, setShopOperatingHours] = useState(null); // 선택된 매장의 운영 시간
     const [occupiedTimeSlots, setOccupiedTimeSlots] = useState([]); // 선택된 매장/날짜의 예약된 시간대
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     const now = new Date(); // 캘린더 minDate/maxDate 기준 시각
 
@@ -45,7 +55,8 @@ const OrderPickupScheduler = ({
                         setSelectedShop(details); // selectedShop 상태를 API로 가져온 상세 정보로 업데이트
                     } catch (error) {
                         console.error(`매장 상세 정보 조회 실패 (shopId: ${finalShopId}):`, error);
-                        alert('매장 상세 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.');
+                        setFormError({message: '매장 상세 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.', type: 'error'});
+                        setShowError(true);
                         setSelectedShop(null); // 오류 발생 시 매장 선택 초기화 (UI에 매장 정보가 표시되지 않음)
                         setShopOperatingHours(null); // 운영 시간도 초기화
                         setOccupiedTimeSlots([]); // 예약 시간도 초기화
@@ -65,7 +76,8 @@ const OrderPickupScheduler = ({
                         setOccupiedTimeSlots(occupied);
                     } catch (error) {
                         console.error('스케줄 조회 실패:', error);
-                        alert('스케줄 정보를 불러오는 데 실패했습니다.');
+                        setFormError({message: '스케줄 정보를 불러오는 데 실패했습니다.', type: 'error'});
+                        setShowError(true);
                         setShopOperatingHours(null);
                         setOccupiedTimeSlots([]);
                     }
@@ -75,7 +87,8 @@ const OrderPickupScheduler = ({
                         setAvailableShops(shops);
                     } catch (error) {
                         console.error('예약 가능 매장 목록 조회 실패:', error);
-                        alert('예약 가능한 매장 목록을 불러오는 데 실패했습니다.');
+                        setFormError({message: '예약 가능한 매장 목록을 불러오는 데 실패했습니다.', type: 'error'});
+                        setShowError(true);
                         setAvailableShops([]);
                     }
                 }
@@ -129,7 +142,6 @@ const OrderPickupScheduler = ({
 
     const handleTimeSelect = useCallback((time) => {
         setSelectedTime(time); // 선택된 시간 상태 업데이트
-        console.log('최종 선택된 시간:', time);
     }, []); // useCallback의 의존성 배열 (여기서는 외부 의존성 없음)
 
 
@@ -198,6 +210,13 @@ const OrderPickupScheduler = ({
 
     return (
         <>
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <div style={{ flex: '1 1 45%', minWidth: '320px', marginBottom: '20px' }}>
                 <h2>1. 픽업 날짜를 선택해주세요</h2>
                 <div style={{ width: '100%', maxWidth: '400px', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden', margin: '0 auto' }}>

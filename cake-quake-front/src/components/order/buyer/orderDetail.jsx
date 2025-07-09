@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router';
+import AlertModal from "../../common/AlertModal.jsx";
+import OKModal from "../../common/OKModal.jsx";
+
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
 export default function OrderDetail({
                                         order,
@@ -11,6 +15,16 @@ export default function OrderDetail({
                                     }) {
     const [isCancelling, setIsCancelling] = useState(false);
     const navigate = useNavigate();
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+    const [cancelModalProps, setCancelModalProps] = useState({ show: false });
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     // 주문 상태 한글화 맵 (기존과 동일)
     const orderStatusMap = {
@@ -23,20 +37,24 @@ export default function OrderDetail({
         NO_SHOW: '노쇼',
     };
 
-    const handleCancel = async () => {
-        const confirmed = window.confirm('정말로 이 주문을 취소하시겠습니까?');
-        if (!confirmed) return;
+    const handleCancelClick = () => {
+        setCancelModalProps({ show: true });
+    };
 
+    const handleConfirmCancel = async () => {
+        setCancelModalProps({ show: false });
         setIsCancelling(true);
         try {
             await onCancel(order.orderId);
         } catch (_err) {
             console.error('❌ 주문 취소 실패:', _err);
-            alert('주문 취소 중 오류가 발생했습니다.');
+            setFormError({ message: '주문 취소 중 오류가 발생했습니다.', type: 'error' });
+            setShowError(true);
         } finally {
             setIsCancelling(false);
         }
     };
+
 
     const handleWriteReview = () => {
         const firstCakeId = order.items && order.items.length > 0 ? order.items[0].cakeId : null;
@@ -109,6 +127,19 @@ export default function OrderDetail({
 
     return (
         <div className="p-6 max-w-3xl mx-auto bg-white shadow-md rounded">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
+            <OKModal
+                show={cancelModalProps.show}
+                message="정말로 이 주문을 취소하시겠습니까?"
+                onConfirm={handleConfirmCancel}
+                onCancel={() => setCancelModalProps({ show: false })}
+            />
             <h2 className="text-2xl font-bold mb-4">주문 상세 #{order.orderNumber ?? order.orderId}</h2>
 
             <div className="mb-6 space-y-1 text-gray-800">
@@ -125,7 +156,9 @@ export default function OrderDetail({
                             {item.thumbnailImageUrl && (
                                 <div className="w-24 h-24 mr-4 flex-shrink-0">
                                     <img
-                                        src={item.thumbnailImageUrl}
+                                        src={item.thumbnailImageUrl
+                                            ? `${S3_BASE_URL}${item.thumbnailImageUrl}`
+                                            : '/cakeImage/default-cake.png'}
                                         alt={item.cname || "케이크 이미지"}
                                         className="w-full h-full object-cover rounded-md"
                                         onError={(e) => { e.target.onerror = null; e.target.src="/default-cake-image.jpg"; }}
@@ -220,7 +253,7 @@ export default function OrderDetail({
 
                 {showCancelButton && ( // 조건부 렌더링
                     <button
-                        onClick={handleCancel}
+                        onClick={handleCancelClick}
                         disabled={isCancelButtonDisabled} // 취소 진행 중일 때 비활성화
                         className={`px-4 py-2 rounded ${isCancelButtonDisabled
                             ? 'bg-gray-400 text-gray-700 cursor-not-allowed'

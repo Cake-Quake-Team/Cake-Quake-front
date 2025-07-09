@@ -2,7 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import { Upload } from 'lucide-react';
 import ConfirmationModal from '../ConfirmationModal.jsx'; // 확인 모달 컴포넌트 임포트
 
-const BASE_URL = "http://localhost/";
+const BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
 const ShopImageEditor = ({
                              images, // 부모로부터 받은 이미지 배열
@@ -27,19 +27,14 @@ const ShopImageEditor = ({
             // 썸네일이 있으면 썸네일 URL, 없으면 첫 번째 이미지 URL을 메인 이미지로 설정
             const selectedMainImageUrl = thumbnail ? `${BASE_URL}${thumbnail.shopImageUrl}` : `${BASE_URL}${images[0].shopImageUrl}`;
             setMainImage(selectedMainImageUrl);
-            console.log("📍 useEffect: 메인 이미지 설정됨:", selectedMainImageUrl);
         } else {
             setMainImage(null);
-            console.log("📍 useEffect: 이미지가 없거나 비어있어 메인 이미지가 null로 설정됨.");
         }
-        console.log("📍 useEffect: 현재 images 상태 (업데이트 후):", images);
-        console.log("📍 useEffect: 현재 thumbnailIndex:", thumbnailIndex);
     }, [images, thumbnailIndex]); // images와 thumbnailIndex 변경을 모두 감지
 
     // 메인 이미지를 클릭하면 그 이미지를 메인으로 설정
     const handleMainImageClick = (imageUrl) => {
         setMainImage(`${BASE_URL}${imageUrl}`);
-        console.log("🖼️ 썸네일 클릭: 메인 이미지 변경됨 ->", `${BASE_URL}${imageUrl}`);
     };
 
     // 새 파일 추가 또는 기존 파일 변경 시 호출 (CakeImageUploadForm의 handleChange와 유사)
@@ -47,11 +42,9 @@ const ShopImageEditor = ({
         const files = Array.from(e.target.files);
 
         if (files.length === 0) {
-            console.log("⚠️ handleFileAddOrChange: 선택된 파일 없음.");
             return;
         }
 
-        console.log("📂 handleFileAddOrChange: 선택된 파일 수:", files.length);
 
         const newImagesToProcess = files.map(file => ({
             shopImageId: null, // 새로운 파일이므로 ID 없음
@@ -66,7 +59,6 @@ const ShopImageEditor = ({
                 return new Promise((resolve) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
-                        console.log(`✨ FileReader: ${img.file.name} (크기: ${img.file.size} bytes) -> Base64 URL 생성 완료.`);
                         resolve({
                             ...img,
                             shopImageUrl: reader.result, // 미리보기 URL (base64)
@@ -81,13 +73,10 @@ const ShopImageEditor = ({
                 if (targetIndex !== null) { // 기존 이미지 교체
                     // ... (기존 로직)
                 } else { // 새 이미지 추가
-                    console.log("➕ 새 이미지 추가: 처리된 이미지 객체들:", processedNewImages); // 새로 추가된 이미지 객체 자체를 확인
                     updatedImages = [...prevImages, ...processedNewImages];
                 }
 
-                console.log("➡️ setImages 직전: 업데이트될 이미지 배열:", updatedImages); // setImages 호출 직전의 배열
                 // ... (이후 썸네일 로직)
-                console.log("✅ setImages 호출: 이미지 목록 업데이트 완료. 최종 setImages에 전달될 배열:", updatedImages); // setImages에 전달되는 최종 배열
                 return updatedImages;
             });
         });
@@ -101,12 +90,10 @@ const ShopImageEditor = ({
     // 이미지 추가 버튼 클릭 시 호출 (실제 파일 입력 클릭)
     const handleAddImageClick = () => {
         inputRef.current.click(); // 숨겨진 파일 입력 필드 클릭
-        console.log("👆 '이미지 추가' 버튼 클릭됨.");
     };
 
     // 썸네일 라디오 버튼 변경을 처리하는 함수
     const handleThumbnailChange = (index) => {
-        console.log(`✨ 썸네일 변경 요청: 인덱스 ${index}로 썸네일 설정.`);
         setThumbnailIndex(index);
         setImages((prev) =>
             prev.map((img, i) => ({
@@ -119,7 +106,6 @@ const ShopImageEditor = ({
                 ? URL.createObjectURL(images[index].file)
                 : images[index].shopImageUrl;
             setMainImage(`${BASE_URL}${imageUrl}`);
-            console.log("✨ 썸네일 변경: 메인 이미지도 해당 썸네일로 업데이트됨.");
         }
     };
 
@@ -127,34 +113,27 @@ const ShopImageEditor = ({
     const handleDeleteClick = (index) => {
         setDeleteTargetIndex(index);
         setIsConfirmOpen(true);
-        console.log(`🗑️ 삭제 요청: 인덱스 ${index}의 이미지. 확인 모달 열림.`);
     };
 
     // 이미지 삭제 확인 처리
     const handleConfirmDelete = () => {
-        console.log(`🗑️ 삭제 확인됨: 인덱스 ${deleteTargetIndex}의 이미지 삭제 진행.`);
         const updatedImages = images.filter((_, i) => i !== deleteTargetIndex);
 
         let newThumbnailIndex = null;
         if (thumbnailIndex !== null) {
             if (deleteTargetIndex < thumbnailIndex) {
                 newThumbnailIndex = thumbnailIndex - 1;
-                console.log(`🗑️ 썸네일 인덱스 조정: 삭제 대상이 썸네일보다 앞. 새 썸네일 인덱스: ${newThumbnailIndex}`);
             } else if (deleteTargetIndex === thumbnailIndex) {
                 if (updatedImages.length > 0) {
                     newThumbnailIndex = 0; // 썸네일이 삭제되면 첫 번째 이미지를 새 썸네일로
-                    console.log(`🗑️ 썸네일 삭제: 썸네일이 삭제되어 첫 번째 이미지를 새 썸네일(${newThumbnailIndex})로 설정.`);
                 } else {
                     newThumbnailIndex = null; // 이미지가 없으면 썸네일 없음
-                    console.log("🗑️ 썸네일 삭제: 모든 이미지가 삭제되어 썸네일 없음.");
                 }
             } else { // deleteTargetIndex > thumbnailIndex
                 newThumbnailIndex = thumbnailIndex;
-                console.log(`🗑️ 썸네일 인덱스 유지: 삭제 대상이 썸네일보다 뒤. 썸네일 인덱스: ${newThumbnailIndex}`);
             }
         } else if (updatedImages.length > 0) {
             newThumbnailIndex = 0; // 썸네일이 없었지만, 이미지가 남아있으면 첫 번째 이미지를 썸네일로
-            console.log("🗑️ 삭제 후: 썸네일이 없었고, 이미지가 남아있어 첫 번째 이미지를 썸네일로 설정.");
         }
 
         setThumbnailIndex(newThumbnailIndex);
@@ -164,13 +143,11 @@ const ShopImageEditor = ({
             isThumbnail: i === newThumbnailIndex // 새 썸네일 인덱스에 따라 isThumbnail 업데이트
         }));
         setImages(finalImages);
-        console.log("🗑️ setImages 호출: 이미지 목록 및 썸네일 상태 업데이트 완료.");
 
 
         // 메인 이미지 조정
         if (finalImages.length === 0) {
             setMainImage(null);
-            console.log("🗑️ 메인 이미지 조정: 모든 이미지가 삭제되어 메인 이미지 없음.");
         } else if (deleteTargetIndex === thumbnailIndex || mainImage === `${BASE_URL}${images[deleteTargetIndex]?.shopImageUrl}`) {
             // 삭제된 이미지가 메인 이미지였거나 썸네일이었다면, 새로운 썸네일 또는 첫 번째 이미지를 메인으로 설정
             const newMainImageObj = finalImages[newThumbnailIndex !== null ? newThumbnailIndex : 0];
@@ -178,9 +155,6 @@ const ShopImageEditor = ({
                 ? URL.createObjectURL(newMainImageObj.file)
                 : newMainImageObj?.shopImageUrl;
             setMainImage(`${BASE_URL}${src}`);
-            console.log(`🗑️ 메인 이미지 조정: 삭제된 이미지가 메인/썸네일이었음. 새 메인 이미지: ${BASE_URL}${src}`);
-        } else {
-            console.log("🗑️ 메인 이미지 조정: 메인 이미지가 삭제 대상이 아니므로 유지.");
         }
 
         setDeleteTargetIndex(null);
@@ -191,14 +165,12 @@ const ShopImageEditor = ({
     const handleCancelDelete = () => {
         setDeleteTargetIndex(null);
         setIsConfirmOpen(false);
-        console.log("❌ 이미지 삭제 취소됨.");
     };
 
     // 이미지가 변경될 때마다 스크롤을 가장 오른쪽으로 이동
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
-            console.log("➡️ 스크롤 이동: 이미지 목록이 변경되어 가장 오른쪽으로 스크롤됨.");
         }
     }, [images]);
 

@@ -21,7 +21,6 @@ const VerifyModal = ({ phoneNumber, type, onClose, onSuccess }) => {
                 phoneNumber,
                 type
             })
-            console.log(res)
             setServerCode(res.data.verificationCode)
             setModalMsg("") // 이전 메시지 초기화
             setSent(true)

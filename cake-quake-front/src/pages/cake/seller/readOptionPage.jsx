@@ -13,6 +13,7 @@ import {
 import OptionDetail from '../../../components/cake/optionComponents/optionDetailComponent';
 import { useAuth } from "../../../store/AuthContext.jsx";
 import AlertModal from "../../../components/common/AlertModal";
+import OKModal from "../../../components/common/OKModal.jsx";
 
 function OptionReadPage() {
     const { user } = useAuth();
@@ -24,6 +25,8 @@ function OptionReadPage() {
     const [isEditMode, setIsEditMode] = useState(false); // 수정 모드 상태
     const [formError, setFormError] = useState(null);
     const [showError, setShowError] = useState(false);
+    const [deleteModalProps, setDeleteModalProps] = useState({ show: false });
+
 
     // 데이터를 다시 불러오는 공통 함수
     const fetchOptionDetail = async () => {
@@ -60,22 +63,26 @@ function OptionReadPage() {
         fetchOptionDetail();
     }, [user.shopId, optionId]);
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (isEditMode) {
             setIsEditMode(false);
         } else {
-            if (window.confirm("정말로 이 옵션을 삭제하시겠습니까?")) {
-                try {
-                    await deleteOptionType(Number(user.shopId), Number(optionId));
-                    setFormError({message: "옵션이 삭제되었습니다.", type: 'success' });
-                    setShowError(true);
-                    navigate(`/shops/${user.shopId}`);
-                } catch (err) {
-                    console.error("옵션 삭제 실패:", err);
-                    setFormError({message: "옵션 삭제에 실패했습니다.", type: 'error' });
-                    setShowError(true);
-                }
-            }
+            setDeleteModalProps({ show: true }); // 삭제 확인 모달 열기
+        }
+    };
+
+    // 삭제 확정 핸들러
+    const handleConfirmDelete = async () => {
+        setDeleteModalProps({ show: false });
+        try {
+            await deleteOptionType(Number(user.shopId), Number(optionId));
+            setFormError({ message: "옵션이 삭제되었습니다.", type: 'success' });
+            setShowError(true);
+            navigate(`/shops/${user.shopId}`);
+        } catch (err) {
+            console.error("옵션 삭제 실패:", err);
+            setFormError({ message: "옵션 삭제에 실패했습니다.", type: 'error' });
+            setShowError(true);
         }
     };
 
@@ -168,6 +175,13 @@ function OptionReadPage() {
                 type={formError?.type || (formError ? 'success' : undefined)}
                 show={showError}
                 onClose={() => setShowError(false)}
+            />
+
+            <OKModal
+                show={deleteModalProps.show}
+                message="정말로 이 옵션을 삭제하시겠습니까?"
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeleteModalProps({ show: false })}
             />
         </>
     );

@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import AlertModal from '../common/AlertModal';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 export default function ReviewItem({
                                        review,
                                        onEdit,
@@ -61,8 +63,8 @@ export default function ReviewItem({
                     <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-md border">
                         {review.reviewPictureUrl ? (
                             <img
-                                src={`http://localhost${review.reviewPictureUrl}`}
-                                alt=""
+                                src={review.reviewPictureUrl ? `${S3_BASE_URL}${review.reviewPictureUrl}` : '/cakeImage/default-cake.png'}
+                                alt="리뷰이미지"
                                 className="object-cover w-full h-full"
                             />
                         ) : (

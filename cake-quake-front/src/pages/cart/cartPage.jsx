@@ -6,6 +6,7 @@ import CartPrice from '../../components/cart/CartPrice';
 import CartActions from "../../components/cart/cartActions.jsx";
 import DeleteModal from '../../components/cart/DeleteModal';
 import SelectDeleteModal from '../../components/cart/SelectDeleteModal';
+import AlertModal from "../../components/common/AlertModal.jsx";
 
 const SuccessMessageModal = ({ message, onClose }) => { // onConfirm 대신 onClose로 변경
     const navigate = useNavigate(); // useNavigate 훅 사용
@@ -52,6 +53,16 @@ export default function CartPage() {
 
     const isAllSelected = cartItems.length > 0 && selectedIds.size === cartItems.length;
 
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
+
     useEffect(() => {
         const currentItemIds = new Set(cartItems.map(item => item.cartItemId));
         const newSelectedIds = new Set();
@@ -93,7 +104,8 @@ export default function CartPage() {
             await updateItem(id, newQty);
         } catch (e) {
             console.error('수량 변경 실패:', e);
-            alert('수량 변경에 실패했습니다.');
+            setFormError({message: '수량 변경에 실패했습니다.', type: 'error'});
+            setShowError(true);
             fetchCart();
         }
     };
@@ -104,7 +116,8 @@ export default function CartPage() {
             openModal('success', null, '상품이 장바구니에서 삭제되었습니다.');
         } catch (e) {
             console.error('단일 상품 삭제 실패:', e);
-            alert('상품 삭제에 실패했습니다.');
+            setFormError({message: '상품 삭제에 실패했습니다.', type: 'error'});
+            setShowError(true);
         } finally {
             closeModal();
         }
@@ -117,7 +130,8 @@ export default function CartPage() {
             openModal('success', null, '선택된 상품들이 장바구니에서 삭제되었습니다.');
         } catch (e) {
             console.error('선택 상품 삭제 실패:', e);
-            alert('선택된 상품 삭제에 실패했습니다.');
+            setFormError({message: '선택된 상품 삭제에 실패했습니다.', type: 'error'});
+            setShowError(true);
         } finally {
             closeModal();
         }
@@ -125,11 +139,13 @@ export default function CartPage() {
 
     const handleOpenClearAllModal = () => {
         if (!isAllSelected) {
-            alert("전체 선택을 해야만 장바구니를 비울 수 있습니다.");
+            setFormError({message: "전체 선택을 해야만 장바구니를 비울 수 있습니다.", type: 'error'});
+            setShowError(true);
             return;
         }
         if (cartItems.length === 0) {
-            alert("장바구니가 이미 비어있습니다.");
+            setFormError({message: "장바구니가 이미 비어있습니다.", type: 'error'});
+            setShowError(true);
             return;
         }
         openModal('all');
@@ -142,7 +158,8 @@ export default function CartPage() {
             openModal('success', null, '장바구니가 모두 비워졌습니다.');
         } catch (e) {
             console.error('장바구니 전체 비우기 실패:', e);
-            alert('장바구니를 비우는 데 실패했습니다.');
+            setFormError({message: '장바구니를 비우는 데 실패했습니다.', type: 'error'});
+            setShowError(true);
         } finally {
             closeModal();
         }
@@ -154,7 +171,8 @@ export default function CartPage() {
     const handleOrderSelected = () => {
         const selectedItems = cartItems.filter(item => selectedIds.has(item.cartItemId));
         if (selectedItems.length === 0) {
-            alert("주문할 상품을 1개 이상 선택해주세요.");
+            setFormError({message: "주문할 상품을 1개 이상 선택해주세요.", type: 'error'});
+            setShowError(true);
             return;
         }
         navigate('/buyer/orders/create', { state: { selectedItems } });
@@ -163,7 +181,8 @@ export default function CartPage() {
     // ⭐ [추가] 전체 주문 핸들러 ⭐
     const handleOrderAll = () => {
         if (cartItems.length === 0) {
-            alert("장바구니가 비어있습니다. 상품을 담아주세요.");
+            setFormError({message: "장바구니가 비어있습니다. 상품을 담아주세요.", type: 'error'});
+            setShowError(true);
             return;
         }
         // 모든 장바구니 아이템을 CreateOrder 페이지로 전달
@@ -174,6 +193,13 @@ export default function CartPage() {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-6">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <h1 className="text-3xl font-bold mb-6 text-center">CART</h1>
 
             {isCartEmpty ? (

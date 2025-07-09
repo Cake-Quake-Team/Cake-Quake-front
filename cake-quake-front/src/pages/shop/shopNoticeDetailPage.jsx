@@ -2,6 +2,7 @@ import {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router";
 import {deleteShopNotice, getShopNoticeDetail} from "../../api/shopApi.jsx";
 import ConfirmationModal from "../../components/shop/confirmationModal.jsx";
+import AlertModal from "../../components/common/AlertModal.jsx";
 //판매자용
 const ShopNoticeDetailPage = () => {
     // URL에서 매장 ID (cid)와 공지사항 ID (nid)를 가져와 바로 shopId와 noticeId로 할당
@@ -10,7 +11,15 @@ const ShopNoticeDetailPage = () => {
     const [noticeDetail, setNoticeDetail] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showError, setShowError] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); //삭제 모달
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     useEffect(() => {
         const fetchNoticeDetail = async () => {
@@ -21,7 +30,8 @@ const ShopNoticeDetailPage = () => {
                 setNoticeDetail(data);
             } catch (err) {
                 console.error('공지사항 상세 불러오기 실패:', err);
-                setError("공지사항 상세 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.");
+                setError({message: "공지사항 상세 정보를 불러오는 데 실패했습니다. 다시 시도해주세요.", type: 'error'});
+                setShowError(true);
             } finally {
                 setIsLoading(false);
             }
@@ -32,7 +42,8 @@ const ShopNoticeDetailPage = () => {
             fetchNoticeDetail();
         } else {
             // URL 파라미터가 유효하지 않은 경우
-            setError("유효하지 않은 공지사항 정보입니다.");
+            setError({message: "유효하지 않은 공지사항 정보입니다.", type: 'error'});
+            setShowError(true);
             setIsLoading(false);
         }
     }, [shopId, noticeId]); // shopId 또는 noticeId가 변경될 때마다 재실행
@@ -44,7 +55,8 @@ const ShopNoticeDetailPage = () => {
     const handleConfirmDelete = async () => {
         setIsDeleteModalOpen(false);
         await deleteShopNotice(shopId, noticeId);
-        alert("공지사항이 성공적으로 삭제되었습니다.");
+        setError({message: "공지사항이 성공적으로 삭제되었습니다.", type: 'success'});
+        setShowError(true);
         navigate(`/shops/read/${shopId}/notices`);
     };
 
@@ -67,6 +79,13 @@ const ShopNoticeDetailPage = () => {
             className="flex-grow max-w-4xl w-full mx-auto px-4 py-12 md:px-0">
             <div
                 className="p-8 bg-white rounded-2xl shadow-xl border border-gray-100">
+                {showError && error && (
+                    <AlertModal
+                        message={error.message}
+                        type={error.type || "error"}
+                        show={showError}
+                    />
+                )}
                 <h1 className="text-4xl font-extrabold mb-4 text-gray-900 leading-tight"> 
                     {noticeDetail.title}
                 </h1>

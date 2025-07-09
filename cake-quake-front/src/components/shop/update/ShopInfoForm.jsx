@@ -6,8 +6,6 @@ const ShopInfoForm = ({ form, onChange }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         onChange({ ...form, [name]: value });
-        console.log(`ShopInfoForm - handleChange: Updating field '${name}' to '${value}'.`);
-        console.log("ShopInfoForm - handleChange: New form state (to be passed up):", { ...form, [name]: value });
     };
 
     return (

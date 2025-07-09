@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import CreateOrderComponent from '../../../components/order/buyer/createOrder';
 import useCart from '../../../hooks/useCart';
 import { useAuth } from '../../../store/AuthContext';
 import { useNavigate, useLocation } from 'react-router';
+import AlertModal from "../../../components/common/AlertModal.jsx";
 // import PickupScheduler from '../../../components/scheduler/PickupScheduler'; // PickupScheduler 임포트 제거
 
 export default function CreateOrderPage() {
@@ -13,6 +14,16 @@ export default function CreateOrderPage() {
     const selectedItemsFromState = location.state?.selectedItems || null;
     const { items: allCartItems } = useCart();
     const itemsToOrder = selectedItemsFromState || allCartItems;
+
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     // pickupInfo 상태 제거
     // const [pickupInfo, setPickupInfo] = useState({
@@ -33,7 +44,8 @@ export default function CreateOrderPage() {
 
     useEffect(() => {
         if (!itemsToOrder || itemsToOrder.length === 0) {
-            alert("주문할 상품 정보가 없습니다. 장바구니로 돌아갑니다.");
+            setFormError({message: "주문할 상품 정보가 없습니다. 장바구니로 돌아갑니다.", type: "error"});
+            setShowError(true);
             navigate('/buyer/cart');
         }
     }, [itemsToOrder, navigate]);
@@ -53,6 +65,13 @@ export default function CreateOrderPage() {
 
     return (
         <div className="max-w-lg mx-auto p-6 bg-white shadow-md rounded">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <h2 className="text-2xl font-semibold mb-6">주문 생성</h2> {/* 제목 변경 */}
 
             {/* <PickupScheduler onComplete={handlePickupSelectionComplete} /> 제거 */}

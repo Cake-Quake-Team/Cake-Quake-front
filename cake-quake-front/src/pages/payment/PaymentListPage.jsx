@@ -37,7 +37,6 @@ export default function PaymentListPage() {
     if (payments.length === 0) {
         return (
             <div className="p-6 text-center">
-                <img src="/images/empty-state.svg" alt="No payments" className="mx-auto mb-4 w-40 h-40" />
                 <p className="text-gray-600">조회된 결제가 없습니다.</p>
             </div>
         );

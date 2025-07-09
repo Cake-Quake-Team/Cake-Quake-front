@@ -3,6 +3,7 @@ import ShopInfoForm from './ShopInfoForm';
 import ShopImageEditor from './ShopImageEditor';
 import { getShopDetail, updateShop } from '../../../api/shopApi.jsx';
 import ShopImageGallery from "../read/ShopImageGallery.jsx";
+import AlertModal from "../../common/AlertModal.jsx";
 
 const ShopEditor = ({ shopId }) => {
     // 매장 기본 정보 및 기존 이미지 URL을 관리하는 상태
@@ -25,17 +26,21 @@ const ShopEditor = ({ shopId }) => {
     const [editorImages, setEditorImages] = useState([]);
     const [editorThumbnailIndex, setEditorThumbnailIndex] = useState(null);
 
-    console.log("➡️ ShopEditor.jsx 컴포넌트 렌더링 시작");
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
 
     useEffect(() => {
         const fetchShop = async () => {
             try {
                 const data = await getShopDetail(shopId);
-                console.log("🎉 ShopEditor: getShopDetail 성공. 불러온 원본 데이터:", data); // 원본 데이터 확인
-                console.log("🔍 ShopEditor: data.images 값 직접 확인:", data.images); // images 필드 값 직접 확인
-                console.log("🔍 ShopEditor: typeof data.images:", typeof data.images); // data.images의 타입 확인
-                console.log("🔍 ShopEditor: Array.isArray(data.images):", Array.isArray(data.images)); // 배열인지 확인
 
                 const initialImages = data.images || []; // data.images가 undefined일 경우 빈 배열 사용
                 setForm({
@@ -44,14 +49,14 @@ const ShopEditor = ({ shopId }) => {
                 });
 
                 setEditorImages(initialImages); // images 필드 사용
-                console.log("✨ ShopEditor: setEditorImages로 초기화됨. 초기 이미지:", initialImages); // 초기화된 값 확인
 
                 const initialThumbnail = (initialImages).findIndex(img => img.isThumbnail);
                 setEditorThumbnailIndex(initialThumbnail !== -1 ? initialThumbnail : null);
 
             } catch (error) {
                 console.error("🚨 ShopEditor: 매장 상세 정보를 불러오는 데 실패했습니다:", error);
-                alert("매장 정보를 불러오는 중 오류가 발생했습니다.");
+                setFormError({message: "매장 정보를 불러오는 중 오류가 발생했습니다.", type: "error"});
+                setShowError(true);
             }
         };
         if (shopId) {
@@ -59,8 +64,6 @@ const ShopEditor = ({ shopId }) => {
         }
     }, [shopId]);
 
-// return 문 직전 (렌더링 직전)
-    console.log("➡️ ShopEditor.jsx 렌더링 중. 현재 editorImages:", editorImages);
 
     // ShopInfoForm에서 입력 값이 변경될 때 호출되는 핸들러
     const handleFormChange = (newFormData) => {
@@ -95,8 +98,6 @@ const ShopEditor = ({ shopId }) => {
             ...form, // ShopInfoForm에서 관리되는 모든 필드 포함
             imageUrls: dtoImageUrls, // 기존/신규 이미지 DTO 정보 모두 포함
         };
-        console.log("전송 전 shopUpdateDTO:", shopUpdateDTO);
-        console.log("전송 전 filesToUpload:", filesToUpload);
 
         try {
             await updateShop(shopId, {
@@ -104,8 +105,8 @@ const ShopEditor = ({ shopId }) => {
                 files: filesToUpload,
             });
 
-            alert('매장 정보가 성공적으로 수정되었습니다.');
-
+            setFormError({message: '매장 정보가 성공적으로 수정되었습니다.', type: "success"});
+            setShowError(true);
             // 성공 후 상태 갱신 로직: 서버에서 최신 데이터를 다시 불러와 UI를 업데이트
             // 이렇게 하면 새로 업로드된 이미지의 실제 서버 URL이 반영됩니다.
             const updatedData = await getShopDetail(shopId);
@@ -119,16 +120,24 @@ const ShopEditor = ({ shopId }) => {
 
         } catch (error) {
             if (error.response && error.response.data && error.response.data.message) {
-                alert(`매장 정보 수정 중 오류가 발생했습니다: ${error.response.data.message}`);
+                setFormError({message: `매장 정보 수정 중 오류가 발생했습니다: ${error.response.data.message}`, type: 'error'});
+                setShowError(true);
             } else {
-                alert('매장 정보 수정 중 알 수 없는 오류가 발생했습니다.');
+                setFormError({message: '매장 정보 수정 중 알 수 없는 오류가 발생했습니다.', type: 'error'});
+                setShowError(true);
             }
-            console.error("매장 정보 저장 오류:", error);
         }
     };
 
     return (
         <div className="p-6 max-w-3xl mx-auto">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             {/* 매장 기본 정보 입력 폼 */}
             <ShopInfoForm form={form} onChange={handleFormChange} />
 
