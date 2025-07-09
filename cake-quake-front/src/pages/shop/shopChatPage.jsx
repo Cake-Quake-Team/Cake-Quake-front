@@ -50,7 +50,6 @@ const ShopChatPage = ({ initialRoomId }) => {
 
         const messagePayload = {
             roomId: currentRoomId, // ⭐ currentRoomId 사용
-            senderUid: user.uid,
             message: input
         };
 
