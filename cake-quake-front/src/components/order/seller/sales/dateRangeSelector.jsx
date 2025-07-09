@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import AlertModal from "../../../common/AlertModal.jsx";
 
 function DateRangeSelector({ startDate: initialStartDate, endDate: initialEndDate, onDateChange, onSubmit }) {
     const [startDate, setStartDate] = useState(initialStartDate.toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState(initialEndDate.toISOString().split('T')[0]);
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     useEffect(() => {
         setStartDate(initialStartDate.toISOString().split('T')[0]);
@@ -19,7 +29,8 @@ function DateRangeSelector({ startDate: initialStartDate, endDate: initialEndDat
 
     const handleSubmitClick = () => {
         if (new Date(startDate) > new Date(endDate)) {
-            alert("시작 날짜는 종료 날짜보다 늦을 수 없습니다.");
+            setFormError({message: "시작 날짜는 종료 날짜보다 늦을 수 없습니다.", type: 'error'});
+            setShowError(true);
             return;
         }
         onDateChange(new Date(startDate), new Date(endDate));
@@ -28,6 +39,13 @@ function DateRangeSelector({ startDate: initialStartDate, endDate: initialEndDat
 
     return (
         <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '20px', backgroundColor: '#f9f9f9', display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap' }}>
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <label htmlFor="startDate" style={{ fontWeight: 'bold', color: '#555' }}>기간:</label>
             <input
                 type="date"

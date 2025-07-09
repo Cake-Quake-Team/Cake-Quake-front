@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 // 별점 SVG 아이콘 컴포넌트
 const Star = ({ filled = false }) => (
     <svg
@@ -30,7 +32,7 @@ export default function ReviewForm({ product, points,  temperatureIncrement, val
         }
         // 문자열(URL)이면 그대로
         if (typeof v === 'string' && v) {
-            setPreviewSrc(`http://localhost${v}`);
+            setPreviewSrc(`${S3_BASE_URL}${v}`);
         }
         // null 또는 빈값인 경우
         if (!v) {
@@ -48,7 +50,8 @@ export default function ReviewForm({ product, points,  temperatureIncrement, val
                 {/* 상품 카드 */}
                 <div className="border border-gray-200 rounded-lg p-4 space-y-2">
                     <div className="flex items-center space-x-4">
-                        <img src={product.imageUrl} alt={product.name} className="w-12 h-12 rounded object-cover"/>
+                        <img src={product.imageUrl ? `${S3_BASE_URL}${product.imageUrl}` : '/cakeImage/default-cake.png'}
+                             alt={product.name} className="w-12 h-12 rounded object-cover"/>
                         <div className="flex-1">
                             <p className="font-semibold">{product.name}</p>
                             <p className="text-sm text-gray-500">{product.store}</p>
@@ -75,7 +78,6 @@ export default function ReviewForm({ product, points,  temperatureIncrement, val
                         {previewSrc
                             ? <img
                                 key={previewSrc}
-                                //src={`http://localhost${previewSrc}`}
                                 src={previewSrc}
                                 alt="preview"
                                 className="w-full h-full object-cover rounded-lg"

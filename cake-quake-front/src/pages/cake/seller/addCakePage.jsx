@@ -163,7 +163,7 @@ function CakeAddPage() {
 
             await addCake(formData);
 
-            alert("상품이 성공적으로 등록되었습니다!");
+            setFormError({message: "상품이 성공적으로 등록되었습니다!", type: 'success'});
             navigate(`/shops/${user.shopId}`);
 
         } catch (error) {

@@ -35,10 +35,8 @@ const WithdrawConfirmModal = ({ isOpen, onClose }) => {
             let res
             if (user?.role === 'SELLER') {
                 res = await withdrawSeller() // seller 탈퇴 API
-                console.log("Seller 탈퇴 api 호출")
             } else {
                 res = await withdrawBuyer() // buyer 탈퇴 API
-                console.log("buyer 탈퇴 api 호출")
             }
             setMsg(res.message)
 

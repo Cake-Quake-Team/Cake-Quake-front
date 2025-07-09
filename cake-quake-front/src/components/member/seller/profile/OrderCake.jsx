@@ -5,12 +5,18 @@ const OrderCard = ({ order, type, onActionClick }) => {
     const buttonBgColor = isNew ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-200 hover:bg-gray-300';
     const buttonTextColor = isNew ? 'text-white' : 'text-gray-800';
     const buttonText = isNew ? '주문 확인' : '자세히 보기';
+    const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
     if (!order) return null;
 
     return (
         <div className={`${bgColor} p-6 rounded-lg border ${borderColor} flex items-center shadow-sm`}>
-            <img src={order.cakeImage} alt="케이크 이미지" className="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover mr-4 border border-blue-100" />
+            <img src={order.cakeImage
+                ? (order.cakeImage.startsWith('http')
+                    ? order.cakeImage
+                    : `${S3_BASE_URL}${order.cakeImage}`)
+                : 'https://placehold.co/80x80?text=No+Image'}
+                 alt="케이크 이미지" className="w-20 h-20 md:w-24 md:h-24 rounded-lg object-cover mr-4 border border-blue-100" />
             <div className="flex-grow">
                 {isNew ? (
                     <>

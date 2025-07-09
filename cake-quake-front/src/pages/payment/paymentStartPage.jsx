@@ -7,6 +7,8 @@ import { createPayment } from '../../api/paymentApi'
 import { HiShoppingCart } from 'react-icons/hi'
 import AlertModal from '../../components/common/AlertModal'
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
+
 export default function PaymentStartPage() {
     const [searchParams] = useSearchParams()
     const rawOrderId = searchParams.get('orderId')
@@ -46,19 +48,30 @@ export default function PaymentStartPage() {
     const [provider, setProvider] = useState('KAKAO')
     const mutation = useMutation({
         mutationFn: () => createPayment({ orderId, provider, amount }),
-        onSuccess: ({ redirectUrl, paymentUrl }) => {
+        onSuccess: (data) => {
+            // 전체 응답 찍어보기
+            console.log('🚀 [onSuccess] createPayment 응답:', data);
+
+            const { redirectUrl, paymentUrl } = data;
+
             if (provider === 'KAKAO') {
-                window.location.href = redirectUrl
+                window.location.href = redirectUrl;
             } else {
-                const qrUrl = paymentUrl.replace('/web/mobile', '/web/desktop')
-                window.location.href = qrUrl
+                // paymentUrl이 undefined면 replace 호출 시 에러 발생
+                if (!paymentUrl) {
+                    console.error('❗️ paymentUrl이 없습니다:', data);
+                    showAlert('결제 URL이 없습니다. 관리자에게 문의하세요.');
+                    return;
+                }
+                const qrUrl = paymentUrl.replace('/web/mobile', '/web/desktop');
+                window.location.href = qrUrl;
             }
         },
         onError: err => {
-            console.error('결제 시작 실패', err)
-            showAlert('결제 시작에 실패했습니다.')
+            console.error('결제 시작 실패', err);
+            showAlert('결제 시작에 실패했습니다.');
         }
-    })
+    });
 
     if (!orderId || !amount) {
         return <Navigate to="/" replace />
@@ -114,7 +127,7 @@ export default function PaymentStartPage() {
                                 >
                                     <div className="flex items-center">
                                         <img
-                                            src={item.thumbnailImageUrl}
+                                            src={item.thumbnailImageUrl ? `${S3_BASE_URL}${item.thumbnailImageUrl}` : '/cakeImage/default-cake-image.jpg'}
                                             alt={item.cname}
                                             className="w-12 h-12 rounded mr-3 object-cover"
                                         />

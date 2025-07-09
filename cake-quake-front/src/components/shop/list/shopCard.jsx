@@ -1,16 +1,16 @@
 import React from 'react';
 
 const DEFAULT_IMAGE='/shop_default_image.png';
-
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
 
 const ShopCard = ({ shop }) => {
 
     const {shopName, address,thumbnailUrl,rating} =shop;
-    console.log("받아온 thumbnailImageUrl:", thumbnailUrl);
 
 
-    const imgSrc = thumbnailUrl ? thumbnailUrl : DEFAULT_IMAGE;
+    const imgSrc = thumbnailUrl ? `${S3_BASE_URL}${thumbnailUrl}`
+        : DEFAULT_IMAGE;
 
     const numericRating = parseFloat(rating);
 
@@ -44,7 +44,7 @@ const ShopCard = ({ shop }) => {
         <div className="bg-white p-6 rounded-3xl interactive-card">
         <div className="relative w-full h-48 overflow-hidden">
                 <img
-                    src={`http://localhost/${imgSrc}`}
+                    src={imgSrc}
                     alt={shopName}
                     className="w-full h-full object-cover transform transition-transform duration-300 hover:scale-105"
                     onError={(e) => {

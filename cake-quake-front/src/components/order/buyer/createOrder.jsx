@@ -14,7 +14,8 @@ import OrderPaymentSummary from './createorderdetails/OrderPaymentSummary';
 
 // getItemDetails 유틸리티 함수 임포트
 import { getItemDetails } from '../../../utils/itemDetailsUtils';
-import CompleteOrderModal from "./completeOrderModal.jsx"; //
+import CompleteOrderModal from "./completeOrderModal.jsx";
+import AlertModal from "../../common/AlertModal.jsx"; //
 
 const CreateOrder = () => {
     const navigate = useNavigate();
@@ -43,6 +44,15 @@ const CreateOrder = () => {
     const [showOrderSuccessModal, setShowOrderSuccessModal] = useState(false);
     const [orderSuccessModalMessage, setOrderSuccessModalMessage] = useState('');
     const [completedOrderId, setCompletedOrderId] = useState(null); // 완료된 주문 ID 저장
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     let initialShopIdFromProps = null;
     if (orderItemsFromSource && orderItemsFromSource.length > 0) {
@@ -131,19 +141,23 @@ const CreateOrder = () => {
         e.preventDefault();
 
         if (!orderItemsFromSource || orderItemsFromSource.length === 0) {
-            alert("주문할 상품이 없습니다.");
+            setFormError({message: "주문할 상품이 없습니다.", type: 'error'});
+            setShowError(true);
             return;
         }
         if (!selectedDate || !selectedTime) {
-            alert("픽업 날짜와 시간을 선택해주세요.");
+            setFormError({message: "픽업 날짜와 시간을 선택해주세요.", type: 'error'});
+            setShowError(true);
             return;
         }
         if (!finalShopId) {
-            alert("픽업 매장을 선택해주세요.");
+            setFormError({message: "픽업 매장을 선택해주세요.", type: 'error'});
+            setShowError(true);
             return;
         }
         if (finalPaymentPrice < 0) {
-            alert("결제 금액이 0원 미만이 될 수 없습니다. 포인트 사용을 조절해주세요.");
+            setFormError({message: "결제 금액이 0원 미만이 될 수 없습니다. 포인트 사용을 조절해주세요.", type: 'error'});
+            setShowError(true);
             return;
         }
 
@@ -185,7 +199,6 @@ const CreateOrder = () => {
             usedPoints: discountAmount,
         };
 
-        console.log("전송될 payload:", payload);
 
         try {
             const responseData = await createOrder(payload);
@@ -207,20 +220,19 @@ const CreateOrder = () => {
 
         } catch (error) {
             console.error("주문 생성 실패 (catch 블록 진입):", error);
-            console.log("Full error object from catch:", error);
 
             if (error.response) {
                 const errorMessage = error.response.data.message || error.response.data.detail || '알 수 없는 서버 오류';
                 if (errorMessage.includes("휴무일") || errorMessage.includes("슬롯이 가득 찼습니다") || errorMessage.includes("픽업 시간 슬롯 부족") || errorMessage.includes("픽업일은 매장의 휴무일") || errorMessage.includes("영업 시간 범위 밖입니다")) {
-                    alert(`예약 불가능: ${errorMessage}\n다른 날짜 또는 시간을 선택해주세요.`);
+                    setFormError(`예약 불가능: ${errorMessage}\n다른 날짜 또는 시간을 선택해주세요.`);
                 } else if (errorMessage.includes("보유 포인트") || errorMessage.includes("포인트 사용량") || errorMessage.includes("포인트 부족")) {
-                    alert(`포인트 사용 오류: ${errorMessage}`);
+                    setFormError(`포인트 사용 오류: ${errorMessage}`);
                 }
                 else {
-                    alert(`주문 처리 중 오류가 발생했습니다: [${error.response.status}] ${errorMessage}`);
+                    setFormError(`주문 처리 중 오류가 발생했습니다: [${error.response.status}] ${errorMessage}`);
                 }
             } else if (error.request) {
-                alert("네트워크 오류가 발생했습니다. 주문 내역에서 주문 상태를 확인해주세요.");
+                setFormError("네트워크 오류가 발생했습니다. 주문 내역에서 주문 상태를 확인해주세요.");
             }
         }
     };
@@ -236,6 +248,13 @@ const CreateOrder = () => {
             gap: '20px',
             flexWrap: 'wrap'
         }}>
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             {/* 픽업 스케줄러 컴포넌트 */}
             <OrderPickupScheduler
                 initialPickupDateFromState={initialPickupDateFromState}

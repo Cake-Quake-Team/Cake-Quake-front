@@ -19,7 +19,6 @@ const SellerShopDetail = ({ className }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
 
-    console.log("user 상태 확인", user);
 
     useEffect(() => {
         const fetchMyShopData = async () => {
@@ -36,7 +35,6 @@ const SellerShopDetail = ({ className }) => {
             try {
                 // user.shopId를 사용하여 getShopDetail API 호출
                 const response = await getShopDetail(user.shopId);
-                console.log("API 응답 데이터:", response);
 
                 // API 응답 데이터가 실제 매장 상세 정보라고 가정합니다.
                 setShopDetail({

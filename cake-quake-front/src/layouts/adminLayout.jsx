@@ -69,7 +69,7 @@ export default function AdminLayout() {
                                 }`}
                             >
                                 <span>승인 관리</span>
-                                {isActive("/admin/sellers/pending")}
+                                {isActive("/admin")}
                             </Link>
 
                             <div className="text-sm font-semibold text-gray-500 mt-4 mb-2">리뷰 관리</div>

@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { getLikedCakeItems } from '../../../api/likeApi'; // 찜한 케이크 상품 API
 import { useAuth } from '../../../store/AuthContext'; // 사용자 인증 정보 훅
-import { useNavigate } from 'react-router'; // 페이지 이동 훅
+import { useNavigate } from 'react-router';
+import AlertModal from "../../../components/common/AlertModal.jsx"; // 페이지 이동 훅
 
 const LikedItemsPage = () => {
     const { user } = useAuth(); // 현재 로그인된 사용자 정보
@@ -10,11 +11,21 @@ const LikedItemsPage = () => {
     const [likedItems, setLikedItems] = useState([]); // 찜한 상품 목록 상태
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태
     const [error, setError] = useState(null); // 에러 상태
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     useEffect(() => {
         const fetchLikedItems = async () => {
             if (!user || !user.userId) {
-                alert("로그인이 필요합니다.");
+                setFormError({message: "로그인이 필요합니다.", type: 'error'});
+                setShowError(true);
                 navigate('/login'); // 로그인하지 않았다면 로그인 페이지로 리다이렉트
                 return;
             }
@@ -36,7 +47,8 @@ const LikedItemsPage = () => {
         if (shopId && cakeItemId) {
             navigate(`/buyer/shops/${shopId}/cakes/read/${cakeItemId}`);
         } else {
-            alert("상품 정보를 불러올 수 없습니다. 다시 시도해주세요.");
+            setFormError({message: "상품 정보를 불러올 수 없습니다. 다시 시도해주세요.", type: 'error'});
+            setShowError(true);
             console.error("Missing shopId or cakeItemId for navigation:", shopId, cakeItemId);
         }
     };
@@ -47,6 +59,13 @@ const LikedItemsPage = () => {
 
     return (
         <div className="container mx-auto p-4">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <h1 className="text-2xl font-bold mb-4">찜한 케이크 상품</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {likedItems.map(item => (

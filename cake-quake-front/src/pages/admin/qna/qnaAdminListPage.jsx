@@ -44,7 +44,6 @@ export default function QnAAdminListPage() {
         else if (status)payload = await listQnAByStatus(status,   { page: p, size });
         else if (role)  payload = await listQnAByAuthorRole(role, { page: p, size });
         else            payload = await listAllQnA({ page: p, size });
-        console.log('QnA payload:', payload);
         setItems(p === 1
             ? payload.content
             : prev => [...prev, ...payload.content]

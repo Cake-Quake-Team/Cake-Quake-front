@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 
-const BASE_URL = "http://localhost/"; // 필요 시 .env 로 분리 가능
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
 
 const ShopImageGallery = ({ images }) => {
     const [mainImage, setMainImage] = useState(null);
@@ -8,7 +8,7 @@ const ShopImageGallery = ({ images }) => {
     useEffect(() => {
         if (images && images.length > 0) {
             const thumbnail = images.find(img => img.isThumbnail);
-            setMainImage(thumbnail ? `${BASE_URL}${thumbnail.shopImageUrl}` : `${BASE_URL}${images[0].shopImageUrl}`);
+            setMainImage(thumbnail ? `${S3_BASE_URL}${thumbnail.shopImageUrl}` : `${S3_BASE_URL}${images[0].shopImageUrl}`);
         } else {
             setMainImage(null);
         }
@@ -31,7 +31,7 @@ const ShopImageGallery = ({ images }) => {
             )}
             <div className="flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
                 {images.map((img, index) => {
-                    const fullUrl = `${BASE_URL}${img.shopImageUrl}`;
+                    const fullUrl = `${S3_BASE_URL}${img.shopImageUrl}`;
                     return (
                         <img
                             key={img.shopImageId || index}

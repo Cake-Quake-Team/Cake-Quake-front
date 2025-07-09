@@ -3,6 +3,7 @@ import { getSellerOrderList } from '../../../../api/sellerOrderApi'; // API 경�
 import { useAuth } from '../../../../store/AuthContext.jsx'; // useAuth 훅 경로 확인
 import OrderCard from "./OrderCake.jsx"; // OrderCard 컴포넌트 임포트 (이름이 OrderCake.jsx이므로)
 import { useNavigate } from 'react-router';
+import AlertModal from "../../../common/AlertModal.jsx";
 
 const OrderManagementSection = ({ onViewOrderDetails }) => {
     const [managedOrders, setManagedOrders] = useState([]);
@@ -11,6 +12,15 @@ const OrderManagementSection = ({ onViewOrderDetails }) => {
     const { user } = useAuth(); // useAuth 훅을 사용하여 user 객체 가져오기
     const navigate = useNavigate();
     const shopId = user?.shopId; // user 객체에서 sellerShopId 가져오기
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     // ⭐ 주문 상태를 한국어로 매핑하는 객체 (필요시) ⭐
     const orderStatusMap = {
@@ -109,12 +119,20 @@ const OrderManagementSection = ({ onViewOrderDetails }) => {
         if (shopId) {
             navigate(`/shops/${shopId}/orders`);
         } else {
-            alert("상점 ID를 알 수 없어 전체 주문 목록 페이지로 이동할 수 없습니다.");
+            setFormError({message: "상점 ID를 알 수 없어 전체 주문 목록 페이지로 이동할 수 없습니다.", type: 'error'});
+            setShowError(true);
         }
     };
 
     return (
         <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             {/* 헤더: 왼쪽 제목, 오른쪽 버튼 그룹 */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-gray-800">주문 관리</h2>

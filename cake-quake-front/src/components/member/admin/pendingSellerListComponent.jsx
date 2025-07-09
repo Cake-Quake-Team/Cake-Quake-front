@@ -1,5 +1,6 @@
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import LoadingSpinner from "../../common/loadingSpinner";
+import AlertModal from "../../common/AlertModal.jsx";
 
 
 const PendingSellerListComponent = ({
@@ -22,6 +23,15 @@ const PendingSellerListComponent = ({
 }) => {
 
     const [openRowId, setOpenRowId] = useState(null);
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     const toggleRow = (id) => {
         setOpenRowId((prev) => (prev === id ? null : id));
@@ -29,6 +39,13 @@ const PendingSellerListComponent = ({
 
     return (
         <div>
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <div className="w-full flex justify-end">
                 {/* 우측: 필터 버튼들 */}
                 <div className="flex items-center space-x-2">
@@ -184,7 +201,8 @@ const PendingSellerListComponent = ({
                                                         if (fileUrl) {
                                                             window.open(`${basePath}${fileUrl}`, "_blank")
                                                         } else {
-                                                            alert("파일이 없습니다.")
+                                                            setFormError({message: "파일이 없습니다.", type: 'error'});
+                                                            setShowError(true);
                                                         }
 
                                                         // 선택 초기화 (선택 후 자동 초기화되도록)

@@ -103,7 +103,6 @@ function NotificationBell() {
         try {
             await deleteNotification(notificationId);
             setNotifications(prev => prev.filter(n => n.id !== notificationId));
-            console.log(`알림 (ID: ${notificationId}) 삭제 성공`);
         } catch (error) {
             console.error(`알림 (ID: ${notificationId}) 삭제 실패`, error);
             setFormError({message: "알림 삭제에 실패했습니다.", type: 'error'});

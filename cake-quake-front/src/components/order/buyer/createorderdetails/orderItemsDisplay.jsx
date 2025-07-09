@@ -3,6 +3,8 @@
 import React from 'react';
 import { getItemDetails } from '../../../../utils/itemDetailsUtils';
 
+const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL
+
 const OrderItemsDisplay = ({ orderItems }) => {
     return (
         <div style={{ marginBottom: '20px', padding: '15px', border: '1px solid #cce5ff', borderRadius: '8px', backgroundColor: '#e6f7ff' }}>
@@ -21,7 +23,7 @@ const OrderItemsDisplay = ({ orderItems }) => {
                             paddingBottom: '10px'
                         }}>
                             <img
-                                src={thumbnail || '/default-cake.png'}
+                                src={thumbnail ? `${S3_BASE_URL}${thumbnail}` : '/cakeImage/default-cake.png'}
                                 alt={name}
                                 style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', marginRight: '10px' }}
                             />

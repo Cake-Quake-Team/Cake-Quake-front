@@ -23,18 +23,14 @@ const ShopList = ({ filter, sort, keyword }) => { // props로 filter, sort, keyw
     const fetchShops = useCallback(async () => {
         // 이미 로딩 중이거나 더 이상 가져올 데이터가 없으면 함수 실행 중단
         if (loading || !hasMore) {
-            console.log("로딩 중이거나 더 이상 데이터가 없습니다. 요청 스킵.");
             return;
         }
 
         setLoading(true); // 로딩 시작
-        console.log(`[ShopList] 페이지 ${page} 데이터 가져오는 중...`);
-        console.log(`[ShopList] 현재 필터: ${filter}, 정렬: ${sort}, 키워드: ${keyword}`);
 
         try {
             // API 호출 시 props로 받은 filter, sort, keyword 및 내부 page 상태 사용
             const responseData = await getShopListInfinity({ page, size: 8, keyword, filter, sort });
-            console.log("[ShopList] API 응답 데이터:", responseData);
 
             const fetchedContent = responseData.content || [];
             const newHasNext = responseData.hasNext; // 백엔드 응답에서 hasNext 필드 사용
@@ -63,7 +59,6 @@ const ShopList = ({ filter, sort, keyword }) => { // props로 filter, sort, keyw
     useEffect(() => {
         // 현재 props의 값과 이전 useRef에 저장된 값을 비교
         if (prevFilter.current !== filter || prevSort.current !== sort || prevKeyword.current !== keyword) {
-            console.log("필터/정렬/키워드 변경 감지. 매장 목록 초기화 및 재로드 시작.");
             setShopList([]);       // 매장 목록 초기화
             setPage(0);            // 페이지 초기화
             setHasMore(true);      // 더 불러올 데이터 있음으로 설정
@@ -82,7 +77,6 @@ const ShopList = ({ filter, sort, keyword }) => { // props로 filter, sort, keyw
         const observer = new IntersectionObserver((entries) => {
             // 마지막 요소가 뷰포트에 들어왔고, 더 불러올 데이터가 있으며, 현재 로딩 중이 아닐 때
             if (entries[0].isIntersecting && hasMore && !loading) {
-                console.log("[ShopList] 마지막 요소 감지. fetchShops 호출.");
                 fetchShops(); // 데이터 가져오기 함수 호출
             }
         }, {
@@ -106,7 +100,6 @@ const ShopList = ({ filter, sort, keyword }) => { // props로 filter, sort, keyw
     useEffect(() => {
         // shopList가 비어있고, 로딩 중이 아니며, 더 가져올 데이터가 남아있고, 페이지가 0일 때 (새로운 검색의 시작)
         if (shopList.length === 0 && !loading && hasMore && page === 0) {
-            console.log("[ShopList] 초기 데이터 또는 새로운 검색 데이터 로드 시작.");
             fetchShops();
         }
     }, [shopList.length, loading, hasMore, page, fetchShops]); // shopList.length, page도 의존성에 추가

@@ -7,6 +7,7 @@ import TimeSelectionModal from "./timeSelectionModal.jsx";
 import { useNavigate } from "react-router";
 // 아이콘 추가 (선택 사항: lucide-react 또는 react-icons에서 필요한 아이콘 import)
 import { Calendar as CalendarIcon, MapPin, Clock, ArrowRight } from 'lucide-react';
+import AlertModal from "../common/AlertModal.jsx";
 
 
 function PickupScheduler({ onComplete }) {
@@ -21,10 +22,19 @@ function PickupScheduler({ onComplete }) {
     const [hasMore, setHasMore] = useState(true);
     const [loadingShops, setLoadingShops] = useState(false);
     const [shopError, setShopError] = useState(null);
+    const [formError, setFormError] = useState(null);
+    const [showError, setShowError] = useState(false);
 
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [isShopSelectorOpen, setIsShopSelectorOpen] = useState(false);
     const [isTimeSelectorOpen, setIsTimeSelectorOpen] = useState(false);
+
+    useEffect(() => {
+        if (showError) {
+            const timer = setTimeout(() => setShowError(false), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [showError]);
 
     // Effect to fetch shops when date changes or page changes
     useEffect(() => {
@@ -123,7 +133,8 @@ function PickupScheduler({ onComplete }) {
             navigate(`/buyer/shops/${selectedShop.shopId}`); // 매장 상세 조회 화면으로 이동
 
         } else {
-            alert("날짜, 매장, 시간을 모두 선택해주세요.");
+            setFormError({message: "날짜, 매장, 시간을 모두 선택해주세요.", type: 'error'});
+            setShowError(true);
         }
     };
 
@@ -150,6 +161,13 @@ function PickupScheduler({ onComplete }) {
     return (
         // max-w-4xl -> max-w-6xl 로 변경하여 가로 폭을 넓힙니다.
         <div className="p-5 font-pretendard max-w-6xl mx-auto my-2">
+            {showError && formError && (
+                <AlertModal
+                    message={formError.message}
+                    type={formError.type || "error"}
+                    show={showError}
+                />
+            )}
             <div className="mb-8 p-6 bg-gray-50 rounded-xl border border-gray-200 flex flex-col gap-6">
                 <h2 className="font-semibold text-gray-800 mb-2">픽업 스케줄 조회</h2>
 
