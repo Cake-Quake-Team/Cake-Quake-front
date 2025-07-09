@@ -168,7 +168,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
     }, [showError]);
 
     return (
-        <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto my-8">
+        <div className="flex flex-col border border-gray-400 items-center p-6 bg-white rounded-lg shadow-md max-w-2xl mx-auto my-8">
             {showError && formError && (
                 <AlertModal
                     message={formError.message}
@@ -176,7 +176,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                     show={showError}
                 />
             )}
-            <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-gray-300 pb-2 w-full text-center">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b-1 border-gray-800 pb-2 w-full text-center">
                 옵션 {isEditMode ? '수정' : '상세 조회'}
             </h2>
 
@@ -188,11 +188,11 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                             type="text"
                             value={optionType}
                             onChange={handleOptionTypeChange}
-                            className="bg-white border border-gray-300 rounded-md p-3 text-lg text-gray-800 focus:border-blue-400 focus:ring-1"
+                            className="bg-white border border-gray-400 rounded-md p-3 text-lg text-gray-800 focus:border-blue-400 focus:ring-1"
                             placeholder="옵션 타입을 입력하세요"
                         />
                     ) : (
-                        <div className="bg-gray-50 border border-gray-200 rounded-md p-3 text-lg text-gray-800">
+                        <div className="bg-gray-100 border border-gray-400 rounded-md p-3 text-lg text-gray-800">
                             {optionType}
                         </div>
                     )}
@@ -201,31 +201,31 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                 {/* 필수 선택 여부 */}
                 <div className="flex flex-col">
                     <label className="text-xl text-gray-700 mb-2">필수 선택 여부</label>
-                    <div className="flex items-center space-x-6 bg-gray-50 border border-gray-200 rounded-md p-3">
+                    <div className="flex items-center space-x-6 bg-gray-100 border border-gray-400 rounded-md p-3">
                         <input
                             type="checkbox"
                             checked={isRequired}
                             onChange={handleIsRequiredChange} // 변경된 핸들러
                             readOnly={!isEditMode}
-                            className={`h-5 w-5 text-blue-600 border-gray-300 rounded ${isEditMode ? 'cursor-pointer focus:ring-blue-500' : 'cursor-not-allowed opacity-70'}`}
+                            className={`h-5 w-5 text-blue-600 border-gray-400 rounded ${isEditMode ? 'cursor-pointer focus:ring-blue-500' : 'cursor-not-allowed opacity-70'}`}
                         />
                         <span className="text-lg text-gray-800">선택필수</span>
                         <div className="flex items-center space-x-2 ml-auto">
-                            <label className="text-lg text-gray-800">최소:</label>
+                            <label className="text-lg text-gray-800">최소 :</label>
                             <input
                                 type="number"
                                 value={minSelection}
                                 onChange={handleMinSelectionChange} // 변경된 핸들러
                                 readOnly={!isEditMode}
-                                className={`w-16 p-1 border border-gray-300 rounded-md text-center text-lg bg-white ${isEditMode ? 'focus:border-blue-400 focus:ring-1' : 'opacity-70 cursor-not-allowed'}`}
+                                className={`w-16 p-1 border border-gray-400 rounded-md text-center text-lg bg-white ${isEditMode ? 'focus:border-blue-400 focus:ring-1' : 'opacity-70 cursor-not-allowed'}`}
                             />
-                            <label className="text-lg text-gray-800">최대:</label>
+                            <label className="text-lg text-gray-800">최대 :</label>
                             <input
                                 type="number"
                                 value={maxSelection}
                                 onChange={handleMaxSelectionChange} // 변경된 핸들러
                                 readOnly={!isEditMode}
-                                className={`w-16 p-1 border border-gray-300 rounded-md text-center text-lg bg-white ${isEditMode ? 'focus:border-blue-400 focus:ring-1' : 'opacity-70 cursor-not-allowed'}`}
+                                className={`w-16 p-1 border border-gray-400 rounded-md text-center text-lg bg-white ${isEditMode ? 'focus:border-blue-400 focus:ring-1' : 'opacity-70 cursor-not-allowed'}`}
                             />
                         </div>
                     </div>
@@ -237,13 +237,13 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                 {/* isUsed 체크박스 */}
                 <div className="flex flex-col">
                     <label className="text-xl text-gray-700 mb-2">사용 여부</label>
-                    <div className="flex items-center space-x-6 bg-gray-50 border border-gray-200 rounded-md p-3">
+                    <div className="flex items-center space-x-6 bg-gray-100 border border-gray-400 rounded-md p-3">
                         <input
                             type="checkbox"
                             checked={isUsed}
                             onChange={handleIsUsedChange} // 새로운 핸들러
                             readOnly={!isEditMode}
-                            className={`h-5 w-5 text-blue-600 border-gray-300 rounded ${isEditMode ? 'cursor-pointer focus:ring-blue-500' : 'cursor-not-allowed opacity-70'}`}
+                            className={`h-5 w-5 text-blue-600 border-gray-400 rounded ${isEditMode ? 'cursor-pointer focus:ring-blue-500' : 'cursor-not-allowed opacity-70'}`}
                         />
                         <span className="text-lg text-gray-800">사용</span>
                     </div>
@@ -252,7 +252,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                 {/* 옵션 항목 목록 */}
                 <div className="flex flex-col">
                     <label className="text-xl text-gray-700 mb-2">옵션 항목</label>
-                    <div className="border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-200">
+                    <div className="border border-gray-400 rounded-lg overflow-hidden divide-y divide-gray-200">
                         {optionItems && optionItems.length > 0 ? (
                             optionItems.map((item, index) => (
                                 <div key={String(item.optionItemId || `new-${index}`)} className="flex justify-between items-center py-3 px-4 bg-white hover:bg-gray-50">
@@ -262,7 +262,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                                                 type="text"
                                                 value={item.optionName}
                                                 onChange={(e) => handleOptionItemChange(index, 'optionName', e.target.value)}
-                                                className="flex-grow mr-4 p-1 border border-gray-300 rounded-md text-lg text-gray-800 focus:border-blue-400 focus:ring-1"
+                                                className="flex-grow mr-4 p-1 border border-gray-400 rounded-md text-lg text-gray-800 focus:border-blue-400 focus:ring-1"
                                                 placeholder="옵션명"
                                             />
                                             <input
@@ -280,7 +280,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                                                         handleOptionItemChange(index, 'price', numeric);
                                                     }
                                                 }}
-                                                className="w-28 p-1 border border-gray-300 rounded-md text-lg text-gray-600 text-right focus:border-blue-400 focus:ring-1"
+                                                className="w-28 p-1 border border-gray-400 rounded-md text-lg text-gray-600 text-right focus:border-blue-400 focus:ring-1"
                                                 placeholder="가격"
                                             />
                                             <span className="ml-1 text-lg text-gray-600 min-w-[25px]">원</span>
@@ -307,7 +307,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
                             <p className="text-md text-gray-500 p-4 text-center bg-white">등록된 옵션 항목이 없습니다.</p>
                         )}
                         {isEditMode && (
-                            <div className="p-3 bg-white border-t border-gray-200">
+                            <div className="p-3 bg-white border-t border-gray-400">
                                 <button
                                     className="w-full text-left text-blue-500 font-medium py-2 px-3 rounded-md hover:bg-blue-50 transition-colors duration-150 flex items-center"
                                     onClick={handleAddOptionItem}
@@ -324,7 +324,7 @@ function OptionDetail({ initialOptionTypeData, onDeleteClick, onEditClick, isEdi
             <div className="mt-8 flex justify-center space-x-4 w-full">
                 <button
                     onClick={() => onDeleteClick(isEditMode ? optionTypeData : undefined)}
-                    className="w-1/3 py-3 px-4 border border-gray-300 rounded-md text-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                    className="w-1/3 py-3 px-4 border border-gray-400 rounded-md text-lg font-semibold text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                 >
                     {isEditMode ? '취소' : '삭제'}
                 </button>
