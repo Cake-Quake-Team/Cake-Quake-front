@@ -24,9 +24,7 @@ export default function ReviewCard({ review, onClick }) {
     }
 
     // 이미지 URL (절대경로/상대경로 모두 대응), 없으면 public/cakeImage/default-cake.png 사용
-    const imgSrc = reviewPictureUrl
-        ? `${reviewPictureUrl}`
-        : '/cakeImage/default-cake.png';
+    const imgSrc = reviewPictureUrl ?? '/cakeImage/default-cake.png';
 
 
     return (
