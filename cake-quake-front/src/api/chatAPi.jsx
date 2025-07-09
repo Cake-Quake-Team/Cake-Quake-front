@@ -1,6 +1,6 @@
 import jwtAxios from "../utils/jwtUtil.js";
 
-const prefix = "/api/v1";
+const prefix = import.meta.env.VITE_API_BASE_URL
 
 // 채팅방 생성 또는 조회
 export const createOrGetChatRoom = async ({ sellerUid, buyerUid, shopId }) => {
