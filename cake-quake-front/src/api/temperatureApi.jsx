@@ -5,7 +5,7 @@ const prefix = import.meta.env.VITE_API_BASE_URL
 //온도 조회
 export const getTemperature=async (uid)=>{
     console.log("getTemperature 요청 - UID:", uid);
-    const {data} = await jwtAxios.get(`${prefix}/${uid}`);
+    const {data} = await jwtAxios.get(`${prefix}/temperature/${uid}`);
     console.log("getTemperature 응답 : ",data);
     return data;
 };
@@ -13,7 +13,7 @@ export const getTemperature=async (uid)=>{
 //이력 조회
 export const getTemperatureHistory=async ({uid,page = 1, size = 10}) => {
     console.log("getTemperatureHistory 요청 - UID:", uid);
-    const {data} = await jwtAxios.get(`${prefix}/${uid}/histories`, {
+    const {data} = await jwtAxios.get(`${prefix}/temperature/${uid}/histories`, {
         params: {page, size},
     });
     console.log("📥 getPointHistory 응답:", data.content, "hasNext:", data.hasNext);
