@@ -216,7 +216,7 @@ function BuyerCakeReadPage() {
     const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL;
     const thumbnailUrl =
         cake && cake.cakeDetailDTO && cake.cakeDetailDTO.thumbnailImageUrl
-            ? S3_BASE_URL + cake.cakeDetailDTO.thumbnailImageUrl
+            ? `${S3_BASE_URL}${cake.cakeDetailDTO.thumbnailImageUrl}`
             : "기본_이미지_경로.png";
 
     return (

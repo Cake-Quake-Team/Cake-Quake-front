@@ -35,12 +35,16 @@ export default function ReviewDetail({
                     <img
                         src={
                             review.reviewPictureUrl
-                                ? `${S3_BASE_URL}${review.reviewPictureUrl}`
+                                ? `${review.reviewPictureUrl}`
                                 : '/cakeImage/default-cake.png'
                         }
                         alt={`리뷰 이미지 ${review.reviewId}`}
                         loading="lazy"
                         className="rounded object-contain max-w-full max-h-96"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = '/cakeImage/default-cake.png';
+                        }}
                     />
                 </div>
             )}
