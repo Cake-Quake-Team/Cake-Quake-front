@@ -38,11 +38,6 @@ export default function CreateOrderPage() {
         }
     }, [itemsToOrder, navigate]);
 
-    if (!user || !user.userId) {
-        alert("로그인이 필요합니다.");
-        navigate('/login');
-        return null;
-    }
 
     if (!itemsToOrder || itemsToOrder.length === 0) {
         return <div className="text-center p-8 text-gray-500">주문할 상품 정보가 없습니다.</div>;

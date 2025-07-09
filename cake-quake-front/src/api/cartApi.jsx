@@ -51,7 +51,7 @@ export const removeCartItem = async (cartItemId) => {
 };
 
 
-// (선택) 여러 아이템 한 번에 삭제(일단 지웠음)
+// 여러 아이템 한 번에 삭제
 export const removeAllCartItems = async () => {
     const res = await jwtAxios.delete(`${baseUrl}/buyer/cart`, {
         data: { }
