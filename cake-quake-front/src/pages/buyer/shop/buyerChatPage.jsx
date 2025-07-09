@@ -57,7 +57,6 @@ const BuyerChatPage = () => {
 
         const messagePayload = {
             roomId: roomId,
-            senderUid: user.uid,
             message: input
         };
 
