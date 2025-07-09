@@ -1,7 +1,6 @@
 import jwtAxios from "../utils/jwtUtil.js";
 
-export const API_SERVER_HOST = "http://localhost:8080";
-const prefix = `${ API_SERVER_HOST }/api/v1`;
+const prefix = import.meta.env.VITE_API_BASE_URL
 
 // 1. 달력에서 날짜 선택 (예: 2025-06-25) 후, 특정 매장의 가능한 시간 조회
 export const getAvailableTimes = async (shopId, date) =>{

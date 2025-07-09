@@ -1,7 +1,6 @@
 import jwtAxios from "../utils/jwtUtil.js";
 
-export const API_SERVER_HOST = "http://localhost:8080";
-const prefix = `${API_SERVER_HOST}/api/temperature`;
+const prefix = import.meta.env.VITE_API_BASE_URL
 
 //온도 조회
 export const getTemperature=async (uid)=>{

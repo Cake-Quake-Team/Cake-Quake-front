@@ -1,6 +1,6 @@
 import React from 'react';
 
-const DEFAULT_IMAGE='/shop_default_image.jpeg';
+const DEFAULT_IMAGE='/shop_default_image.png';
 
 
 

@@ -6,7 +6,7 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
 const DEFAULT_IMAGE = '/cakeImage/default-cake.png';
-const DEFAULT_SHOP_THUMBNAIL = '/shop_default_image.jpeg';
+const DEFAULT_SHOP_THUMBNAIL = '/shop_default_image.png';
 
 const SampleNextArrow = (props) => {
     const { className, style, onClick } = props;
